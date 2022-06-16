@@ -81,6 +81,77 @@ packages:
           DESTDIR: '@THIS_COLLECT_DIR@'
       - args: ['ln', '-s', 'flex', '@THIS_COLLECT_DIR@/usr/bin/lex']
 
+  - name: gcc
+    from_source: gcc
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - gmp
+      - mpfr
+      - mpc
+      - zlib
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--target=@OPTION:arch-triple@'
+        - '--with-sysroot=/'
+        - '--with-build-sysroot=@SYSROOT_DIR@'
+        - '--enable-languages=c,c++'
+        - '--enable-initfini-array'
+        - '--disable-multilib'
+        - '--disable-nls'
+        - '--enable-lto'
+        - '--with-system-zlib'
+        - '--enable-libstdcxx-filesystem-ts'
+        # - '--disable-dependency-tracking'
+        # -g blows up GCC's binary size.
+        - 'CFLAGS=-O2'
+        - 'CXXFLAGS=-O2'
+    build:
+      - args: ['make', 'all-gcc', 'all-target-libgcc', 'all-target-libstdc++-v3', 'all-target-libsanitizer', '-j@PARALLELISM@']
+      - args: ['make', 'install-gcc', 'install-target-libgcc', 'install-target-libstdc++-v3', 'install-target-libsanitizer']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+        quiet: true
+      - args: ['ln', '-sf', 'gcc', '@THIS_COLLECT_DIR@/usr/bin/cc']
+
+  - name: gdb
+    source:
+      subdir: 'ports'
+      git: 'https://sourceware.org/git/binutils-gdb.git'
+      tag: 'gdb-9.2-release'
+      version: '9.2'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['cp',
+            '@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.sub',
+            '@THIS_SOURCE_DIR@/']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - readline
+      - zlib
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-nls'
+        #- '--with-python=/usr/bin/python3'
+        - '--with-system-readline'
+        - '--with-system-zlib'
+        - '--enable-gdbserver=no'
+        #- '--with-intel-pt'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'DESTDIR=@THIS_COLLECT_DIR@', '-C', 'gdb', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
   - name: m4
     source:
       subdir: 'ports'

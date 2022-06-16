@@ -73,11 +73,6 @@ sources:
     git: "https://github.com/gcc-mirror/gcc.git"
     tag: "releases/gcc-11.2.0"
     version: "11.2.0"
-    tools_required:
-      - cross-automake-v1.15
-    regenerate:
-      - args: ["./contrib/download_prerequisites"]
-        workdir: "@THIS_SOURCE_DIR@"
 
   - name: linux
     subdir: ports
