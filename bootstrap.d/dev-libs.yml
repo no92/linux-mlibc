@@ -30,6 +30,42 @@ packages:
           DESTDIR: '@THIS_COLLECT_DIR@'
         quiet: true
 
+  - name : mpfr
+    source:
+      subdir: 'ports'
+      url: 'https://ftp.gnu.org/gnu/mpfr/mpfr-4.1.0.tar.xz'
+      format: 'tar.xz'
+      extract_path: 'mpfr-4.1.0'
+      version: '4.1.0'
+      tools_required:
+        - cross-autoconf-archive
+        - cross-toolchain
+      regenerate:
+        - args: ['autoreconf', '-v', '-f', '-i', '--warnings=all,error']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - gmp
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--enable-static=no'
+        - '--enable-shared=yes'
+        - '--docdir=/usr/share/doc/mpfr-4.0.2'
+        - '--with-pic'
+        environ:
+          # MPFR's configuration script misdetects cross-compilations. Hence,
+          # set one of its internal variables to force it into the cross compilation path.
+          'user_redefine_cc': 'yes'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+        quiet: true
+
   - name: openssl
     source:
       subdir: ports
