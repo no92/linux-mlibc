@@ -1,0 +1,55 @@
+From a5c6cc303ddacf989abb557048b26500c9336daa Mon Sep 17 00:00:00 2001
+From: no92 <no92.mail@gmail.com>
+Date: Fri, 17 Jun 2022 00:08:04 +0200
+Subject: [PATCH] Add managarm-specific changes
+
+---
+ Configurations/10-main.conf | 4 ++++
+ crypto/mem_sec.c            | 2 +-
+ crypto/rand/rand_unix.c     | 2 +-
+ 3 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/Configurations/10-main.conf b/Configurations/10-main.conf
+index 61c6689a..17f05872 100644
+--- a/Configurations/10-main.conf
++++ b/Configurations/10-main.conf
+@@ -806,6 +806,10 @@ my %targets = (
+         perlasm_scheme   => "elf",
+         multilib         => "64",
+     },
++    "linux-mlibc-x86_64" => {
++        inherit_from     => [ "linux-x86_64" ],
++        disable          => [ "afalgeng" ],
++    },
+     "linux-x86_64-clang" => {
+         inherit_from     => [ "linux-x86_64" ],
+         CC               => "clang",
+diff --git a/crypto/mem_sec.c b/crypto/mem_sec.c
+index 222c786c..c4c93c93 100644
+--- a/crypto/mem_sec.c
++++ b/crypto/mem_sec.c
+@@ -478,7 +478,7 @@ static int sh_init(size_t size, int minsize)
+     if (mprotect(sh.map_result + aligned, pgsize, PROT_NONE) < 0)
+         ret = 2;
+ 
+-#if defined(OPENSSL_SYS_LINUX) && defined(MLOCK_ONFAULT) && defined(SYS_mlock2)
++#if defined(OPENSSL_SYS_LINUX) && defined(MLOCK_ONFAULT) && defined(SYS_mlock2) && 0
+     if (syscall(SYS_mlock2, sh.arena, sh.arena_size, MLOCK_ONFAULT) < 0) {
+         if (errno == ENOSYS) {
+             if (mlock(sh.arena, sh.arena_size) < 0)
+diff --git a/crypto/rand/rand_unix.c b/crypto/rand/rand_unix.c
+index 43f1069d..e650bfec 100644
+--- a/crypto/rand/rand_unix.c
++++ b/crypto/rand/rand_unix.c
+@@ -405,7 +405,7 @@ static ssize_t syscall_random(void *buf, size_t buflen)
+ 
+     /* Linux supports this since version 3.17 */
+ #  if defined(__linux) && defined(__NR_getrandom)
+-    return syscall(__NR_getrandom, buf, buflen, 0);
++    return getrandom(buf, buflen, 0);
+ #  elif (defined(__FreeBSD__) || defined(__NetBSD__)) && defined(KERN_ARND)
+     return sysctl_random(buf, buflen);
+ #  else
+-- 
+2.36.1
+

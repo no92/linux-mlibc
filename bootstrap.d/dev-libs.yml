@@ -1,0 +1,32 @@
+packages:
+  - name: "openssl"
+    source:
+      subdir: ports
+      git: "https://github.com/openssl/openssl.git"
+      tag: "OpenSSL_1_1_1l"
+      version: "1.1.1l"
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - zlib
+    configure:
+      - args:
+          - "@THIS_SOURCE_DIR@/Configure"
+          - "--prefix=/usr"
+          - "--openssldir=/etc/ssl"
+          - "--libdir=lib"
+          - "linux-mlibc-x86_64"
+          - "shared"
+          - "zlib-dynamic"
+          - "no-afalgeng"
+        environ:
+          CC: "@OPTION:arch-triple@-gcc"
+          CXX: "@OPTION:arch-triple@-g++"
+    build:
+      - args: ["make", "-j@PARALLELISM@"]
+      - args: ["sed", "-i", "/INSTALL_LIBS/s/libcrypto.a libssl.a//", "@THIS_BUILD_DIR@/Makefile"]
+      - args: ["make", "DESTDIR=@THIS_COLLECT_DIR@", "MANSUFFIX=ssl", "install"]
+        environ:
+          DESTDIR: "@THIS_COLLECT_DIR@"
+      - args: ["mv", "@THIS_COLLECT_DIR@/usr/share/doc/openssl", "@THIS_COLLECT_DIR@/usr/share/doc/openssl-1.1.1j"]
+      - args: ["cp", "-fr", "@THIS_SOURCE_DIR@/doc/.", "@THIS_COLLECT_DIR@/usr/share/doc/openssl-1.1.1j"]
