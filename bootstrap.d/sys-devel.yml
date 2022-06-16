@@ -21,6 +21,35 @@ packages:
         environ:
           DESTDIR: '@THIS_COLLECT_DIR@'
 
+  - name: flex
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/westes/flex.git'
+      tag: 'v2.6.4'
+      version: '2.6.4'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+    tools_required:
+      - cross-toolchain
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--docdir=/usr/share/doc/flex-2.6.4'
+        - '--disable-nls'
+        - '--disable-static'
+        - '--disable-bootstrap'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['touch', '@THIS_BUILD_DIR@/doc/flex.1']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+      - args: ['ln', '-s', 'flex', '@THIS_COLLECT_DIR@/usr/bin/lex']
+
   - name: m4
     source:
       subdir: 'ports'
