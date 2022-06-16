@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 # Adapted from LFS (https://www.linuxfromscratch.org/lfs/view/stable/chapter07/kernfs.html)
 
 # Exit if not running as root.

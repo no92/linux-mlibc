@@ -33,7 +33,9 @@ sources:
     git: "https://git.savannah.gnu.org/git/libtool.git"
     tag: "v2.4.6"
     version: "2.4.6"
-    tools_required: ["cross-automake-v1.15"]
+    tools_required:
+      - cross-autoconf-v2.69
+      - cross-automake-v1.15
     regenerate:
       - args: ["git", "submodule", "update", "--init"]
       - args: ["./bootstrap"]
@@ -43,7 +45,10 @@ sources:
     git: "https://gitlab.freedesktop.org/pkg-config/pkg-config.git"
     tag: "pkg-config-0.29.2"
     version: "0.29.2"
-    tools_required: ["cross-automake-v1.15", "cross-libtool"]
+    tools_required:
+      - cross-autoconf-v2.69
+      - cross-automake-v1.15
+      - cross-libtool
     regenerate:
       - args: ["./autogen.sh"]
         environ:
@@ -54,14 +59,16 @@ sources:
     git: "https://github.com/bminor/binutils-gdb.git"
     tag: "binutils-2_38"
     version: "2.38"
-    tools_required: ["cross-automake-v1.15"]
+    tools_required:
+      - cross-automake-v1.15
 
   - name: gcc
     subdir: ports
     git: "https://github.com/gcc-mirror/gcc.git"
     tag: "releases/gcc-11.2.0"
     version: "11.2.0"
-    tools_required: ["cross-automake-v1.15"]
+    tools_required:
+      - cross-automake-v1.15
     regenerate:
       - args: ["./contrib/download_prerequisites"]
         workdir: "@THIS_SOURCE_DIR@"
@@ -117,6 +124,7 @@ tools:
     exports_aclocal: true
     from_source: libtool
     tools_required:
+      - cross-autoconf-v2.69
       - cross-automake-v1.15
     configure:
       - args: ["@THIS_SOURCE_DIR@/configure", "--prefix=@PREFIX@"]
