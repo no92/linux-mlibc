@@ -23,6 +23,8 @@ sources:
     git: "https://git.savannah.gnu.org/git/automake.git"
     tag: "v1.15.1"
     version: "1.15.1"
+    tools_required:
+      - cross-autoconf-v2.69
     regenerate:
       - args: ["./bootstrap"]
 
@@ -84,56 +86,59 @@ declare_options:
 
 tools:
   - name: cross-autoconf-v2.69
-    from_source: "autoconf-v2.69"
+    from_source: autoconf-v2.69
     configure:
       - args: ["@THIS_SOURCE_DIR@/configure", "--prefix=@PREFIX@"]
     compile:
-      - args: ["make", "-j", "@PARALLELISM@"]
+      - args: ["make", "-j@PARALLELISM@"]
     install:
       - args: ["make", "install"]
 
   - name: cross-autoconf-archive
-    from_source: "autoconf-archive"
+    from_source: autoconf-archive
     exports_aclocal: true
     install:
       - args: ["mkdir", "-p", "@BUILD_ROOT@/tools/cross-autoconf-archive/share/"]
       - args: ["cp", "-r", "@THIS_SOURCE_DIR@/m4", "@BUILD_ROOT@/tools/cross-autoconf-archive/share/aclocal"]
 
   - name: cross-automake-v1.15
-    from_source: "automake-v1.15"
-    tools_required: ["cross-autoconf-v2.69"]
+    from_source: automake-v1.15
+    tools_required:
+      - cross-autoconf-v2.69
     configure:
       - args: ["@THIS_SOURCE_DIR@/configure", "--prefix=@PREFIX@", "MAKEINFO=/bin/true"]
     compile:
-      - args: ["make", "-j", "@PARALLELISM@"]
+      - args: ["make", "-j@PARALLELISM@"]
     install:
       - args: ["make", "install"]
       - args: ["ln", "-sf", "@PREFIX@/share/aclocal-1.15", "@PREFIX@/share/aclocal"]
 
   - name: cross-libtool
     exports_aclocal: true
-    from_source: "libtool"
-    tools_required: ["cross-automake-v1.15"]
+    from_source: libtool
+    tools_required:
+      - cross-automake-v1.15
     configure:
       - args: ["@THIS_SOURCE_DIR@/configure", "--prefix=@PREFIX@"]
     compile:
-      - args: ["make", "-j", "@PARALLELISM@"]
+      - args: ["make", "-j@PARALLELISM@"]
     install:
       - args: ["make", "install"]
 
   - name: cross-pkg-config
     exports_aclocal: true
-    from_source: "pkg-config"
+    from_source: pkg-config
     configure:
       - args: ["@THIS_SOURCE_DIR@/configure", "--prefix=@PREFIX@", "--with-internal-glib"]
     compile:
-      - args: ["make", "-j", "@PARALLELISM@"]
+      - args: ["make", "-j@PARALLELISM@"]
     install:
       - args: ["make", "install"]
 
   - name: cross-binutils
-    from_source: "binutils"
-    tools_required: ["cross-automake-v1.15"]
+    from_source: binutils
+    tools_required:
+      - cross-automake-v1.15
     configure:
       - args:
           - "@THIS_SOURCE_DIR@/configure"
@@ -143,13 +148,14 @@ tools:
           - "--disable-nls"
           - "--disable-werror"
     compile:
-      - args: ["make", "-j", "@PARALLELISM@"]
+      - args: ["make", "-j@PARALLELISM@", 'all-binutils', 'all-gas', 'all-ld']
     install:
-      - args: ["make", "install"]
+      - args: ["make", 'install-binutils', 'install-gas', 'install-ld']
 
   - name: cross-gcc
-    from_source: "gcc"
-    tools_required: ["cross-binutils"]
+    from_source: gcc
+    tools_required:
+      - cross-binutils
     configure:
       - args:
           - "@THIS_SOURCE_DIR@/configure"
@@ -163,9 +169,10 @@ tools:
           - "--enable-libstdcxx-filesystem-ts"
     stages:
       - name: compiler
-        pkgs_required: ["mlibc-headers"]
+        pkgs_required:
+          - mlibc-headers
         compile:
-          - args: ["make", "-j", "@PARALLELISM@", "all-gcc"]
+          - args: ["make", "-j@PARALLELISM@", "all-gcc"]
         install:
           - args: ["make", "install-gcc"]
           - args: ["mkdir", "-p", "@PREFIX@/@OPTION:arch-triple@/bin"]
@@ -174,38 +181,38 @@ tools:
 
       - name: libgcc
         tools_required:
-          - tool: "cross-gcc"
-            stage_dependencies: ["compiler"]
+          - tool: cross-gcc
+            stage_dependencies: [compiler]
         pkgs_required:
-          - "mlibc"
+          - mlibc
         compile:
-          - args: ["make", "-j", "@PARALLELISM@", "all-target-libgcc"]
+          - args: ["make", "-j@PARALLELISM@", "all-target-libgcc"]
         install:
           - args: ["make", "install-target-libgcc"]
 
       - name: libstdc++
         tools_required:
-          - tool: "cross-gcc"
-            stage_dependencies: ["libgcc"]
+          - tool: cross-gcc
+            stage_dependencies: [libgcc]
         compile:
-          - args: ["make", "-j", "@PARALLELISM@", "all-target-libstdc++-v3"]
+          - args: ["make", "-j@PARALLELISM@", "all-target-libstdc++-v3"]
         install:
           - args: ["make", "install-strip-target-libstdc++-v3"]
 
   - name: cross-toolchain
     source:
-      subdir: "meta-sources"
+      subdir: meta-sources
       version: "1.0"
     tools_required:
-      - tool: "cross-autoconf-v2.69"
+      - tool: cross-autoconf-v2.69
         recursive: true
-      - tool: "cross-automake-v1.15"
+      - tool: cross-automake-v1.15
         recursive: true
-      - tool: "cross-binutils"
+      - tool: cross-binutils
         recursive: true
-      - tool: "cross-gcc"
+      - tool: cross-gcc
         recursive: true
-      - tool: "cross-pkg-config"
+      - tool: cross-pkg-config
         recursive: true
     configure: []
     compile: []
@@ -215,8 +222,8 @@ packages:
   - name: base-files
     implict_package: true
     source:
-      subdir: "meta-sources"
-      version: "1.0"
+      subdir: meta-sources
+      version: '1.0'
     default: true
     build:
       - args: |
@@ -252,8 +259,9 @@ packages:
           touch @THIS_COLLECT_DIR@/{tmp,var/tmp}/.keep
           ln -sfv run @THIS_COLLECT_DIR@/var/run
           ln -sfv run/lock @THIS_COLLECT_DIR@/var/lock
+
   - name: kernel-headers
-    from_source: "linux"
+    from_source: linux
     implict_package: true
     configure:
       - args: ["rsync", "-ar", "@THIS_SOURCE_DIR@/", "@THIS_BUILD_DIR@/"]
@@ -267,9 +275,10 @@ packages:
   # TODO: Build the kernel itself too
 
   - name: mlibc-headers
-    from_source: "mlibc"
+    from_source: mlibc
     implict_package: true
-    pkgs_required: ["kernel-headers"]
+    pkgs_required:
+      - kernel-headers
     configure:
       - args:
           - "meson"
@@ -287,13 +296,14 @@ packages:
           DESTDIR: "@THIS_COLLECT_DIR@"
 
   - name: mlibc
-    from_source: "mlibc"
+    from_source: mlibc
     tools_required:
-      - tool: "cross-gcc"
+      - tool: cross-gcc
         stage_dependencies: ["compiler"]
-      - tool: "cross-binutils"
+      - tool: cross-binutils
     implict_package: true
-    pkgs_required: ["mlibc-headers"]
+    pkgs_required:
+      - mlibc-headers
     configure:
       - args:
           - "meson"
