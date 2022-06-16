@@ -3,6 +3,7 @@ imports:
   - file: bootstrap.d/app-shells.yml
   - file: bootstrap.d/games-misc.yml
   - file: bootstrap.d/sys-apps.yml
+  - file: bootstrap.d/sys-devel.yml
   - file: bootstrap.d/sys-libs.yml
 
 sources:
@@ -222,6 +223,8 @@ tools:
       - tool: cross-gcc
         recursive: true
       - tool: cross-pkg-config
+        recursive: true
+      - tool: cross-libtool
         recursive: true
     configure: []
     compile: []

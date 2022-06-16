@@ -61,7 +61,7 @@ packages:
     configure:
       - args:
         - '@THIS_SOURCE_DIR@/configure'
-        - "--host=@OPTION:arch-triple@"
+        - '--host=@OPTION:arch-triple@'
         - '--prefix=/usr'
         - '--disable-bzlib'
         - '--disable-xzlib'
