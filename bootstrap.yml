@@ -1,5 +1,6 @@
 imports:
   - file: ports/app-shells.yml
+  - file: ports/games-misc.yml
   - file: ports/sys-apps.yml
   - file: ports/sys-libs.yml
 

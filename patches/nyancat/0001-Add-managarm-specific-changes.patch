@@ -1,0 +1,26 @@
+From fb0512d5a0883f50ca0c81acd8ca09be92c033d2 Mon Sep 17 00:00:00 2001
+From: no92 <no92.mail@gmail.com>
+Date: Thu, 16 Jun 2022 20:40:38 +0200
+Subject: [PATCH] Add managarm-specific changes
+
+---
+ src/nyancat.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/src/nyancat.c b/src/nyancat.c
+index 6989623..e3126c3 100644
+--- a/src/nyancat.c
++++ b/src/nyancat.c
+@@ -67,9 +67,7 @@
+ 
+ #include <sys/ioctl.h>
+ 
+-#ifndef TIOCGWINSZ
+ #include <termios.h>
+-#endif
+ 
+ #ifdef ECHO
+ #undef ECHO
+-- 
+2.36.1
+
