@@ -1,0 +1,26 @@
+From 738c14504aae8387991322031c36b3b156c5a2c2 Mon Sep 17 00:00:00 2001
+From: czapek1337 <czapek1337@gmail.com>
+Date: Sun, 8 May 2022 13:42:41 +0200
+Subject: [PATCH] Fix $lt_sysroot
+
+Yoinked shamelessly from https://github.com/managarm/bootstrap-managarm/blob/master/patches/libtool/0001-Fix-lt_sysroot.patch
+---
+ build-aux/ltmain.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
+index d5cf07a..ce97a5f 100644
+--- a/build-aux/ltmain.in
++++ b/build-aux/ltmain.in
+@@ -6449,7 +6449,7 @@ func_mode_link ()
+ 	      fi
+ 	    else
+ 	      # We cannot seem to hardcode it, guess we'll fake it.
+-	      add_dir=-L$libdir
++	      add_dir=-L$lt_sysroot$libdir
+ 	      # Try looking first in the location we're being installed to.
+ 	      if test -n "$inst_prefix_dir"; then
+ 		case $libdir in
+-- 
+2.35.1
+

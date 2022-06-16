@@ -1,0 +1,341 @@
+imports:
+  - file: ports/app-shells.yml
+  - file: ports/sys-apps.yml
+  - file: ports/sys-libs.yml
+
+sources:
+  - name: "autoconf-v2.69"
+    subdir: source
+    url: "https://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.xz"
+    format: "tar.xz"
+    extract_path: "autoconf-2.69"
+    version: "2.69"
+
+  - name: "autoconf-archive"
+    subdir: source
+    git: "https://github.com/autoconf-archive/autoconf-archive.git"
+    tag: "v2019.01.06"
+    version: "2019.01.06"
+
+  - name: "automake-v1.15"
+    subdir: source
+    git: "https://git.savannah.gnu.org/git/automake.git"
+    tag: "v1.15.1"
+    version: "1.15.1"
+    regenerate:
+      - args: ["./bootstrap"]
+
+  - name: "libtool"
+    subdir: source
+    git: "https://git.savannah.gnu.org/git/libtool.git"
+    tag: "v2.4.6"
+    version: "2.4.6"
+    tools_required: ["cross-automake-v1.15"]
+    regenerate:
+      - args: ["git", "submodule", "update", "--init"]
+      - args: ["./bootstrap"]
+
+  - name: "pkg-config"
+    subdir: source
+    git: "https://gitlab.freedesktop.org/pkg-config/pkg-config.git"
+    tag: "pkg-config-0.29.2"
+    version: "0.29.2"
+    tools_required: ["cross-automake-v1.15", "cross-libtool"]
+    regenerate:
+      - args: ["./autogen.sh"]
+        environ:
+          NOCONFIGURE: "yes"
+
+  - name: "binutils"
+    subdir: source
+    git: "https://github.com/bminor/binutils-gdb.git"
+    tag: "binutils-2_38"
+    version: "2.38"
+    tools_required: ["cross-automake-v1.15"]
+
+  - name: "gcc"
+    subdir: source
+    git: "https://github.com/gcc-mirror/gcc.git"
+    tag: "releases/gcc-11.2.0"
+    version: "11.2.0"
+    tools_required: ["cross-automake-v1.15"]
+    regenerate:
+      - args: ["./contrib/download_prerequisites"]
+        workdir: "@THIS_SOURCE_DIR@"
+
+  - name: "linux"
+    subdir: source
+    git: "https://github.com/torvalds/linux.git"
+    tag: "v5.17"
+    version: "5.17"
+
+  - name: "mlibc"
+    subdir: source
+    git: "https://github.com/no92/mlibc.git"
+    branch: "lfs"
+    version: "2.2.0"
+
+declare_options:
+  - name: arch
+    default: x86_64
+  - name: arch-triple
+    default: x86_64-linux-mlibc
+
+tools:
+  - name: "cross-autoconf-v2.69"
+    from_source: "autoconf-v2.69"
+    configure:
+      - args: ["@THIS_SOURCE_DIR@/configure", "--prefix=@PREFIX@"]
+    compile:
+      - args: ["make", "-j", "@PARALLELISM@"]
+    install:
+      - args: ["make", "install"]
+
+  - name: "cross-autoconf-archive"
+    from_source: "autoconf-archive"
+    exports_aclocal: true
+    install:
+      - args: ["mkdir", "-p", "@BUILD_ROOT@/tools/cross-autoconf-archive/share/"]
+      - args: ["cp", "-r", "@THIS_SOURCE_DIR@/m4", "@BUILD_ROOT@/tools/cross-autoconf-archive/share/aclocal"]
+
+  - name: "cross-automake-v1.15"
+    from_source: "automake-v1.15"
+    tools_required: ["cross-autoconf-v2.69"]
+    configure:
+      - args: ["@THIS_SOURCE_DIR@/configure", "--prefix=@PREFIX@", "MAKEINFO=/bin/true"]
+    compile:
+      - args: ["make", "-j", "@PARALLELISM@"]
+    install:
+      - args: ["make", "install"]
+      - args: ["ln", "-sf", "@PREFIX@/share/aclocal-1.15", "@PREFIX@/share/aclocal"]
+
+  - name: "cross-libtool"
+    exports_aclocal: true
+    from_source: "libtool"
+    tools_required: ["cross-automake-v1.15"]
+    configure:
+      - args: ["@THIS_SOURCE_DIR@/configure", "--prefix=@PREFIX@"]
+    compile:
+      - args: ["make", "-j", "@PARALLELISM@"]
+    install:
+      - args: ["make", "install"]
+
+  - name: "cross-pkg-config"
+    exports_aclocal: true
+    from_source: "pkg-config"
+    configure:
+      - args: ["@THIS_SOURCE_DIR@/configure", "--prefix=@PREFIX@", "--with-internal-glib"]
+    compile:
+      - args: ["make", "-j", "@PARALLELISM@"]
+    install:
+      - args: ["make", "install"]
+
+  - name: "cross-binutils"
+    from_source: "binutils"
+    tools_required: ["cross-automake-v1.15"]
+    configure:
+      - args:
+          - "@THIS_SOURCE_DIR@/configure"
+          - "--prefix=@PREFIX@"
+          - "--with-sysroot=@SYSROOT_DIR@"
+          - "--target=@OPTION:arch-triple@"
+          - "--disable-nls"
+          - "--disable-werror"
+    compile:
+      - args: ["make", "-j", "@PARALLELISM@"]
+    install:
+      - args: ["make", "install"]
+
+  - name: "cross-gcc"
+    from_source: "gcc"
+    tools_required: ["cross-binutils"]
+    configure:
+      - args:
+          - "@THIS_SOURCE_DIR@/configure"
+          - "--prefix=@PREFIX@"
+          - "--with-sysroot=@SYSROOT_DIR@"
+          - "--target=@OPTION:arch-triple@"
+          - "--enable-languages=c,c++"
+          - "--disable-multilib"
+          - "--disable-nls"
+          - "--enable-initfini-array"
+          - "--enable-libstdcxx-filesystem-ts"
+    stages:
+      - name: "compiler"
+        pkgs_required: ["mlibc-headers"]
+        compile:
+          - args: ["make", "-j", "@PARALLELISM@", "all-gcc"]
+        install:
+          - args: ["make", "install-gcc"]
+          - args: ["mkdir", "-p", "@PREFIX@/@OPTION:arch-triple@/bin"]
+          - args: ["ln", "-sf", "../../../cross-binutils/@OPTION:arch-triple@/bin/as", "@PREFIX@/@OPTION:arch-triple@/bin/as"]
+          - args: ["ln", "-sf", "../../../cross-binutils/@OPTION:arch-triple@/bin/ld", "@PREFIX@/@OPTION:arch-triple@/bin/ld"]
+
+      - name: "libgcc"
+        tools_required:
+          - tool: "cross-gcc"
+            stage_dependencies: ["compiler"]
+        pkgs_required:
+          - "mlibc"
+        compile:
+          - args: ["make", "-j", "@PARALLELISM@", "all-target-libgcc"]
+        install:
+          - args: ["make", "install-target-libgcc"]
+
+      - name: "libstdc++"
+        tools_required:
+          - tool: "cross-gcc"
+            stage_dependencies: ["libgcc"]
+        compile:
+          - args: ["make", "-j", "@PARALLELISM@", "all-target-libstdc++-v3"]
+        install:
+          - args: ["make", "install-strip-target-libstdc++-v3"]
+
+  - name: "cross-toolchain"
+    source:
+      subdir: "meta-sources"
+      version: "1.0"
+    tools_required:
+      - tool: "cross-autoconf-v2.69"
+        recursive: true
+      - tool: "cross-automake-v1.15"
+        recursive: true
+      - tool: "cross-binutils"
+        recursive: true
+      - tool: "cross-gcc"
+        recursive: true
+      - tool: "cross-pkg-config"
+        recursive: true
+    configure: []
+    compile: []
+    install: []
+
+packages:
+  - name: "base-files"
+    implict_package: true
+    source:
+      subdir: "meta-sources"
+      version: "1.0"
+    default: true
+    build:
+      - args: |
+          mkdir -pv @THIS_COLLECT_DIR@/usr/{,local/}{bin,include,lib,sbin,src}
+          ln -sfv usr/bin @THIS_COLLECT_DIR@/bin
+          ln -sfv usr/lib @THIS_COLLECT_DIR@/lib
+          ln -sfv usr/sbin @THIS_COLLECT_DIR@/sbin
+          mkdir -pv @THIS_COLLECT_DIR@/{boot,home,mnt,opt,srv}
+          mkdir -pv @THIS_COLLECT_DIR@/etc/{opt,sysconfig}
+          mkdir -pv @THIS_COLLECT_DIR@/lib/firmware
+          mkdir -pv @THIS_COLLECT_DIR@/media/{floppy,cdrom}
+          mkdir -pv @THIS_COLLECT_DIR@/usr/local/{bin,lib,sbin}
+          mkdir -pv @THIS_COLLECT_DIR@/usr/{,local/}share/{color,dict,doc,info,locale,man}
+          mkdir -pv @THIS_COLLECT_DIR@/usr/{,local/}share/{misc,terminfo,zoneinfo}
+          mkdir -pv @THIS_COLLECT_DIR@/usr/{,local/}share/man/man{1..8}
+          mkdir -pv @THIS_COLLECT_DIR@/var/{cache,local,log,mail,opt,spool}
+          mkdir -pv @THIS_COLLECT_DIR@/var/lib/{color,misc,locate}
+          install -dv -m 0750 @THIS_COLLECT_DIR@/root
+          install -dv -m 1777 @THIS_COLLECT_DIR@/tmp @THIS_COLLECT_DIR@/var/tmp
+          cp @THIS_SOURCE_DIR@/{group,hosts,passwd,profile} @THIS_COLLECT_DIR@/etc
+          cp @THIS_SOURCE_DIR@/.bashrc @THIS_COLLECT_DIR@/root
+          touch @THIS_COLLECT_DIR@/{boot,home,mnt,opt,root,srv,tmp}/.keep
+          touch @THIS_COLLECT_DIR@/etc/{opt,sysconfig}/.keep
+          touch @THIS_COLLECT_DIR@/lib/firmware/.keep
+          touch @THIS_COLLECT_DIR@/media/{floppy,cdrom}/.keep
+          touch @THIS_COLLECT_DIR@/usr/{,local/}{bin,include,lib,sbin,src}/.keep
+          touch @THIS_COLLECT_DIR@/usr/local/{bin,lib,sbin}/.keep
+          touch @THIS_COLLECT_DIR@/usr/{,local/}share/{color,dict,doc,info,locale,man}/.keep
+          touch @THIS_COLLECT_DIR@/usr/{,local/}share/{misc,terminfo,zoneinfo}/.keep
+          touch @THIS_COLLECT_DIR@/usr/{,local/}share/man/man{1..8}/.keep
+          touch @THIS_COLLECT_DIR@/var/{cache,local,log,mail,opt,spool}/.keep
+          touch @THIS_COLLECT_DIR@/var/lib/{color,misc,locate}/.keep
+          touch @THIS_COLLECT_DIR@/{tmp,var/tmp}/.keep
+          ln -sfv run @THIS_COLLECT_DIR@/var/run
+          ln -sfv run/lock @THIS_COLLECT_DIR@/var/lock
+  - name: "kernel-headers"
+    from_source: "linux"
+    implict_package: true
+    configure:
+      - args: ["rsync", "-ar", "@THIS_SOURCE_DIR@/", "@THIS_BUILD_DIR@/"]
+    build:
+      - args: ["make", "headers"]
+      - args: ["find", "usr/include", "-name", '".*"', "-delete"]
+      - args: ["rm", "usr/include/Makefile"]
+      - args: ["mkdir", "-pv", "@THIS_COLLECT_DIR@/usr"]
+      - args: ["cp", "-rv", "usr/include", "@THIS_COLLECT_DIR@/usr"]
+
+  # TODO: Build the kernel itself too
+
+  - name: "mlibc-headers"
+    from_source: "mlibc"
+    implict_package: true
+    pkgs_required: ["kernel-headers"]
+    configure:
+      - args:
+          - "meson"
+          - "--cross-file"
+          - "@SOURCE_ROOT@/scripts/cross.ini"
+          - "--prefix=/usr"
+          - "-Dheaders_only=true"
+          - "-Ddisable_iconv_option=true"
+          - "-Dbuildtype=debug"
+          - "@THIS_SOURCE_DIR@"
+    build:
+      - args: ["ninja"]
+      - args: ["ninja", "install"]
+        environ:
+          DESTDIR: "@THIS_COLLECT_DIR@"
+
+  - name: "mlibc"
+    from_source: "mlibc"
+    tools_required:
+      - tool: "cross-gcc"
+        stage_dependencies: ["compiler"]
+      - tool: "cross-binutils"
+    implict_package: true
+    pkgs_required: ["mlibc-headers"]
+    configure:
+      - args:
+          - "meson"
+          - "--cross-file"
+          - "@SOURCE_ROOT@/scripts/cross.ini"
+          - "--prefix=/usr"
+          - "--libdir=lib"
+          - "-Dmlibc_no_headers=true"
+          - "-Ddisable_iconv_option=true"
+          - "-Dbuildtype=debug"
+          - "@THIS_SOURCE_DIR@"
+    build:
+      - args: ["ninja"]
+      - args: ["ninja", "install"]
+        environ:
+          DESTDIR: "@THIS_COLLECT_DIR@"
+
+tasks:
+  - name: version-check
+    args: ["@SOURCE_ROOT@/scripts/version-check.sh"]
+
+  - name: mount
+    args:
+      - sudo
+      - "@SOURCE_ROOT@/scripts/lfs.sh"
+      - "@BUILD_ROOT@"
+      - mount
+    containerless: true
+
+  - name: unmount
+    args:
+      - sudo
+      - "@SOURCE_ROOT@/scripts/lfs.sh"
+      - "@BUILD_ROOT@"
+      - unmount
+    containerless: true
+
+  - name: chroot
+    tasks_required:
+      - mount
+    args:
+      - sudo
+      - "@SOURCE_ROOT@/scripts/lfs.sh"
+      - "@BUILD_ROOT@"
+      - chroot
+    containerless: true

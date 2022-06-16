@@ -1,0 +1,34 @@
+From d67b9a8f31c4508457cd40d3d34e55de1cb8c53e Mon Sep 17 00:00:00 2001
+From: czapek1337 <czapek1337@gmail.com>
+Date: Thu, 7 Apr 2022 16:32:10 +0200
+Subject: [PATCH] Accept mlibc as a valid libc
+
+---
+ config.sub | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/config.sub b/config.sub
+index dba16e84..fd912ecf 100755
+--- a/config.sub
++++ b/config.sub
+@@ -1712,7 +1712,7 @@ fi
+ # Now, validate our (potentially fixed-up) OS.
+ case $os in
+ 	# Sometimes we do "kernel-libc", so those need to count as OSes.
+-	musl* | newlib* | relibc* | uclibc*)
++	musl* | newlib* | relibc* | uclibc* | mlibc*)
+ 		;;
+ 	# Likewise for "kernel-abi"
+ 	eabi* | gnueabi*)
+@@ -1772,7 +1772,7 @@ esac
+ # (given a valid OS), if there is a kernel.
+ case $kernel-$os in
+ 	linux-gnu* | linux-dietlibc* | linux-android* | linux-newlib* \
+-		   | linux-musl* | linux-relibc* | linux-uclibc* )
++		   | linux-musl* | linux-relibc* | linux-uclibc* | linux-mlibc*)
+ 		;;
+ 	uclinux-uclibc* )
+ 		;;
+-- 
+2.35.1
+

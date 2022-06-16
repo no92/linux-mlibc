@@ -1,0 +1,34 @@
+From dfd91b46a80d5f8faa4ef28b37b4ffcb70daab39 Mon Sep 17 00:00:00 2001
+From: czapek1337 <czapek1337@gmail.com>
+Date: Sun, 8 May 2022 04:31:53 +0200
+Subject: [PATCH] Add support for linux-mlibc
+
+---
+ lib/config.sub | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/config.sub b/lib/config.sub
+index 40ea5df..aa2f7da 100755
+--- a/lib/config.sub
++++ b/lib/config.sub
+@@ -114,7 +114,7 @@ esac
+ # Here we must recognize all the valid KERNEL-OS combinations.
+ maybe_os=`echo $1 | sed 's/^\(.*\)-\([^-]*-[^-]*\)$/\2/'`
+ case $maybe_os in
+-  nto-qnx* | linux-gnu* | linux-android* | linux-dietlibc | linux-newlib* | \
++  nto-qnx* | linux-gnu* | linux-android* | linux-dietlibc | linux-newlib* | linux-mlibc* | \
+   linux-musl* | linux-uclibc* | uclinux-uclibc* | uclinux-gnu* | kfreebsd*-gnu* | \
+   knetbsd*-gnu* | netbsd*-gnu* | netbsd*-eabi* | \
+   kopensolaris*-gnu* | cloudabi*-eabi* | \
+@@ -1408,7 +1408,7 @@ case $os in
+ 	      | -chorusos* | -chorusrdb* | -cegcc* | -glidix* \
+ 	      | -cygwin* | -msys* | -pe* | -psos* | -moss* | -proelf* | -rtems* \
+ 	      | -midipix* | -mingw32* | -mingw64* | -linux-gnu* | -linux-android* \
+-	      | -linux-newlib* | -linux-musl* | -linux-uclibc* \
++	      | -linux-newlib* | -linux-musl* | -linux-uclibc* | linux-mlibc* \
+ 	      | -uxpv* | -beos* | -mpeix* | -udk* | -moxiebox* \
+ 	      | -interix* | -uwin* | -mks* | -rhapsody* | -darwin* | -opened* \
+ 	      | -openstep* | -oskit* | -conix* | -pw32* | -nonstopux* \
+-- 
+2.35.1
+
