@@ -1,4 +1,26 @@
 packages:
+  - name: bc
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/gavinhoward/bc.git'
+      tag: '5.2.1'
+      version: '5.2.1'
+    tools_required:
+      - cross-toolchain
+    configure:
+      - args: ['cp', '-r', '@THIS_SOURCE_DIR@/.', '@THIS_BUILD_DIR@']
+      - args: ['./configure.sh', '-G', '-O3']
+        environ:
+          PREFIX: '/usr'
+          CC: '@OPTION:arch-triple@-gcc'
+          CFLAGS: '-std=c99'
+          GEN_HOST: '0'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
   - name: m4
     source:
       subdir: 'ports'
