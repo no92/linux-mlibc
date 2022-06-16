@@ -30,6 +30,35 @@ packages:
           DESTDIR: '@THIS_COLLECT_DIR@'
         quiet: true
 
+  - name : mpc
+    source:
+      subdir: ports
+      git: 'https://gitlab.inria.fr/mpc/mpc.git'
+      tag: '1.2.1'
+      version: '1.2.1'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['autoreconf', '-f', '-i']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - gmp
+      - mpfr
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-static'
+        - '--docdir=/usr/share/doc/mpc-1.2.1'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+        quiet: true
+
   - name : mpfr
     source:
       subdir: 'ports'
