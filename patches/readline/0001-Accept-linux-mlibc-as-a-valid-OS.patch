@@ -1,0 +1,34 @@
+From 0bb6d5a0dea7f2872fdfc03f83e29a66ef39cc88 Mon Sep 17 00:00:00 2001
+From: czapek1337 <czapek1337@gmail.com>
+Date: Mon, 9 May 2022 16:44:11 +0200
+Subject: [PATCH] Accept linux-mlibc as a valid OS
+
+---
+ support/config.sub | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/support/config.sub b/support/config.sub
+index c874b7a..76db6c8 100755
+--- a/support/config.sub
++++ b/support/config.sub
+@@ -1682,7 +1682,7 @@ fi
+ # Now, validate our (potentially fixed-up) OS.
+ case $os in
+ 	# Sometimes we do "kernel-abi", so those need to count as OSes.
+-	musl* | newlib* | uclibc*)
++	musl* | newlib* | uclibc* | mlibc*)
+ 		;;
+ 	# Likewise for "kernel-libc"
+ 	eabi | eabihf | gnueabi | gnueabihf)
+@@ -1737,7 +1737,7 @@ esac
+ # As a final step for OS-related things, validate the OS-kernel combination
+ # (given a valid OS), if there is a kernel.
+ case $kernel-$os in
+-	linux-gnu* | linux-dietlibc* | linux-android* | linux-newlib* | linux-musl* | linux-uclibc* )
++	linux-gnu* | linux-dietlibc* | linux-android* | linux-newlib* | linux-musl* | linux-uclibc* | linux-mlibc*)
+ 		;;
+ 	uclinux-uclibc* )
+ 		;;
+-- 
+2.35.1
+

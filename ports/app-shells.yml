@@ -1,0 +1,35 @@
+sources:
+  - name: bash
+    subdir: source
+    git: "https://git.savannah.gnu.org/git/bash.git"
+    branch: master
+    commit: 15409324f1974d41c183904ad575da7188058c1c
+    version: 5.1.12
+    tools_required:
+      - cross-automake-v1.15
+    regenerate:
+      - args: ["cp", "@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.sub", "@THIS_SOURCE_DIR@/support/"]
+
+packages:
+  - name: bash
+    from_source: bash
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - readline
+      - ncurses
+      - coreutils
+    configure:
+      - args:
+          - "@THIS_SOURCE_DIR@/configure"
+          - "--host=@OPTION:arch-triple@"
+          - "--prefix=/usr"
+          - "--without-bash-malloc"
+          - "--disable-nls"
+          - "--enable-readline"
+          - "--with-installed-readline=$SYSROOT_DIR$/usr"
+          - "--with-curses"
+    build:
+      - args: ["make", "-j", "@PARALLELISM@"]
+      - args: ["make", "DESTDIR=@THIS_COLLECT_DIR@", "install"]
+      - args: ["ln", "-svf", "bash", "@THIS_COLLECT_DIR@/usr/bin/sh"]

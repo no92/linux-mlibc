@@ -1,0 +1,28 @@
+sources:
+  - name: coreutils
+    subdir: source
+    url: "https://ftp.gnu.org/gnu/coreutils/coreutils-9.0.tar.xz"
+    format: "tar.xz"
+    extract_path: "coreutils-9.0"
+    version: "9.0"
+    tools_required:
+      - cross-automake-v1.15
+    regenerate:
+      - args: ["cp", "@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.sub", "@THIS_SOURCE_DIR@/build-aux/"]
+
+packages:
+  - name: coreutils
+    from_source: coreutils
+    tools_required:
+      - cross-toolchain
+    configure:
+      - args:
+          - "@THIS_SOURCE_DIR@/configure"
+          - "--host=@OPTION:arch-triple@"
+          - "--prefix=/usr"
+          - "--enable-install-program=hostname"
+          - "--enable-no-install-program=kill,uptime"
+          - "CFLAGS=-DSLOW_BUT_NO_HACKS"
+    build:
+      - args: ["make", "-j", "@PARALLELISM@"]
+      - args: ["make", "DESTDIR=@THIS_COLLECT_DIR@", "install"]
