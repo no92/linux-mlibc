@@ -1,4 +1,5 @@
 imports:
+  - file: bootstrap.d/app-arch.yml
   - file: bootstrap.d/app-shells.yml
   - file: bootstrap.d/games-misc.yml
   - file: bootstrap.d/sys-apps.yml
