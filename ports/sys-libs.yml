@@ -17,6 +17,12 @@ sources:
     tag: "readline-8.1"
     version: "8.1"
 
+  - name: zlib
+    subdir: build
+    git: "https://github.com/madler/zlib.git"
+    tag: "v1.2.11"
+    version: "1.2.11"
+
 packages:
   - name: tzdata
     from_source: tzdata
@@ -111,5 +117,20 @@ packages:
     build:
       - args: ["make", "-j", "@PARALLELISM@"]
       - args: ["make", "DESTDIR=@THIS_COLLECT_DIR@", "install"]
+        environ:
+          DESTDIR: "@THIS_COLLECT_DIR@"
+
+  - name: "zlib"
+    from_source: "zlib"
+    tools_required:
+      - cross-toolchain
+    configure:
+      - args: ["@THIS_SOURCE_DIR@/configure"]
+        environ:
+          CHOST: "@OPTION:arch-triple@"
+          prefix: "/usr"
+    build:
+      - args: ["make", "-j", "@PARALLELISM@"]
+      - args: ["make", "install"]
         environ:
           DESTDIR: "@THIS_COLLECT_DIR@"
