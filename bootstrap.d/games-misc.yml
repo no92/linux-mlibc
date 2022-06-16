@@ -1,7 +1,7 @@
 packages:
   - name: nyancat
     source:
-      subdir: source
+      subdir: ports
       git: "https://github.com/klange/nyancat.git"
       tag: 1.5.2
       version: 1.5.2

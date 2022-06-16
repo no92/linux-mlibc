@@ -1,24 +1,24 @@
 sources:
   - name: tzdata
-    subdir: build
+    subdir: ports
     url: "https://data.iana.org/time-zones/releases/tzdata2021e.tar.gz"
     format: "tar.gz"
     version: "2021e"
 
   - name: ncurses
-    subdir: build
+    subdir: ports
     git: "https://github.com/ThomasDickey/ncurses-snapshots.git"
     tag: "v6_2"
     version: "6.2"
 
   - name: readline
-    subdir: build
+    subdir: ports
     git: "https://git.savannah.gnu.org/git/readline.git"
     tag: "readline-8.1"
     version: "8.1"
 
   - name: zlib
-    subdir: build
+    subdir: ports
     git: "https://github.com/madler/zlib.git"
     tag: "v1.2.11"
     version: "1.2.11"

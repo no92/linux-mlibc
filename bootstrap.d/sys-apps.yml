@@ -1,6 +1,6 @@
 sources:
   - name: coreutils
-    subdir: source
+    subdir: ports
     url: "https://ftp.gnu.org/gnu/coreutils/coreutils-9.0.tar.xz"
     format: "tar.xz"
     extract_path: "coreutils-9.0"

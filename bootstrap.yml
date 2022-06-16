@@ -1,33 +1,33 @@
 imports:
-  - file: ports/app-shells.yml
-  - file: ports/games-misc.yml
-  - file: ports/sys-apps.yml
-  - file: ports/sys-libs.yml
+  - file: bootstrap.d/app-shells.yml
+  - file: bootstrap.d/games-misc.yml
+  - file: bootstrap.d/sys-apps.yml
+  - file: bootstrap.d/sys-libs.yml
 
 sources:
-  - name: "autoconf-v2.69"
-    subdir: source
+  - name: autoconf-v2.69
+    subdir: ports
     url: "https://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.xz"
     format: "tar.xz"
     extract_path: "autoconf-2.69"
     version: "2.69"
 
-  - name: "autoconf-archive"
-    subdir: source
+  - name: autoconf-archive
+    subdir: ports
     git: "https://github.com/autoconf-archive/autoconf-archive.git"
     tag: "v2019.01.06"
     version: "2019.01.06"
 
-  - name: "automake-v1.15"
-    subdir: source
+  - name: automake-v1.15
+    subdir: ports
     git: "https://git.savannah.gnu.org/git/automake.git"
     tag: "v1.15.1"
     version: "1.15.1"
     regenerate:
       - args: ["./bootstrap"]
 
-  - name: "libtool"
-    subdir: source
+  - name: libtool
+    subdir: ports
     git: "https://git.savannah.gnu.org/git/libtool.git"
     tag: "v2.4.6"
     version: "2.4.6"
@@ -36,8 +36,8 @@ sources:
       - args: ["git", "submodule", "update", "--init"]
       - args: ["./bootstrap"]
 
-  - name: "pkg-config"
-    subdir: source
+  - name: pkg-config
+    subdir: ports
     git: "https://gitlab.freedesktop.org/pkg-config/pkg-config.git"
     tag: "pkg-config-0.29.2"
     version: "0.29.2"
@@ -47,15 +47,15 @@ sources:
         environ:
           NOCONFIGURE: "yes"
 
-  - name: "binutils"
-    subdir: source
+  - name: binutils
+    subdir: ports
     git: "https://github.com/bminor/binutils-gdb.git"
     tag: "binutils-2_38"
     version: "2.38"
     tools_required: ["cross-automake-v1.15"]
 
-  - name: "gcc"
-    subdir: source
+  - name: gcc
+    subdir: ports
     git: "https://github.com/gcc-mirror/gcc.git"
     tag: "releases/gcc-11.2.0"
     version: "11.2.0"
@@ -64,14 +64,14 @@ sources:
       - args: ["./contrib/download_prerequisites"]
         workdir: "@THIS_SOURCE_DIR@"
 
-  - name: "linux"
-    subdir: source
+  - name: linux
+    subdir: ports
     git: "https://github.com/torvalds/linux.git"
     tag: "v5.17"
     version: "5.17"
 
-  - name: "mlibc"
-    subdir: source
+  - name: mlibc
+    subdir: ports
     git: "https://github.com/no92/mlibc.git"
     branch: "lfs"
     version: "2.2.0"
@@ -83,7 +83,7 @@ declare_options:
     default: x86_64-linux-mlibc
 
 tools:
-  - name: "cross-autoconf-v2.69"
+  - name: cross-autoconf-v2.69
     from_source: "autoconf-v2.69"
     configure:
       - args: ["@THIS_SOURCE_DIR@/configure", "--prefix=@PREFIX@"]
@@ -92,14 +92,14 @@ tools:
     install:
       - args: ["make", "install"]
 
-  - name: "cross-autoconf-archive"
+  - name: cross-autoconf-archive
     from_source: "autoconf-archive"
     exports_aclocal: true
     install:
       - args: ["mkdir", "-p", "@BUILD_ROOT@/tools/cross-autoconf-archive/share/"]
       - args: ["cp", "-r", "@THIS_SOURCE_DIR@/m4", "@BUILD_ROOT@/tools/cross-autoconf-archive/share/aclocal"]
 
-  - name: "cross-automake-v1.15"
+  - name: cross-automake-v1.15
     from_source: "automake-v1.15"
     tools_required: ["cross-autoconf-v2.69"]
     configure:
@@ -110,7 +110,7 @@ tools:
       - args: ["make", "install"]
       - args: ["ln", "-sf", "@PREFIX@/share/aclocal-1.15", "@PREFIX@/share/aclocal"]
 
-  - name: "cross-libtool"
+  - name: cross-libtool
     exports_aclocal: true
     from_source: "libtool"
     tools_required: ["cross-automake-v1.15"]
@@ -121,7 +121,7 @@ tools:
     install:
       - args: ["make", "install"]
 
-  - name: "cross-pkg-config"
+  - name: cross-pkg-config
     exports_aclocal: true
     from_source: "pkg-config"
     configure:
@@ -131,7 +131,7 @@ tools:
     install:
       - args: ["make", "install"]
 
-  - name: "cross-binutils"
+  - name: cross-binutils
     from_source: "binutils"
     tools_required: ["cross-automake-v1.15"]
     configure:
@@ -147,7 +147,7 @@ tools:
     install:
       - args: ["make", "install"]
 
-  - name: "cross-gcc"
+  - name: cross-gcc
     from_source: "gcc"
     tools_required: ["cross-binutils"]
     configure:
@@ -162,7 +162,7 @@ tools:
           - "--enable-initfini-array"
           - "--enable-libstdcxx-filesystem-ts"
     stages:
-      - name: "compiler"
+      - name: compiler
         pkgs_required: ["mlibc-headers"]
         compile:
           - args: ["make", "-j", "@PARALLELISM@", "all-gcc"]
@@ -172,7 +172,7 @@ tools:
           - args: ["ln", "-sf", "../../../cross-binutils/@OPTION:arch-triple@/bin/as", "@PREFIX@/@OPTION:arch-triple@/bin/as"]
           - args: ["ln", "-sf", "../../../cross-binutils/@OPTION:arch-triple@/bin/ld", "@PREFIX@/@OPTION:arch-triple@/bin/ld"]
 
-      - name: "libgcc"
+      - name: libgcc
         tools_required:
           - tool: "cross-gcc"
             stage_dependencies: ["compiler"]
@@ -183,7 +183,7 @@ tools:
         install:
           - args: ["make", "install-target-libgcc"]
 
-      - name: "libstdc++"
+      - name: libstdc++
         tools_required:
           - tool: "cross-gcc"
             stage_dependencies: ["libgcc"]
@@ -192,7 +192,7 @@ tools:
         install:
           - args: ["make", "install-strip-target-libstdc++-v3"]
 
-  - name: "cross-toolchain"
+  - name: cross-toolchain
     source:
       subdir: "meta-sources"
       version: "1.0"
@@ -212,7 +212,7 @@ tools:
     install: []
 
 packages:
-  - name: "base-files"
+  - name: base-files
     implict_package: true
     source:
       subdir: "meta-sources"
@@ -252,7 +252,7 @@ packages:
           touch @THIS_COLLECT_DIR@/{tmp,var/tmp}/.keep
           ln -sfv run @THIS_COLLECT_DIR@/var/run
           ln -sfv run/lock @THIS_COLLECT_DIR@/var/lock
-  - name: "kernel-headers"
+  - name: kernel-headers
     from_source: "linux"
     implict_package: true
     configure:
@@ -266,7 +266,7 @@ packages:
 
   # TODO: Build the kernel itself too
 
-  - name: "mlibc-headers"
+  - name: mlibc-headers
     from_source: "mlibc"
     implict_package: true
     pkgs_required: ["kernel-headers"]
@@ -286,7 +286,7 @@ packages:
         environ:
           DESTDIR: "@THIS_COLLECT_DIR@"
 
-  - name: "mlibc"
+  - name: mlibc
     from_source: "mlibc"
     tools_required:
       - tool: "cross-gcc"
