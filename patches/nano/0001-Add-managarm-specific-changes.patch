@@ -1,0 +1,29 @@
+From 2a0d71952b96c379e8e51768e2d6dff03a024e4f Mon Sep 17 00:00:00 2001
+From: no92 <no92.mail@gmail.com>
+Date: Thu, 16 Jun 2022 23:27:26 +0200
+Subject: [PATCH] Add managarm-specific changes
+
+---
+ configure.ac | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 23dd03c..976ebec 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -71,12 +71,6 @@ AM_CONDITIONAL(BUILDING_FROM_GIT, test x$from_git = xyes)
+ dnl Checks for pkg-config and gettext when building from git.
+ 
+ if test x$from_git = xyes; then
+-	if test ! -f $(aclocal --print-ac-dir)/pkg.m4; then
+-		AC_MSG_ERROR([
+-  *** The pkg.m4 macros are missing.
+-  *** The pkg-config package needs to be installed when building from git.
+-  *** After fixing this problem, rerun ./autogen.sh.])
+-	fi
+ 	if test "$ac_cv_path_MSGFMT" = ":"; then
+ 		AC_MSG_ERROR([
+   *** The msgfmt program is missing.
+-- 
+2.36.1
+

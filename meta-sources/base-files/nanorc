@@ -1,0 +1,8 @@
+set autoindent
+set constantshow
+set historylog
+set linenumbers
+set positionlog
+set suspendable
+
+include "/usr/share/nano/*.nanorc"
