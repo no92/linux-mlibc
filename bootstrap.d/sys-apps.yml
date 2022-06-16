@@ -50,3 +50,23 @@ packages:
     build:
       - args: ["make", "-j", "@PARALLELISM@"]
       - args: ["make", "DESTDIR=@THIS_COLLECT_DIR@", "install"]
+
+  - name: file
+    from_source: file
+    tools_required:
+      - cross-toolchain
+      - cross-file
+    pkgs_required:
+      - zlib
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - "--host=@OPTION:arch-triple@"
+        - '--prefix=/usr'
+        - '--disable-bzlib'
+        - '--disable-xzlib'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
