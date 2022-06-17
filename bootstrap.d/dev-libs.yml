@@ -30,6 +30,34 @@ packages:
           DESTDIR: '@THIS_COLLECT_DIR@'
         quiet: true
 
+  - name: libexpat
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/libexpat/libexpat.git'
+      tag: 'R_2_4_1'
+      version: '2.4.1'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./buildconf.sh']
+          workdir: '@THIS_SOURCE_DIR@/expat'
+    tools_required:
+      - cross-toolchain
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/expat/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--with-sysroot=@SYSROOT_DIR@' # Set libtool's lt_sysroot.
+        # We disable xmlwf to avoid building its documentation.
+        - '--without-xmlwf'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+        quiet: true
+
   - name: libffi
     source:
       subdir: 'ports'
