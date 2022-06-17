@@ -235,3 +235,23 @@ packages:
       - args: ['make', 'install']
         environ:
           DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: which
+    source:
+      subdir: ports
+      url: 'https://ftp.gnu.org/gnu/which/which-2.21.tar.gz'
+      format: 'tar.gz'
+      extract_path: 'which-2.21'
+      version: '2.21'
+    tools_required:
+      - cross-toolchain
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
