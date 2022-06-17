@@ -1,0 +1,27 @@
+packages:
+  - name: sl
+    metadata:
+      summary: Never type 'ls' wrong again!
+      description: This package provides a fun way to correct the all too common typo of 'sl' when 'ls' was meant.
+      spdx: 'Toyoda'
+      website: 'https://github.com/mtoyoda/sl/'
+      maintainer: "Dennis Bonke <dennis@managarm.org>"
+      categories: ['app-misc']
+    source:
+      subdir: ports
+      git: 'https://github.com/mtoyoda/sl.git'
+      branch: 'master'
+      commit: '923e7d7ebc5c1f009755bdeb789ac25658ccce03'
+      version: '5.03'
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - ncurses
+    configure:
+      - args: ['cp', '-r', '@THIS_SOURCE_DIR@/.', '@THIS_BUILD_DIR@']
+    build:
+      - args: ['make', 'CC=@OPTION:arch-triple@-gcc', '-j@PARALLELISM@']
+      - args: ['mkdir', '-p', '@THIS_COLLECT_DIR@/usr/bin']
+      - args: ['mkdir', '-p', '@THIS_COLLECT_DIR@/usr/share/man/man1']
+      - args: ['cp', '@THIS_BUILD_DIR@/sl', '@THIS_COLLECT_DIR@/usr/bin']
+      - args: ['cp', '@THIS_BUILD_DIR@/sl.1', '@THIS_COLLECT_DIR@/usr/share/man/man1']

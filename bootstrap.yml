@@ -1,6 +1,7 @@
 imports:
   - file: bootstrap.d/app-arch.yml
   - file: bootstrap.d/app-editors.yml
+  - file: bootstrap.d/app-misc.yml
   - file: bootstrap.d/app-shells.yml
   - file: bootstrap.d/dev-db.yml
   - file: bootstrap.d/dev-lang.yml
