@@ -41,11 +41,8 @@ packages:
         - '@THIS_SOURCE_DIR@/configure'
         - '--host=@OPTION:arch-triple@'
         - '--prefix=/usr'
-        # - '--disable-nls'
         - '--disable-static'
         - '--enable-shared'
-        # - '--enable-libgdbm-compat'
-        # - '--without-readline'
     build:
       - args: ['make', '-j@PARALLELISM@']
       - args: ['make', 'install']
@@ -53,6 +50,31 @@ packages:
           DESTDIR: '@THIS_COLLECT_DIR@'
       - args: ['mkdir', '-pv', '@THIS_COLLECT_DIR@/usr/include']
       - args: ['cp', '-v', '@THIS_SOURCE_DIR@/argp.h', '@THIS_COLLECT_DIR@/usr/include']
+
+  - name: fts-standalone
+    source:
+      subdir: ports
+      git: 'https://github.com/pullmoll/musl-fts.git'
+      tag: 'v1.2.7'
+      version: '1.2.7'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./bootstrap.sh']
+    tools_required:
+      - cross-toolchain
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-static'
+        - '--enable-shared'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
 
   - name: gdbm
     source:
