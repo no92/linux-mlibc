@@ -24,6 +24,36 @@ sources:
     version: "1.2.11"
 
 packages:
+  - name: argp-standalone
+    source:
+      subdir: ports
+      git: 'https://github.com/argp-standalone/argp-standalone.git'
+      tag: '1.5.0'
+      version: '1.5.0'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['autoreconf', '-fvi']
+    tools_required:
+      - cross-toolchain
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        # - '--disable-nls'
+        - '--disable-static'
+        - '--enable-shared'
+        # - '--enable-libgdbm-compat'
+        # - '--without-readline'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+      - args: ['mkdir', '-pv', '@THIS_COLLECT_DIR@/usr/include']
+      - args: ['cp', '-v', '@THIS_SOURCE_DIR@/argp.h', '@THIS_COLLECT_DIR@/usr/include']
+
   - name: gdbm
     source:
       subdir: ports
