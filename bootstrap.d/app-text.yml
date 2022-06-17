@@ -1,0 +1,14 @@
+packages:
+  - name: tree
+    source:
+      subdir: ports
+      git: https://gitlab.com/OldManProgrammer/unix-tree
+      tag: '2.0.2'
+      version: '2.0.2'
+    tools_required:
+      - cross-toolchain
+    configure:
+      - args: ['cp', '-r', '@THIS_SOURCE_DIR@/.', '@THIS_BUILD_DIR@']
+    build:
+      - args: ['make', 'CC=@OPTION:arch-triple@-gcc', '-j@PARALLELISM@']
+      - args: ['make', 'PREFIX=@THIS_COLLECT_DIR@/usr', 'install']
