@@ -1,0 +1,40 @@
+From 962b404d345c775e3738d52bd7231210119106c1 Mon Sep 17 00:00:00 2001
+From: Dennis Bonke <admin@dennisbonke.com>
+Date: Fri, 17 Jun 2022 02:19:11 +0200
+Subject: [PATCH] Add mlibc support
+
+Signed-off-by: Dennis Bonke <admin@dennisbonke.com>
+---
+ gdb/linux-nat.c        | 2 +-
+ gdb/nat/linux-osdata.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gdb/linux-nat.c b/gdb/linux-nat.c
+index 4484fa5c..dbcf393c 100644
+--- a/gdb/linux-nat.c
++++ b/gdb/linux-nat.c
+@@ -1785,7 +1785,7 @@ kill_lwp (int lwpid, int signo)
+   int ret;
+ 
+   errno = 0;
+-  ret = syscall (__NR_tkill, lwpid, signo);
++  ret = tgkill (0, lwpid, signo);
+   if (errno == ENOSYS)
+     {
+       /* If tkill fails, then we are not using nptl threads, a
+diff --git a/gdb/nat/linux-osdata.c b/gdb/nat/linux-osdata.c
+index a4db8062..ea85beee 100644
+--- a/gdb/nat/linux-osdata.c
++++ b/gdb/nat/linux-osdata.c
+@@ -21,7 +21,7 @@
+ #include "linux-osdata.h"
+ 
+ #include <sys/types.h>
+-#include <sys/sysinfo.h>
++#include <sys/ipc.h>
+ #include <ctype.h>
+ #include <utmp.h>
+ #include <time.h>
+-- 
+2.36.1
+
