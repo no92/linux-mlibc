@@ -1,15 +1,18 @@
-From 047b3ac40a3c299253b6e6c108f4374bf23e5cac Mon Sep 17 00:00:00 2001
+From f801bba22adf2453611695459255894f06b59485 Mon Sep 17 00:00:00 2001
 From: czapek1337 <czapek1337@gmail.com>
 Date: Thu, 7 Apr 2022 19:35:51 +0200
 Subject: [PATCH] Add mlibc-specific changes
 
+Signed-off-by: Dennis Bonke <admin@dennisbonke.com>
 ---
- config.sub                  |  4 ++--
- gcc/config.gcc              |  5 ++++-
- gcc/config/linux.h          | 40 ++++++++++++++++++++++++-------------
- libgcc/libgcov.h            |  2 ++
- libstdc++-v3/configure.host |  2 +-
- 5 files changed, 35 insertions(+), 18 deletions(-)
+ config.sub                                  |  4 +--
+ gcc/config.gcc                              |  5 ++-
+ gcc/config/linux.h                          | 40 +++++++++++++--------
+ libgcc/libgcov.h                            |  2 ++
+ libstdc++-v3/configure.host                 |  2 +-
+ libstdc++-v3/include/c_compatibility/fenv.h |  4 +--
+ libstdc++-v3/include/c_global/cfenv         |  4 +--
+ 7 files changed, 37 insertions(+), 24 deletions(-)
 
 diff --git a/config.sub b/config.sub
 index 63c1f1c8b..ba32b6d6b 100755
@@ -173,6 +176,36 @@ index ec32980aa..1fe59f392 100644
      os_include_dir="os/generic"
      ;;
    gnu* | linux* | kfreebsd*-gnu | uclinux*)
+diff --git a/libstdc++-v3/include/c_compatibility/fenv.h b/libstdc++-v3/include/c_compatibility/fenv.h
+index 0413e3b7c..9158b45eb 100644
+--- a/libstdc++-v3/include/c_compatibility/fenv.h
++++ b/libstdc++-v3/include/c_compatibility/fenv.h
+@@ -32,9 +32,7 @@
+ #pragma GCC system_header
+ 
+ #include <bits/c++config.h>
+-#if _GLIBCXX_HAVE_FENV_H
+-# include_next <fenv.h>
+-#endif
++#include_next <fenv.h>
+ 
+ #if __cplusplus >= 201103L
+ 
+diff --git a/libstdc++-v3/include/c_global/cfenv b/libstdc++-v3/include/c_global/cfenv
+index 0b0ec35a8..fba5e4582 100644
+--- a/libstdc++-v3/include/c_global/cfenv
++++ b/libstdc++-v3/include/c_global/cfenv
+@@ -37,9 +37,7 @@
+ 
+ #include <bits/c++config.h>
+ 
+-#if _GLIBCXX_HAVE_FENV_H
+-# include <fenv.h>
+-#endif
++#include_next <fenv.h>
+ 
+ #ifdef _GLIBCXX_USE_C99_FENV_TR1
+ 
 -- 
 2.36.1
 
