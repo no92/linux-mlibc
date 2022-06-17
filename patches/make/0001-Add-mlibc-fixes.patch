@@ -1,0 +1,25 @@
+From 263042352fd789a033a3667ca066089ff97a5221 Mon Sep 17 00:00:00 2001
+From: no92 <no92.mail@gmail.com>
+Date: Fri, 17 Jun 2022 04:03:41 +0200
+Subject: [PATCH] Add mlibc fixes
+
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index c88c465..670b417 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -31,7 +31,7 @@ else
+   ossrc =	posixos.c
+ endif
+ 
+-SUBDIRS =	glob config po doc $(MAYBE_W32)
++SUBDIRS =	glob config po $(MAYBE_W32)
+ 
+ bin_PROGRAMS =	make
+ include_HEADERS = gnumake.h
+-- 
+2.36.1
+
