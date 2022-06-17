@@ -175,3 +175,24 @@ packages:
       - args: ['make', 'install']
         environ:
           DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: less
+    source:
+      subdir: ports
+      url: 'http://www.greenwoodsoftware.com/less/less-563.tar.gz'
+      format: 'tar.gz'
+      extract_path: 'less-563'
+      version: '563'
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - ncurses
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--sysconfdir=/etc'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'DESTDIR=@THIS_COLLECT_DIR@', 'install']
