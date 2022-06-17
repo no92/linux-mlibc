@@ -206,3 +206,29 @@ packages:
       - args: ["make", "install"]
         environ:
           DESTDIR: "@THIS_COLLECT_DIR@"
+
+  - name: patch
+    source:
+      subdir: ports
+      git: "https://git.savannah.gnu.org/git/patch.git"
+      tag: "v2.7.6"
+      version: "2.7.6"
+      tools_required:
+        - cross-autoconf-v2.69
+        - cross-automake-v1.15
+        - cross-libtool
+      regenerate:
+        - args: ["./bootstrap"]
+        - args: ["cp", "@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.sub", "@THIS_SOURCE_DIR@/build-aux/"]
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - diffutils
+    configure:
+      - args: ["@THIS_SOURCE_DIR@/configure", "--host=@OPTION:arch-triple@", "--prefix=/usr"]
+    build:
+      - args: ["make", "-j", "@PARALLELISM@"]
+      - args: ["make", "install"]
+        environ:
+          DESTDIR: "@THIS_COLLECT_DIR@"
+      - args: ["rm", "-r", "@THIS_COLLECT_DIR@/usr/lib"]
