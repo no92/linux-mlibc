@@ -10,7 +10,7 @@ Derived and restructured from [czapek1337's patches](https://github.com/czapek13
 $ mkdir build && cd $_ # create and cd into a build directory
 $ xbstrap init ../ # init xbstrap with the source directory containing bootstrap.yml
 $ xbstrap install -u --all # build everything
-$ xbstrap run versioncheck # run a versioncheck, verify against LFS
+$ xbstrap run version-check # run a version check, verify against LFS
 $ xbstrap run chroot # mount & chroot into the system (requires sudo permissions)
 ```
 
