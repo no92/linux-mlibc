@@ -86,6 +86,69 @@ packages:
           DESTDIR: '@THIS_COLLECT_DIR@'
         quiet: true
 
+  - name: libiconv
+    source:
+      subdir: 'ports'
+      git: 'https://git.savannah.gnu.org/git/libiconv.git'
+      # Last release tag is broken for us, use current master (07-12-2020)
+      branch: 'master'
+      commit: '0eb1068ceb77ba383c3ce2fc391ab40ef686c491'
+      version: '1.16'
+      tools_required:
+        - cross-toolchain
+        - cross-autoconf-archive
+        - cross-gettext
+      regenerate:
+        - args: ['./gitsub.sh', 'pull']
+        # Gnulib broke on commit e3174b6d1fdbe6ea2297bf8c8333f65f9d9d9588, so check out the one before that.
+        - args: ['git', 'checkout', '766ec17a90f67e8cda78394e58a7fffb00f5a4b7']
+          workdir: '@THIS_SOURCE_DIR@/gnulib'
+        - args: ['./autogen.sh']
+          environ:
+            'NOCONFIGURE': 'yes'
+        - args: ['cp',
+            '@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.sub',
+            '@THIS_SOURCE_DIR@/build-aux/']
+        - args: ['cp',
+            '@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.sub',
+            '@THIS_SOURCE_DIR@/libcharset/build-aux/']
+        - args: ['cp',
+            '@BUILD_ROOT@/tools/cross-libtool/share/aclocal/libtool.m4',
+            '@THIS_SOURCE_DIR@/m4/']
+        - args: ['cp',
+            '@BUILD_ROOT@/tools/cross-libtool/share/aclocal/libtool.m4',
+            '@THIS_SOURCE_DIR@/libcharset/m4/']
+        - args: ['cp',
+            '@BUILD_ROOT@/tools/cross-libtool/share/libtool/build-aux/ltmain.sh',
+            '@THIS_SOURCE_DIR@/libcharset/build-aux/']
+        - args: ['cp',
+            '@BUILD_ROOT@/tools/cross-libtool/share/libtool/build-aux/ltmain.sh',
+            '@THIS_SOURCE_DIR@/build-aux/']
+        - args: ['cp',
+            '@BUILD_ROOT@/tools/cross-libtool/share/aclocal/ltversion.m4',
+            '@THIS_SOURCE_DIR@/m4/']
+        - args: ['cp',
+            '@BUILD_ROOT@/tools/cross-libtool/share/aclocal/ltversion.m4',
+            '@THIS_SOURCE_DIR@/libcharset/m4/']
+        - args: ['autoreconf', '-fvi', '-I@THIS_SOURCE_DIR@/m4', '-I@THIS_SOURCE_DIR@/srcm4']
+    tools_required:
+      - cross-toolchain
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--with-sysroot=@SYSROOT_DIR@' # Set libtool's lt_sysroot.
+        - '--disable-nls'
+        - '--enable-shared'
+        - '--disable-static'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+        quiet: true
+
   - name: libpipeline
     source:
       subdir: ports
