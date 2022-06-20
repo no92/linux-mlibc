@@ -80,8 +80,8 @@ sources:
   - name: linux
     subdir: ports
     git: "https://github.com/torvalds/linux.git"
-    tag: "v5.17"
-    version: "5.17"
+    tag: "v5.18"
+    version: "5.18"
 
   - name: mlibc
     subdir: ports
