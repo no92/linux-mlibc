@@ -1,0 +1,21 @@
+packages:
+  - name: libpng
+    source:
+      subdir: ports
+      git: https://github.com/glennrp/libpng
+      tag: 'v1.6.37'
+      version: '1.6.37'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['autoreconf', '-fvi']
+    tools_required:
+        - cross-toolchain
+    configure:
+      - args:
+        - "@THIS_SOURCE_DIR@/configure"
+        - "--host=@OPTION:arch-triple@"
+        - "--prefix=/usr"
+    build:
+      - args: ["make", "-j@PARALLELISM@"]
+      - args: ["make", "DESTDIR=@THIS_COLLECT_DIR@", "install"]
