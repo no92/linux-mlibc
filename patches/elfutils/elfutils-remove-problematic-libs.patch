@@ -1,0 +1,13 @@
+--- elfutils/Makefile.am	2022-06-20 15:43:19.974637559 +0200
++++ elfutils-good/Makefile.am	2022-06-20 15:43:40.050741920 +0200
+@@ -26,8 +26,8 @@
+ 
+ pkginclude_HEADERS = version.h
+ 
+-SUBDIRS = config lib libelf libcpu backends libebl libdwelf libdwfl libdw \
+-	  libasm debuginfod src po doc tests
++SUBDIRS = config lib libelf libcpu backends libebl libdwelf \
++	  debuginfod po doc tests
+ 
+ EXTRA_DIST = elfutils.spec GPG-KEY NOTES CONTRIBUTING \
+ 	     COPYING COPYING-GPLV2 COPYING-LGPLV3
