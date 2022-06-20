@@ -211,6 +211,35 @@ packages:
         environ:
           DESTDIR: '@THIS_COLLECT_DIR@'
 
+  - name: libtasn
+    source:
+      subdir: ports
+      git: 'https://gitlab.com/gnutls/libtasn1.git'
+      tag: 'v4.17.0'
+      version: '4.17.0'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        #- args: ['sed', '-i', 's/"SUBDIRS = lib src fuzz tests"/"SUBDIRS = lib src fuzz"/', '@THIS_SOURCE_DIR@/Makefile.am']
+        - args: ['./bootstrap']
+        - args: ['cp',
+            '@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.sub',
+            '@THIS_SOURCE_DIR@/build-aux/']
+    tools_required:
+      - cross-toolchain
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-static'
+        - '--disable-doc'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
   - name: libunistring
     architecture: '@OPTION:arch@'
     metadata:
