@@ -343,6 +343,37 @@ packages:
           DESTDIR: '@THIS_COLLECT_DIR@'
         quiet: true
 
+  - name: nettle
+    source:
+      subdir: 'ports'
+      git: 'https://git.lysator.liu.se/nettle/nettle.git'
+      tag: 'nettle_3.7.3_release_20210606'
+      version: '3.7.3'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./.bootstrap']
+        - args: ['cp',
+            '@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.sub',
+            '@THIS_SOURCE_DIR@/']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - gmp
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-static'
+        - '--disable-documentation'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+        quiet: true
+
   - name: openssl
     source:
       subdir: ports
