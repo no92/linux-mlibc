@@ -301,6 +301,7 @@ packages:
           - "--prefix=/usr"
           - "-Dheaders_only=true"
           - "-Ddisable_iconv_option=true"
+          - "-Ddisable_intl_option=true"
           - "-Dbuildtype=debug"
           - "@THIS_SOURCE_DIR@"
     build:
@@ -327,6 +328,7 @@ packages:
           - "--libdir=lib"
           - "-Dmlibc_no_headers=true"
           - "-Ddisable_iconv_option=true"
+          - "-Ddisable_intl_option=true"
           - "-Dbuildtype=debug"
           - "@THIS_SOURCE_DIR@"
     build:
