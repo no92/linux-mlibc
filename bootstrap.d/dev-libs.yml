@@ -21,6 +21,8 @@ packages:
       - argp-standalone
       - fts-standalone
       - obstack-standalone
+      - libintl
+      - libiconv
     configure:
       - args:
         - '@THIS_SOURCE_DIR@/configure'
