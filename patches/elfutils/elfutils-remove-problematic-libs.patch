@@ -11,3 +11,25 @@
  
  EXTRA_DIST = elfutils.spec GPG-KEY NOTES CONTRIBUTING \
  	     COPYING COPYING-GPLV2 COPYING-LGPLV3
+--- elfutils/libelf/Makefile.am	2022-04-25 22:56:39.000000000 +0200
++++ elfutils-good/libelf/Makefile.am	2022-06-21 00:48:14.032259673 +0200
+@@ -106,7 +106,7 @@
+ am_libelf_pic_a_OBJECTS = $(libelf_a_SOURCES:.c=.os)
+ 
+ libelf_so_DEPS = ../lib/libeu.a
+-libelf_so_LDLIBS = $(libelf_so_DEPS) -lz
++libelf_so_LDLIBS = $(libelf_so_DEPS) -lz -lintl
+ if USE_LOCKS
+ libelf_so_LDLIBS += -lpthread
+ endif
+--- elfutils/configure.ac	2022-04-25 22:56:39.000000000 +0200
++++ elfutils-good/configure.ac	2022-06-21 00:41:46.367491605 +0200
+@@ -571,7 +571,7 @@
+ 	       [test "x$ac_cv_no_packed_not_aligned" != "xno"])
+ 
+ saved_LIBS="$LIBS"
+-AC_SEARCH_LIBS([argp_parse], [argp])
++AC_SEARCH_LIBS([argp_parse], [argp], [], [], [-lintl])
+ LIBS="$saved_LIBS"
+ case "$ac_cv_search_argp_parse" in
+         no) AC_MSG_FAILURE([failed to find argp_parse]) ;;

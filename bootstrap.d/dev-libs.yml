@@ -180,6 +180,8 @@ packages:
         - args: ['autoreconf', '-fvi', '-I@THIS_SOURCE_DIR@/m4', '-I@THIS_SOURCE_DIR@/srcm4']
     tools_required:
       - cross-toolchain
+      - cross-gettext
+      - cross-bison
     configure:
       - args:
         - '@THIS_SOURCE_DIR@/configure'
@@ -200,6 +202,8 @@ packages:
     from_source: gettext
     tools_required:
       - cross-toolchain
+      - cross-gettext
+      - cross-bison
     pkgs_required:
       - libiconv
     configure:
