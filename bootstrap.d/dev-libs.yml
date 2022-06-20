@@ -149,6 +149,42 @@ packages:
           DESTDIR: '@THIS_COLLECT_DIR@'
         quiet: true
 
+  - name: libintl
+    from_source: gettext
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - libiconv
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--without-emacs'
+        - '--without-lispdir'
+        # Normally this controls nls behavior in general, but the libintl
+        # subdir is skipped unless this is explicitly set.
+        - '--enable-nls'
+        # This magic flag enables libintl.
+        - '--with-included-gettext'
+        - '--disable-c++'
+        - '--disable-libasprintf'
+        - '--disable-java'
+        - '--enable-shared'
+        - '--disable-static'
+        - '--enable-threads=posix'
+        - '--disable-curses'
+        - '--without-git'
+        - '--without-cvs'
+        - '--without-bzip2'
+        - '--without-xz'
+    build:
+      - args: ['make', '-C', 'gettext-runtime/intl', '-j@PARALLELISM@']
+      - args: ['make', '-C', 'gettext-runtime/intl', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+        quiet: true
+
   - name: libpipeline
     source:
       subdir: ports
