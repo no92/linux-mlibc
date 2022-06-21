@@ -268,10 +268,18 @@ packages:
           mkdir -pv @THIS_COLLECT_DIR@/var/lib/{color,misc,locate}
           install -dv -m 0750 @THIS_COLLECT_DIR@/root
           install -dv -m 1777 @THIS_COLLECT_DIR@/tmp @THIS_COLLECT_DIR@/var/tmp
-          cp @THIS_SOURCE_DIR@/{group,hosts,passwd,profile} @THIS_COLLECT_DIR@/etc
+          install --directory --mode=0755 @THIS_COLLECT_DIR@/etc/profile.d
+          cp @THIS_SOURCE_DIR@/{group,hosts,passwd,profile,bashrc,dircolors,shells,inputrc} @THIS_COLLECT_DIR@/etc
+          cp @THIS_SOURCE_DIR@/bash_completion.sh @THIS_COLLECT_DIR@/etc/profile.d
+          cp @THIS_SOURCE_DIR@/dircolors.sh @THIS_COLLECT_DIR@/etc/profile.d
+          cp @THIS_SOURCE_DIR@/extrapaths.sh @THIS_COLLECT_DIR@/etc/profile.d
+          cp @THIS_SOURCE_DIR@/readline.sh @THIS_COLLECT_DIR@/etc/profile.d
+          cp @THIS_SOURCE_DIR@/umask.sh @THIS_COLLECT_DIR@/etc/profile.d
           cp @THIS_SOURCE_DIR@/.bashrc @THIS_COLLECT_DIR@/root
+          install --directory --mode=0755 @THIS_COLLECT_DIR@/etc/bash_completion.d
           touch @THIS_COLLECT_DIR@/{boot,home,mnt,opt,root,srv,tmp}/.keep
           touch @THIS_COLLECT_DIR@/etc/{opt,sysconfig}/.keep
+          touch @THIS_COLLECT_DIR@/etc/bash_completion.d/.keep
           touch @THIS_COLLECT_DIR@/lib/firmware/.keep
           touch @THIS_COLLECT_DIR@/media/{floppy,cdrom}/.keep
           touch @THIS_COLLECT_DIR@/usr/{,local/}{bin,include,lib,sbin,src}/.keep
