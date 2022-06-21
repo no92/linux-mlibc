@@ -1,0 +1,48 @@
+From 830f577985b0ebf61277a4d2d521f51c7db9169f Mon Sep 17 00:00:00 2001
+From: Dennis Bonke <admin@dennisbonke.com>
+Date: Tue, 21 Jun 2022 03:48:18 +0200
+Subject: [PATCH 2/2] Work around several glib issues
+
+Signed-off-by: Dennis Bonke <admin@dennisbonke.com>
+---
+ glib/gspawn.c | 2 ++
+ meson.build   | 3 ++-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/glib/gspawn.c b/glib/gspawn.c
+index 67be6a6..3183739 100644
+--- a/glib/gspawn.c
++++ b/glib/gspawn.c
+@@ -1425,6 +1425,7 @@ safe_fdwalk (int (*cb)(void *data, int fd), void *data)
+   struct rlimit rl;
+ #endif
+ 
++#if 0
+ #ifdef __linux__
+   /* Avoid use of opendir/closedir since these are not async-signal-safe. */
+   int dir_fd = open ("/proc/self/fd", O_RDONLY | O_DIRECTORY);
+@@ -1457,6 +1458,7 @@ safe_fdwalk (int (*cb)(void *data, int fd), void *data)
+    * rlimit trick. */
+ 
+ #endif
++#endif
+ 
+ #if defined(__sun__) && defined(F_PREVFD) && defined(F_NEXTFD)
+ /*
+diff --git a/meson.build b/meson.build
+index 3e8c155..8b200e3 100644
+--- a/meson.build
++++ b/meson.build
+@@ -2017,7 +2017,8 @@ endif
+ libm = cc.find_library('m', required : false)
+ libffi_dep = dependency('libffi', version : '>= 3.0.0', fallback : ['libffi', 'ffi_dep'])
+ 
+-if get_option('wrap_mode') == 'forcefallback'
++#if get_option('wrap_mode') == 'forcefallback'
++if true
+   # Respects "wrap_mode=forcefallback" option
+   libz_dep = subproject('zlib').get_variable('zlib_dep')
+ else
+-- 
+2.36.1
+

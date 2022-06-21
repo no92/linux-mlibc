@@ -1,3 +1,10 @@
+sources:
+  - name: glib
+    subdir: ports
+    git: 'https://gitlab.gnome.org/GNOME/glib.git'
+    tag: '2.70.3'
+    version: '2.70.3'
+
 packages:
   - name: double-conversion
     metadata:
@@ -79,6 +86,44 @@ packages:
         environ:
           DESTDIR: '@THIS_COLLECT_DIR@'
       - args: ['rm', '-rv', '@THIS_COLLECT_DIR@/usr/bin']
+
+  - name: glib
+    from_source: glib
+    tools_required:
+      - cross-toolchain
+      - virtual: pkgconfig-for-target
+        triple: "@OPTION:arch-triple@"
+    pkgs_required:
+      - mlibc
+      - libiconv
+      - libintl
+      - pcre
+      - libffi
+      - zlib
+    configure:
+      - args:
+        - 'meson'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+        - '--prefix=/usr'
+        - '--libdir=lib'
+        - '--buildtype=debugoptimized'
+        - '-Dxattr=false'
+        - '-Dtests=true'
+        - '-Dinstalled_tests=true'
+        - '@THIS_SOURCE_DIR@'
+        environ:
+          PKG_CONFIG_SYSROOT_DIR: '@BUILD_ROOT@/system-root'
+          PKG_CONFIG_LIBDIR: '@BUILD_ROOT@/system-root/usr/lib/pkgconfig:@BUILD_ROOT@/system-root/usr/share/pkgconfig'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+    scripts:
+        post_install:
+          - args: ['glib-compile-schemas /usr/share/glib-2.0/schemas']
+          - args: ['gio-querymodules /usr/lib/gio/modules']
 
   - name : gmp
     source:
