@@ -302,7 +302,7 @@ packages:
       - args: ['make', '-j@PARALLELISM@']
       - args: ['make', 'modules_install']
         environ:
-          INSTALL_MOD_PATH: '@THIS_COLLECT_DIR@'
+          INSTALL_MOD_PATH: '@THIS_COLLECT_DIR@/usr/'
       - args: ['mkdir', '-pv', '@THIS_COLLECT_DIR@/boot']
       - args: ['cp', '-v', '@THIS_BUILD_DIR@/arch/x86/boot/bzImage', '@THIS_COLLECT_DIR@/boot/vmlinuz-linux']
 
