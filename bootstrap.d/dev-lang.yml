@@ -5,6 +5,28 @@ sources:
     tag: '1.3.3'
     version: '1.3.3'
 
+  - name: python
+    subdir: 'ports'
+    git: 'https://github.com/python/cpython.git'
+    tag: 'v3.8.2'
+    version: '3.8.2'
+    tools_required:
+      - cross-toolchain
+    regenerate:
+      - args: ['autoreconf', '-f', '-i']
+
+tools:
+  - name: host-python
+    from_source: python
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--prefix=@PREFIX@'
+    compile:
+      - args: ['make', '-j@PARALLELISM@']
+    install:
+      - args: ['make', 'install']
+
 packages:
   - name: nasm
     source:
