@@ -14,6 +14,7 @@ imports:
   - file: bootstrap.d/media-libs.yml
   - file: bootstrap.d/net-misc.yml
   - file: bootstrap.d/sys-apps.yml
+  - file: bootstrap.d/sys-boot.yml
   - file: bootstrap.d/sys-devel.yml
   - file: bootstrap.d/sys-fs.yml
   - file: bootstrap.d/sys-libs.yml
@@ -284,15 +285,26 @@ packages:
     from_source: linux
     implict_package: true
     configure:
-      - args: ["rsync", "-ar", "@THIS_SOURCE_DIR@/", "@THIS_BUILD_DIR@/"]
+      - args: ['rsync', '-ar', '@THIS_SOURCE_DIR@/', '@THIS_BUILD_DIR@/']
     build:
-      - args: ["make", "headers"]
-      - args: ["find", "usr/include", "-name", '".*"', "-delete"]
-      - args: ["rm", "usr/include/Makefile"]
-      - args: ["mkdir", "-pv", "@THIS_COLLECT_DIR@/usr"]
-      - args: ["cp", "-rv", "usr/include", "@THIS_COLLECT_DIR@/usr"]
+      - args: ['make', 'mrproper', 'headers']
+      - args: ['find', 'usr/include', '-name', '".*"', '-delete']
+      - args: ['rm', 'usr/include/Makefile']
+      - args: ['mkdir', '-pv', '@THIS_COLLECT_DIR@/usr']
+      - args: ['cp', '-rv', 'usr/include', '@THIS_COLLECT_DIR@/usr']
 
-  # TODO: Build the kernel itself too
+  - name: kernel
+    from_source: linux
+    configure:
+      - args: ['rsync', '-ar', '@THIS_SOURCE_DIR@/', '@THIS_BUILD_DIR@/']
+    build:
+      - args: ['make', 'mrproper', 'defconfig']
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'modules_install']
+        environ:
+          INSTALL_MOD_PATH: '@THIS_COLLECT_DIR@'
+      - args: ['mkdir', '-pv', '@THIS_COLLECT_DIR@/boot']
+      - args: ['cp', '-v', '@THIS_BUILD_DIR@/arch/x86/boot/bzImage', '@THIS_COLLECT_DIR@/boot/vmlinuz-linux']
 
   - name: mlibc-headers
     from_source: mlibc
@@ -371,4 +383,39 @@ tasks:
       - "@SOURCE_ROOT@/scripts/lfs.sh"
       - "@BUILD_ROOT@"
       - chroot
+    containerless: true
+
+  - name: mount-image
+    args:
+      - sudo
+      - '@SOURCE_ROOT@/scripts/mount-image.sh'
+      - '@BUILD_ROOT@'
+    containerless: true
+
+  - name: update-image
+    args:
+      - sudo
+      - '@SOURCE_ROOT@/scripts/update-image.sh'
+      - '@BUILD_ROOT@'
+    containerless: true
+
+  - name: unmount-image
+    args:
+      - sudo
+      - '@SOURCE_ROOT@/scripts/unmount-image.sh'
+      - '@BUILD_ROOT@'
+    containerless: true
+
+  - name: make-image
+    tools_required:
+      - host-limine
+    args: |
+      sudo @SOURCE_ROOT@/scripts/make-image.sh @BUILD_ROOT@
+      sudo @BUILD_ROOT@/tools/host-limine/share/limine/limine-deploy @BUILD_ROOT@/image
+    containerless: true
+
+  - name: qemu
+    tasks_required:
+      - make-image
+    args: ['qemu-system-x86_64', '-drive', 'format=raw,file=@BUILD_ROOT@/image', '-serial', 'stdio']
     containerless: true
