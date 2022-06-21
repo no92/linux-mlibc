@@ -1,0 +1,32 @@
+packages:
+  - name: xorg-proto
+    source:
+      subdir: ports
+      git: 'https://gitlab.freedesktop.org/xorg/proto/xorgproto.git'
+      tag: 'xorgproto-2021.5'
+      version: '2021.5'
+      tools_required:
+        - cross-toolchain
+        - host-xorg-macros
+      regenerate:
+        - args: ['./autogen.sh']
+          environ:
+            'NOCONFIGURE': 'yes'
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - xorg-util-macros
+    revision: 2
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--sysconfdir=/etc'
+        - '--localstatedir=/var'
+        - '--disable-static'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
