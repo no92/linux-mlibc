@@ -1,0 +1,50 @@
+sources:
+  - name: 'cmake'
+    subdir: 'ports'
+    git: 'https://gitlab.kitware.com/cmake/cmake.git'
+    tag: 'v3.22.0'
+    version: '3.22.0'
+
+tools:
+  - name: cross-cmake
+    from_source: cmake
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/bootstrap'
+        - '--prefix=@PREFIX@'
+        - '--parallel=@PARALLELISM@'
+    compile:
+      - args: ['make', '-j@PARALLELISM@']
+    install:
+      - args: ['make', 'install']
+      # - args: ['ln', '-sf', '@SOURCE_ROOT@/scripts/managarm.cmake', '@PREFIX@/share/cmake-3.22/Modules/Platform/']
+
+packages:
+  - name: strace
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/strace/strace.git'
+      tag: 'v5.18'
+      version: '5.18'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./bootstrap']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - elfutils
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-gcc-Werror'
+        - '--with-libiberty'
+        - '--enable-mpers=no'
+        - '--enable-bundled=no'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
