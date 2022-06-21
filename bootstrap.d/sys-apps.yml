@@ -348,7 +348,9 @@ packages:
       - args: ['make', '-j@PARALLELISM@']
         environ:
           CC: '@OPTION:arch-triple@-gcc'
-      - args: ['make', 'DESTDIR=@THIS_COLLECT_DIR@', 'install']
+      - args: ['make', 'ROOT=@THIS_COLLECT_DIR@', 'install']
+      - args: ['cp', '-v', '@THIS_SOURCE_DIR@/../../meta-sources/base-files/inittab', '@THIS_COLLECT_DIR@/etc/inittab']
+      - args: ['cp', '-v', '@THIS_SOURCE_DIR@/../../meta-sources/base-files/fstab', '@THIS_COLLECT_DIR@/etc/fstab']
 
   - name: util-linux
     source:

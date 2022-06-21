@@ -1,0 +1,71 @@
+From 0e3ba779508187e310db84d22584b37a4c425066 Mon Sep 17 00:00:00 2001
+From: Dennis Bonke <admin@dennisbonke.com>
+Date: Tue, 21 Jun 2022 20:17:46 +0200
+Subject: [PATCH] Add initial mlibc support
+
+Signed-off-by: Dennis Bonke <admin@dennisbonke.com>
+---
+ src/Makefile | 16 ++++++++--------
+ src/init.c   |  2 +-
+ 2 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index cc753c1..e506cc6 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -10,7 +10,7 @@
+ 
+ CPPFLAGS =
+ CFLAGS  ?= -O2
+-override CFLAGS += -ansi -fomit-frame-pointer -fstack-protector-strong -W -Wall -Wunreachable-code -Wformat -Werror=format-security -D_FORTIFY_SOURCE=2 -D_XOPEN_SOURCE -D_GNU_SOURCE -DVERSION=\"$(VERSION)\"
++override CFLAGS += -ansi -fomit-frame-pointer -W -Wall -Wunreachable-code -Wformat -Werror=format-security -D_FORTIFY_SOURCE=2 -D_XOPEN_SOURCE -D_GNU_SOURCE -DVERSION=\"$(VERSION)\"
+ override CFLAGS += $(shell getconf LFS_CFLAGS)
+ STATIC	=
+ MANDB	:= s@^\('\\\\\"\)[^\*-]*-\*- coding: [^[:blank:]]\+ -\*-@\1@
+@@ -194,13 +194,13 @@ clobber:	cleanobjs
+ distclean:	clobber
+ 
+ install:	all
+-		$(INSTALL_DIR) $(ROOT)/bin/ $(ROOT)/sbin/
+-		$(INSTALL_DIR) $(ROOT)/usr/bin/
++# 		$(INSTALL_DIR) $(ROOT)/bin/ $(ROOT)/sbin/
++		$(INSTALL_DIR) $(ROOT)/usr/bin/ $(ROOT)/usr/sbin/
+ 		for i in $(BIN); do \
+-			$(INSTALL_EXEC) $$i $(ROOT)/bin/ ; \
++			$(INSTALL_EXEC) $$i $(ROOT)/usr/bin/ ; \
+ 		done
+ 		for i in $(SBIN); do \
+-			$(INSTALL_EXEC) $$i $(ROOT)/sbin/ ; \
++			$(INSTALL_EXEC) $$i $(ROOT)/usr/sbin/ ; \
+ 		done
+ 		for i in $(USRBIN); do \
+ 			$(INSTALL_EXEC) $$i $(ROOT)/usr/bin/ ; \
+@@ -208,9 +208,9 @@ install:	all
+ 		# $(INSTALL_DIR) $(ROOT)/etc/
+ 		$(INSTALL_DIR) $(ROOT)/etc/inittab.d
+ 		# $(INSTALL_EXEC) ../doc/initscript.sample $(ROOT)/etc/
+-		ln -sf halt $(ROOT)/sbin/reboot
+-		ln -sf halt $(ROOT)/sbin/poweroff
+-		ln -sf init $(ROOT)/sbin/telinit
++		ln -sf halt $(ROOT)/usr/sbin/reboot
++		ln -sf halt $(ROOT)/usr/sbin/poweroff
++		ln -sf init $(ROOT)/usr/sbin/telinit
+ 		#ln -sf /sbin/killall5 $(ROOT)/bin/pidof
+ 		#if [ ! -f $(ROOT)/usr/bin/lastb ]; then \
+ 		#	ln -sf last $(ROOT)/usr/bin/lastb; \
+diff --git a/src/init.c b/src/init.c
+index d8e304e..412da67 100644
+--- a/src/init.c
++++ b/src/init.c
+@@ -2867,7 +2867,7 @@ void init_main(void)
+   	/* Close whatever files are open, and reset the console. */
+ 	close(0);
+ 	close(1);
+-	close(2);
++	/*close(2);*/
+   	console_stty();
+   	setsid();
+ 
+-- 
+2.36.1
+
