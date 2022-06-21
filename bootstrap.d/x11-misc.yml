@@ -1,0 +1,49 @@
+sources:
+  - name: 'xorg-util-macros'
+    subdir: ports
+    git: 'https://gitlab.freedesktop.org/xorg/util/macros.git'
+    tag: 'util-macros-1.19.3'
+    version: '1.19.3'
+    tools_required:
+      - cross-toolchain
+    regenerate:
+      - args: ['./autogen.sh']
+        environ:
+          'NOCONFIGURE': 'yes'
+
+tools:
+  - name: host-xorg-macros
+    labels: [aarch64]
+    architecture: noarch
+    exports_aclocal: true
+    from_source: xorg-util-macros
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--prefix=@PREFIX@'
+    compile:
+      - args: ['make', '-j@PARALLELISM@']
+    install:
+      - args: ['make', 'install']
+
+packages:
+  - name: xorg-util-macros
+    labels: [aarch64]
+    architecture: '@OPTION:arch@'
+    from_source: xorg-util-macros
+    tools_required:
+      - cross-toolchain
+      - host-xorg-macros
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--sysconfdir=/etc'
+        - '--localstatedir=/var'
+        - '--disable-static'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
