@@ -1,0 +1,14 @@
+diff -Naur bootscripts/Makefile bootscripts-good/Makefile
+--- bootscripts/Makefile	2022-06-21 09:08:02.000000000 +0200
++++ bootscripts-good/Makefile	2022-06-21 20:13:44.389047299 +0200
+@@ -1,8 +1,8 @@
+ ETCDIR=${DESTDIR}/etc
+-LIBDIR=${DESTDIR}/lib
++LIBDIR=${DESTDIR}/usr/lib
+ SERVICEDIR=${LIBDIR}/services
+ MAN8=${DESTDIR}/usr/share/man/man8
+-SBIN=${DESTDIR}/sbin
++SBIN=${DESTDIR}/usr/sbin
+ MODE=754
+ DIRMODE=755
+ CONFMODE=644
