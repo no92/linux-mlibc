@@ -1,0 +1,33 @@
+packages:
+  - name: eudev
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/gentoo/eudev.git'
+      tag: 'v3.2.10'
+      version: '3.2.10'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+    tools_required:
+      - cross-toolchain
+    # pkgs_required:
+    #   - util-linux
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--with-sysroot=@SYSROOT_DIR@' # Set libtool's lt_sysroot.
+        - '--disable-blkid'
+        - '--disable-selinux'
+        - '--disable-kmod'
+        - '--disable-mtd-probe'
+        - '--disable-rule-generator'
+        - '--enable-introspection=no'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+        quiet: true

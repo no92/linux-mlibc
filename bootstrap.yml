@@ -15,6 +15,7 @@ imports:
   - file: bootstrap.d/net-misc.yml
   - file: bootstrap.d/sys-apps.yml
   - file: bootstrap.d/sys-devel.yml
+  - file: bootstrap.d/sys-fs.yml
   - file: bootstrap.d/sys-libs.yml
   - file: bootstrap.d/sys-process.yml
 
