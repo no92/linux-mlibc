@@ -27,6 +27,41 @@ tools:
       - args: ['make', 'install']
 
 packages:
+  - name: xkeyboard-config
+    source:
+      subdir: 'ports'
+      git: 'https://gitlab.freedesktop.org/xkeyboard-config/xkeyboard-config.git'
+      tag: 'xkeyboard-config-2.34'
+      version: '2.34'
+      tools_required:
+        - cross-toolchain
+        - host-xorg-macros
+      regenerate:
+        - args: ['./autogen.sh']
+          environ:
+            'NOCONFIGURE': 'yes'
+    tools_required:
+      - cross-toolchain
+      - host-xorg-macros
+    pkgs_required:
+      - mlibc
+      - libx11
+      - xorg-proto
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--sysconfdir=/etc'
+        - '--localstatedir=/var'
+        - '--with-xkb-rules-symlink=xorg'
+        - '--disable-nls'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
   - name: xorg-util-macros
     labels: [aarch64]
     architecture: '@OPTION:arch@'
