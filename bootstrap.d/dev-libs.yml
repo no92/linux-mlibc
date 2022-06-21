@@ -370,6 +370,33 @@ packages:
         environ:
           DESTDIR: '@THIS_COLLECT_DIR@'
 
+  - name: libtsm
+    source:
+      subdir: 'ports'
+      git: 'git://people.freedesktop.org/~dvdhrm/libtsm'
+      tag: 'libtsm-3'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+          environ:
+            'NOCONFIGURE': 'yes'
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - libxkbcommon
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+        quiet: true
+
   - name: libunistring
     architecture: '@OPTION:arch@'
     metadata:
