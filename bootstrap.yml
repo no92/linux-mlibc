@@ -423,5 +423,12 @@ tasks:
   - name: qemu
     tasks_required:
       - make-image
-    args: ['qemu-system-x86_64', '-drive', 'format=raw,file=@BUILD_ROOT@/image', '-serial', 'stdio']
+    args:
+      - qemu-system-x86_64
+      - '-drive'
+      - 'format=raw,file=@BUILD_ROOT@/image'
+      - '-serial'
+      - 'stdio'
+      - '-machine'
+      - 'q35,accel=kvm:whpx:tcg'
     containerless: true
