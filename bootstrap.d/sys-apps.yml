@@ -431,7 +431,7 @@ packages:
         - '--disable-agetty'
         # - '--disable-partx'
         # - '--disable-fallocate'
-        # - '--disable-unshare'
+        - '--disable-unshare'
         # - '--disable-nsenter'
         - '--disable-setpriv'
         - '--disable-eject'

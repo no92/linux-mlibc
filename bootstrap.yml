@@ -439,4 +439,6 @@ tasks:
       - 'stdio'
       - '-machine'
       - 'q35,accel=kvm:whpx:tcg'
+      - '-m'
+      - '2G'
     containerless: true

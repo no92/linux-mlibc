@@ -55,7 +55,7 @@ packages:
       - mlibc
       - zlib
       - zstd
-      # - pcre2
+      - pcre2
       - double-conversion
       - libiconv
       # - icu
@@ -124,7 +124,7 @@ packages:
         - '-DFEATURE_libudev=OFF'
         - '-DFEATURE_icu=OFF'
         - '-DFEATURE_glib=ON'
-        - '-DFEATURE_pcre2=OFF'
+        - '-DFEATURE_pcre2=ON'
         - '-DFEATURE_xml=OFF'
         - '-DFEATURE_harfbuzz=OFF'
         - '-DFEATURE_xkbcommon=OFF'
