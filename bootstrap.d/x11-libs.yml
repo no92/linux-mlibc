@@ -1,0 +1,28 @@
+sources:
+  - name: libxtrans
+    subdir: ports
+    git: 'https://gitlab.freedesktop.org/xorg/lib/libxtrans.git'
+    tag: 'xtrans-1.4.0'
+    version: '1.4.0'
+    tools_required:
+      - cross-toolchain
+      - host-xorg-macros
+    regenerate:
+      - args: ['./autogen.sh']
+        environ:
+          'NOCONFIGURE': 'yes'
+
+tools:
+  - name: host-xtrans
+    labels: [aarch64]
+    architecture: noarch
+    exports_aclocal: true
+    from_source: libxtrans
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--prefix=@PREFIX@'
+    compile:
+      - args: ['make', '-j@PARALLELISM@']
+    install:
+      - args: ['make', 'install']
