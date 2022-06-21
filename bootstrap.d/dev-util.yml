@@ -21,6 +21,7 @@ tools:
 
 packages:
   - name: strace
+    default: false
     source:
       subdir: 'ports'
       git: 'https://github.com/strace/strace.git'
