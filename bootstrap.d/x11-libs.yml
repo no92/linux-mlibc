@@ -28,6 +28,44 @@ tools:
       - args: ['make', 'install']
 
 packages:
+  - name: libx11
+    source:
+      subdir: ports
+      git: 'https://gitlab.freedesktop.org/xorg/lib/libx11.git'
+      tag: 'libX11-1.7.2'
+      version: '1.7.2'
+      tools_required:
+        - cross-toolchain
+        - host-xorg-macros
+        - host-xtrans
+      regenerate:
+        - args: ['./autogen.sh']
+          environ:
+            'NOCONFIGURE': 'yes'
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - xorg-util-macros
+      - xorg-proto
+      - libxcb
+      - libxtrans
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--sysconfdir=/etc'
+        - '--localstatedir=/var'
+        - '--disable-static'
+        - '--disable-ipv6'
+        - '--disable-malloc0returnsnull'
+        - '--with-keysymdefdir=@SYSROOT_DIR@/usr/include/X11'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
   - name: libxcb
     source:
       subdir: ports
