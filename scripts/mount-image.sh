@@ -51,12 +51,9 @@ fi
 
 sudo -u ${SUDO_USER} mkdir -p ${image_dir}
 mount ${loopback}p1 ${image_dir}
-
-if [ "${create_fs}" == "1" ]; then
-  mkdir -p ${image_dir}/boot
-  cp ${build_root}/tools/host-limine/share/limine/limine.sys ${image_dir}/boot
-  cp ${scripts_dir}/limine.cfg ${image_dir}/boot
-  # In the future when we generate an initrd and we have eudev we can use this
-  # instead of hardcoding /dev/sda1 in the Limine config!
-  # sed -i "s/@UUID@/`blkid -o value -s PARTUUID ${loopback}p1`/" ${image_dir}/boot/limine.cfg
-fi
+mkdir -p ${image_dir}/boot
+cp ${build_root}/tools/host-limine/share/limine/limine.sys ${image_dir}/boot
+cp ${scripts_dir}/limine.cfg ${image_dir}/boot
+# In the future when we generate an initrd and we have eudev we can use this
+# instead of hardcoding /dev/sda1 in the Limine config!
+# sed -i "s/@UUID@/`blkid -o value -s PARTUUID ${loopback}p1`/" ${image_dir}/boot/limine.cfg
