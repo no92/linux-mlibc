@@ -14,6 +14,7 @@ imports:
   - file: bootstrap.d/sys-apps.yml
   - file: bootstrap.d/sys-devel.yml
   - file: bootstrap.d/sys-libs.yml
+  - file: bootstrap.d/sys-process.yml
 
 sources:
   - name: autoconf-v2.69
