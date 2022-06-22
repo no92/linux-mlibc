@@ -287,9 +287,17 @@ packages:
         - '--with-xz'
         - '--with-zstd'
         - '--with-zlib'
+        - '--disable-manpages'
     build:
       - args: ['make', '-j@PARALLELISM@']
       - args: ['make', 'DESTDIR=@THIS_COLLECT_DIR@', 'install']
+      - args: ['mkdir', '-pv', '@THIS_COLLECT_DIR@/usr/sbin']
+      - args: ['ln', '-svn', 'kmod', '@THIS_COLLECT_DIR@/usr/sbin/depmod']
+      - args: ['ln', '-svn', 'kmod', '@THIS_COLLECT_DIR@/usr/sbin/insmod']
+      - args: ['ln', '-svn', 'kmod', '@THIS_COLLECT_DIR@/usr/sbin/modinfo']
+      - args: ['ln', '-svn', 'kmod', '@THIS_COLLECT_DIR@/usr/sbin/modprobe']
+      - args: ['ln', '-svn', 'kmod', '@THIS_COLLECT_DIR@/usr/sbin/rmmod']
+      - args: ['ln', '-svn', 'kmod', '@THIS_COLLECT_DIR@/usr/bin/lsmod']
 
   - name: less
     source:
