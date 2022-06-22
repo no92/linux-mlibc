@@ -59,8 +59,8 @@ packages:
       - double-conversion
       - libiconv
       # - icu
-      # - glib
-      # - libxkbcommon
+      - glib
+      - libxkbcommon
       # - libinput
       # - libevdev
       # - mtdev
@@ -69,12 +69,12 @@ packages:
       # - fontconfig
       - libpng
       # - harfbuzz
-      # - libx11
+      - libx11
       # - libjpeg-turbo
       # - libsm
       # - libice
-      # - libdrm
-      # - libxcb
+      - libdrm
+      - libxcb
       # - xcb-util-image
       # - xcb-util-keysyms
       # - xcb-util-wm
@@ -113,21 +113,21 @@ packages:
         - '-DBUILD_SHARED_LIBS=ON'
         - '-DQT_BUILD_EXAMPLES=OFF'
         - '-DQT_BUILD_TESTS=OFF'
-        - '-DFEATURE_concurrent=OFF'
+        - '-DFEATURE_concurrent=ON'
         - '-DFEATURE_dbus=OFF'
         - '-DFEATURE_gui=OFF'
         - '-DFEATURE_network=OFF'
         - '-DFEATURE_printsupport=OFF'
-        - '-DFEATURE_sql=OFF'
-        - '-DFEATURE_testlib=OFF'
+        - '-DFEATURE_sql=ON'
+        - '-DFEATURE_testlib=ON'
         - '-DFEATURE_widgets=OFF'
         - '-DFEATURE_libudev=OFF'
         - '-DFEATURE_icu=OFF'
         - '-DFEATURE_glib=ON'
         - '-DFEATURE_pcre2=ON'
-        - '-DFEATURE_xml=OFF'
+        - '-DFEATURE_xml=ON'
         - '-DFEATURE_harfbuzz=OFF'
-        - '-DFEATURE_xkbcommon=OFF'
+        - '-DFEATURE_xkbcommon=ON'
         - '-DFEATURE_xkbcommon_x11=OFF'
         - '-DFEATURE_libinput=OFF'
         - '-DFEATURE_evdev=OFF'
@@ -135,15 +135,15 @@ packages:
         - '-DFEATURE_egl=OFF'
         - '-DFEATURE_opengl=OFF'
         - '-DFEATURE_accessibility=OFF'
-        - '-DFEATURE_xlib=OFF'
-        - '-DFEATURE_xcb=OFF'
-        - '-DFEATURE_xcb_xlib=OFF'
+        - '-DFEATURE_xlib=ON'
+        - '-DFEATURE_xcb=ON'
+        - '-DFEATURE_xcb_xlib=ON'
         - '-DFEATURE_eglfs_gbm=OFF'
         - '-DFEATURE_eglfs_egldevice=OFF'
         - '-DFEATURE_gtk3=OFF'
         - '-DFEATURE_system_sqlite=ON'
         - '-DFEATURE_cups=OFF'
-        - '-DFEATURE_ssl=OFF'
+        - '-DFEATURE_ssl=ON'
         - '@THIS_SOURCE_DIR@'
         environ:
           PKG_CONFIG_SYSROOT_DIR: '@BUILD_ROOT@/system-root'
