@@ -1,0 +1,28 @@
+From b7d2ee42d7eb7c57d3a1dce528dfc6f16c610ac8 Mon Sep 17 00:00:00 2001
+From: Dennis Bonke <admin@dennisbonke.com>
+Date: Wed, 22 Jun 2022 03:14:44 +0200
+Subject: [PATCH] Fix cross compilation issues
+
+Signed-off-by: Dennis Bonke <admin@dennisbonke.com>
+---
+ llvm/cmake/modules/CrossCompile.cmake | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/llvm/cmake/modules/CrossCompile.cmake b/llvm/cmake/modules/CrossCompile.cmake
+index 2a39b6a40..ceceb2aab 100644
+--- a/llvm/cmake/modules/CrossCompile.cmake
++++ b/llvm/cmake/modules/CrossCompile.cmake
+@@ -17,8 +17,8 @@ function(llvm_create_cross_target project_name target_name toolchain buildtype)
+       -DCMAKE_TOOLCHAIN_FILE=\"${LLVM_MAIN_SRC_DIR}/cmake/platforms/${toolchain}.cmake\")
+   else()
+     set(CROSS_TOOLCHAIN_FLAGS_INIT
+-      -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+-      -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
++      -DCMAKE_C_COMPILER=gcc
++      -DCMAKE_CXX_COMPILER=g++
+       )
+   endif()
+   set(CROSS_TOOLCHAIN_FLAGS_${target_name} ${CROSS_TOOLCHAIN_FLAGS_INIT}
+-- 
+2.36.1
+

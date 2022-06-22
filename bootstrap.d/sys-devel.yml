@@ -211,6 +211,50 @@ packages:
         environ:
           DESTDIR: '@THIS_COLLECT_DIR@'
 
+  - name: llvm
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/llvm/llvm-project'
+      tag: 'llvmorg-14.0.5'
+      version: '14.0.5'
+    tools_required:
+      - cross-cmake
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - zlib
+    configure:
+      - args:
+        - 'cmake'
+        - '-GNinja'
+        - '-DCMAKE_TOOLCHAIN_FILE=@SOURCE_ROOT@/scripts/CMakeToolchain-@OPTION:arch-triple@.txt'
+        - '-DCMAKE_INSTALL_PREFIX=/usr'
+        #- '-DLLVM_DEFAULT_TARGET_TRIPLE=x86_64-managarm'
+        - '-DLLVM_ENABLE_PROJECTS=clang;clang-tools-extra;lld'
+        # We really have to build LLVM in Release mode.
+        # Building it in debug mode produces tens of GiB of debugging info.
+        - '-DCMAKE_BUILD_TYPE=Release'
+        - '-DLLVM_LINK_LLVM_DYLIB=ON'
+        # RTTI affects the ABI. Hence, we enable it.
+        - '-DLLVM_ENABLE_RTTI=ON'
+        - '-DLLVM_TARGETS_TO_BUILD=X86'
+        - '-DLLVM_TARGET_ARCH=@OPTION:arch@'
+        - '-DLLVM_DEFAULT_TARGET_TRIPLE=@OPTION:arch-triple@'
+        - '-DLLVM_HOST_TRIPLE=@OPTION:arch-triple@'
+        # Disable linking against ncurses, which we do not build with -fPIC.
+        - '-DLLVM_ENABLE_TERMINFO=OFF'
+        # Suppress developer warnings
+        - '-Wno-dev'
+        - '@THIS_SOURCE_DIR@/llvm'
+    build:
+      - args: ['ninja', '-j8']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+        quiet: true
+      # One empty directory found, touch it so xbps doesn't complain
+      - args: ['touch', '@THIS_COLLECT_DIR@/usr/include/clang-tidy/plugin/.keep']
+
   - name: m4
     source:
       subdir: 'ports'
