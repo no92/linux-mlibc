@@ -106,26 +106,28 @@ packages:
         environ:
           DESTDIR: '@THIS_COLLECT_DIR@'
 
-  - name: libunwind
+  - name: libxcrypt
     source:
-      subdir: ports
-      git: 'https://github.com/libunwind/libunwind.git'
-      tag: 'v1.6.2'
-      version: '1.6.2'
+      subdir: 'ports'
+      git: 'https://github.com/besser82/libxcrypt.git'
+      tag: 'v4.4.26'
+      version: '4.4.26'
       tools_required:
         - cross-toolchain
       regenerate:
-        - args: ['autoreconf', '-fvi']
-        # - args: ['cp',
-        #     '@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.sub',
-        #     '@THIS_SOURCE_DIR@/build-aux/']
+        - args: ['./autogen.sh']
     tools_required:
       - cross-toolchain
+    pkgs_required:
+      - mlibc
     configure:
       - args:
         - '@THIS_SOURCE_DIR@/configure'
         - '--host=@OPTION:arch-triple@'
         - '--prefix=/usr'
+        - '--with-sysroot=@SYSROOT_DIR@' # Set libtool's lt_sysroot.
+        - '--enable-obsolete-api=yes'
+        - '--disable-xcrypt-compat-files'
         - '--disable-static'
     build:
       - args: ['make', '-j@PARALLELISM@']
