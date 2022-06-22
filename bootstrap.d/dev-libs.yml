@@ -673,3 +673,27 @@ packages:
       - args: ['make', 'install']
         environ:
           DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: wayland-protocols
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/wayland-project/wayland-protocols.git'
+      tag: '1.24'
+      version: '1.24'
+    tools_required:
+      - cross-toolchain
+      - wayland-scanner
+    configure:
+      - args:
+        - 'meson'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+        - '--prefix=/usr'
+        - '--buildtype=release'
+        - '-Dtests=false'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
