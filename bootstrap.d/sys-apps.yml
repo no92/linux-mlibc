@@ -477,7 +477,7 @@ packages:
         - '--disable-lsipc'
         # - '--disable-lsns'
         # - '--disable-readprofile'
-        - '--disable-dmesg'
+        # - '--disable-dmesg'
         # - '--disable-fincore'
         # - '--disable-fsfreeze'
         # - '--disable-blkdiscard'
