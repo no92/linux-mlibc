@@ -413,7 +413,7 @@ packages:
       - cross-toolchain
     pkgs_required:
       # - util-linux-libs
-      - eudev
+      # - eudev
       - readline
       - ncurses
       - zlib
@@ -428,8 +428,8 @@ packages:
         - '--libdir=/usr/lib'
         - '--bindir=/usr/bin'
         - '--sbindir=/usr/sbin'
-        - '--docdir=/usr/share/doc/util-linux-2.38'
-        - '--with-udev'
+        - '--docdir=/usr/share/doc/util-linux-2.36.2'
+        - '--without-udev'
         - '--disable-nls'
         - '--disable-static'
         - '--without-python'

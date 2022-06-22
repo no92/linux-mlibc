@@ -11,17 +11,19 @@ packages:
         - args: ['./autogen.sh']
     tools_required:
       - cross-toolchain
-    # pkgs_required:
-    #   - util-linux
+    pkgs_required:
+      - util-linux
+      - kmod
     configure:
       - args:
         - '@THIS_SOURCE_DIR@/configure'
         - '--host=@OPTION:arch-triple@'
         - '--prefix=/usr'
+        - '--bindir=/usr/sbin'
+        - '--sysconfdir=/etc'
+        - '--disable-static'
         - '--with-sysroot=@SYSROOT_DIR@' # Set libtool's lt_sysroot.
-        - '--disable-blkid'
         - '--disable-selinux'
-        - '--disable-kmod'
         - '--disable-mtd-probe'
         - '--disable-rule-generator'
         - '--enable-introspection=no'
@@ -31,3 +33,5 @@ packages:
         environ:
           DESTDIR: '@THIS_COLLECT_DIR@'
         quiet: true
+      - args: ['mkdir', '-pv', '@THIS_COLLECT_DIR@/usr/lib/udev/rules.d']
+      - args: ['mkdir', '-pv', '@THIS_COLLECT_DIR@/etc/udev/rules.d']
