@@ -493,7 +493,7 @@ packages:
         - '--without-systemd'
         - '--without-systemdsystemunitdir'
         - '--disable-pylibmount'
-        - '--disable-agetty'
+        # - '--disable-agetty'
         # - '--disable-partx'
         # - '--disable-fallocate'
         - '--disable-unshare'
