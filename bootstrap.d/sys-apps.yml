@@ -108,6 +108,9 @@ packages:
     from_source: coreutils
     tools_required:
       - cross-toolchain
+    pkgs_required:
+      - acl
+      - attr
     configure:
       - args:
           - "@THIS_SOURCE_DIR@/configure"
@@ -117,8 +120,8 @@ packages:
           - "--enable-no-install-program=kill,uptime"
           - "CFLAGS=-DSLOW_BUT_NO_HACKS"
     build:
-      - args: ["make", "-j", "@PARALLELISM@"]
-      - args: ["make", "DESTDIR=@THIS_COLLECT_DIR@", "install"]
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'DESTDIR=@THIS_COLLECT_DIR@', 'install']
 
   - name: diffutils
     source:
