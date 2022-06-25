@@ -20,6 +20,40 @@ tools:
       # - args: ['ln', '-sf', '@SOURCE_ROOT@/scripts/managarm.cmake', '@PREFIX@/share/cmake-3.22/Modules/Platform/']
 
 packages:
+  - name: cmake
+    from_source: cmake
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - curl
+      - libarchive
+      - libexpat
+      - openssl
+      - libuv
+      - libxml
+      - xz-utils
+      - zlib
+      - zstd
+    configure:
+      - args: ['sed', '-i', '/"lib64"/s/64//', '@THIS_SOURCE_DIR@/Modules/GNUInstallDirs.cmake']
+      - args:
+        - '@THIS_SOURCE_DIR@/bootstrap'
+        - '--prefix=/usr'
+        - '--system-libs'
+        - '--mandir=/usr/share/man'
+        - '--datadir=/usr/share/cmake-3.22'
+        - '--no-system-jsoncpp'
+        - '--no-system-librhash'
+        - '--docdir=/usr/share/doc/cmake-3.22.0'
+        - '--parallel=@PARALLELISM@'
+        - '--'
+        - '-DCMAKE_TOOLCHAIN_FILE=@SOURCE_ROOT@/scripts/CMakeToolchain-@OPTION:arch-triple@.txt'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
   - name: strace
     source:
       subdir: 'ports'
