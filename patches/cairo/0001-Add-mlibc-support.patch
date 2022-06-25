@@ -1,0 +1,40 @@
+From 3569010a9cbfed570f8270b2a2885ba05482d14f Mon Sep 17 00:00:00 2001
+From: Dennis Bonke <admin@dennisbonke.com>
+Date: Sat, 25 Jun 2022 16:34:06 +0200
+Subject: [PATCH] Add mlibc support
+
+Signed-off-by: Dennis Bonke <admin@dennisbonke.com>
+---
+ perf/cairo-perf-micro.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/perf/cairo-perf-micro.c b/perf/cairo-perf-micro.c
+index d8745c2..3863f3c 100644
+--- a/perf/cairo-perf-micro.c
++++ b/perf/cairo-perf-micro.c
+@@ -413,6 +413,7 @@ parse_options (cairo_perf_t *perf,
+ static int 
+ check_cpu_affinity (void)
+ {
++#if 0
+ #ifdef HAVE_SCHED_GETAFFINITY
+ 
+     cpu_set_t affinity;
+@@ -437,11 +438,13 @@ check_cpu_affinity (void)
+ 
+     return 0;
+ #else
++#endif
++#endif
+     fputs(
+ 	"WARNING: Cannot check CPU affinity for this platform.\n",
+ 	stderr);
+     return -1;
+-#endif
++// #endif
+ }
+ 
+ static void
+-- 
+2.36.1
+
