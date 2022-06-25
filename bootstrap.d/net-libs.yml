@@ -1,0 +1,27 @@
+packages:
+  - name: libtirpc
+    source:
+      subdir: ports
+      git: 'git://git.linux-nfs.org/projects/steved/libtirpc.git'
+      tag: 'libtirpc-1-3-2'
+      version: '1.3.2'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['bash', 'bootstrap']
+    tools_required:
+      - cross-toolchain
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--sysconfdir=/etc'
+        - '--disable-static'
+        - '--disable-ipv6'
+        - '--disable-gssapi'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'

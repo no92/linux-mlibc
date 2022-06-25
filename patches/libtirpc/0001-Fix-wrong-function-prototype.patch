@@ -1,0 +1,26 @@
+From 757a38164a4a2408b7bb06e255769d2039e12460 Mon Sep 17 00:00:00 2001
+From: Dennis Bonke <admin@dennisbonke.com>
+Date: Sat, 25 Jun 2022 02:11:09 +0200
+Subject: [PATCH] Fix wrong function prototype
+
+Signed-off-by: Dennis Bonke <admin@dennisbonke.com>
+---
+ tirpc/rpc/auth.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tirpc/rpc/auth.h b/tirpc/rpc/auth.h
+index 5f8ea72..8d649f6 100644
+--- a/tirpc/rpc/auth.h
++++ b/tirpc/rpc/auth.h
+@@ -271,7 +271,7 @@ int authany_wrap(void), authany_unwrap(void);
+ #ifdef __cplusplus
+ extern "C" {
+ #endif
+-extern AUTH *authunix_create(char *, uid_t, uid_t, int, uid_t *);
++extern AUTH *authunix_create(char *, uid_t, gid_t, int, gid_t *);
+ extern AUTH *authunix_create_default(void);	/* takes no parameters */
+ extern AUTH *authnone_create(void);		/* takes no parameters */
+ #ifdef __cplusplus
+-- 
+2.36.1
+
