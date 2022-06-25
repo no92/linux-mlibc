@@ -36,6 +36,47 @@ packages:
       - args: ['ln', '-sf', 'bzip2', '@THIS_COLLECT_DIR@/usr/bin/bunzip2']
       - args: ['rm', '-fv', '@THIS_COLLECT_DIR@/usr/lib/libbz2.a']
 
+  - name: libarchive
+    labels: [aarch64]
+    architecture: '@OPTION:arch@'
+    metadata:
+      summary: Multi-format archive and compression library
+      description: This package provides a common library to interface with the most used file compression standards.
+      spdx: 'BSD-2-Clause'
+      website: 'https://www.libarchive.org/'
+      maintainer: "Dennis Bonke <dennis@managarm.org>"
+      categories: ['app-arch']
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/libarchive/libarchive.git'
+      tag: 'v3.5.2'
+      version: '3.5.2'
+    tools_required:
+      - cross-cmake
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - openssl
+      - zlib
+      - xz-utils
+      - libiconv
+      - libexpat
+      - libxml
+      - acl
+      - zstd
+    configure:
+      - args:
+        - 'cmake'
+        - '-GNinja'
+        - '-DCMAKE_TOOLCHAIN_FILE=@SOURCE_ROOT@/scripts/CMakeToolchain-@OPTION:arch-triple@.txt'
+        - '-DCMAKE_INSTALL_PREFIX=/usr'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
   - name: xz-utils
     source:
       subdir: ports
