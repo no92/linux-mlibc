@@ -1,4 +1,31 @@
 packages:
+  - name: libnsl
+    source:
+      subdir: ports
+      git: 'https://github.com/thkukuk/libnsl.git'
+      tag: 'v2.0.0'
+      version: '2.0.0'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - libtirpc
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--sysconfdir=/etc'
+        - '--disable-static'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
   - name: libtirpc
     source:
       subdir: ports
