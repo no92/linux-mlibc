@@ -116,7 +116,7 @@ packages:
         - '-DFEATURE_concurrent=ON'
         - '-DFEATURE_dbus=OFF'
         - '-DFEATURE_gui=OFF'
-        - '-DFEATURE_network=OFF'
+        - '-DFEATURE_network=ON'
         - '-DFEATURE_printsupport=OFF'
         - '-DFEATURE_sql=ON'
         - '-DFEATURE_testlib=ON'
