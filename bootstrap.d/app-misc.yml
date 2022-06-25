@@ -1,4 +1,40 @@
 packages:
+  - name: ca-certificates
+    metadata:
+      summary: Common CA certificates PEM files
+      description: This package provides the standard set of Certificate Authorities as chosen by Mozilla in their NSS project  It also includes a script to (re)generate the certificate files.
+      spdx: 'MPL-2.0'
+      website: 'https://packages.debian.org/sid/ca-certificates'
+      maintainer: "Dennis Bonke <dennis@managarm.org>"
+      categories: ['app-misc']
+    source:
+      subdir: ports
+      git: 'https://github.com/djlucas/make-ca.git'
+      tag: 'v1.7'
+      # While unusual, version will be the date of the last bump + the NSS version used.
+      # If needed, we can always fetch a set NSS commit past the last release to fix critical bugs.
+      version: '20211107.3.72'
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - openssl
+      - p11-kit
+    sources_required:
+      - nss
+    configure:
+      - args: ['cp', '-r', '@THIS_SOURCE_DIR@/.', '@THIS_BUILD_DIR@']
+      - args: ['cp', '@THIS_SOURCE_DIR@/../nss/lib/ckfw/builtins/certdata.txt', '@THIS_SOURCE_DIR@']
+    build:
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+      # Run it, -f forces it, -C points to our certdata.txt -D sets the destination.
+      - args: ['@THIS_BUILD_DIR@/make-ca', '-f', '-C', '@THIS_SOURCE_DIR@/certdata.txt', '-D', '@THIS_COLLECT_DIR@']
+      # BLFS installs this directory for any local certificates a system administrator may have.
+      - args: ['install', '-dm755', '@THIS_COLLECT_DIR@/etc/ssl/local']
+      # Fix a small permission issue during installation
+      - args: ['chmod', '0755', '@THIS_COLLECT_DIR@/etc/ssl/certs/.']
+
   - name: cmatrix
     source:
       subdir: ports

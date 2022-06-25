@@ -5,6 +5,12 @@ sources:
     tag: '2.70.3'
     version: '2.70.3'
 
+  - name: nss
+    subdir: 'ports'
+    git: 'https://github.com/nss-dev/nss.git'
+    tag: 'NSS_3_72_RTM'
+    version: 'NSS_3_72_RTM'
+
   - name: wayland
     subdir: 'ports'
     git: 'https://github.com/wayland-project/wayland.git'
