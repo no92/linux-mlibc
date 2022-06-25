@@ -25,3 +25,28 @@ packages:
       - args: ['make', 'install']
         environ:
           DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: rpcsvc-proto
+    source:
+      subdir: ports
+      git: 'https://github.com/thkukuk/rpcsvc-proto.git'
+      tag: 'v1.4.3'
+      version: '1.4.3'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+    tools_required:
+      - cross-toolchain
+    configure:
+      # Headers only, build the generator for the host
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--prefix=/usr'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+      # Nuke the generator, host only
+      - args: ['rm', '-rf', '@THIS_COLLECT_DIR@/usr/bin']
