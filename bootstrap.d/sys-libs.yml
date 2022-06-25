@@ -135,6 +135,47 @@ packages:
         environ:
           DESTDIR: '@THIS_COLLECT_DIR@'
 
+  - name: linux-pam
+    source:
+      subdir: ports
+      git: 'https://github.com/linux-pam/linux-pam.git'
+      tag: 'v1.5.2'
+      version: '1.5.2'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - libxcrypt
+      - libintl
+      - libnsl
+      - libtirpc
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--sbindir=/usr/sbin'
+        - '--sysconfdir=/etc'
+        - '--libdir=/usr/lib'
+        - '--enable-securedir=/usr/lib/security'
+        - '--docdir=/usr/share/doc/Linux-PAM-1.5.2'
+        - '--disable-doc'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+      - args: ['chmod', '-v', '4755', '@THIS_COLLECT_DIR@/usr/sbin/unix_chkpwd']
+      - args: ['install', '-v', '-m755', '-d', '@THIS_COLLECT_DIR@/etc/pam.d']
+      - args: ['cp', '-v', '@SOURCE_ROOT@/meta-sources/base-files/other.pam', '@THIS_COLLECT_DIR@/etc/pam.d/other']
+      - args: ['cp', '-v', '@SOURCE_ROOT@/meta-sources/base-files/system-account.pam', '@THIS_COLLECT_DIR@/etc/pam.d/system-account']
+      - args: ['cp', '-v', '@SOURCE_ROOT@/meta-sources/base-files/system-auth.pam', '@THIS_COLLECT_DIR@/etc/pam.d/system-auth']
+      - args: ['cp', '-v', '@SOURCE_ROOT@/meta-sources/base-files/system-session.pam', '@THIS_COLLECT_DIR@/etc/pam.d/system-session']
+      - args: ['cp', '-v', '@SOURCE_ROOT@/meta-sources/base-files/system-password.pam', '@THIS_COLLECT_DIR@/etc/pam.d/system-password']
+
   - name: ncurses
     from_source: ncurses
     tools_required:
