@@ -34,6 +34,8 @@ packages:
       - args: ['install', '-dm755', '@THIS_COLLECT_DIR@/etc/ssl/local']
       # Fix a small permission issue during installation
       - args: ['chmod', '0755', '@THIS_COLLECT_DIR@/etc/ssl/certs/.']
+      # Nuke systemd specific stuff
+      - args: ['rm', '-rvf', '@THIS_COLLECT_DIR@/lib']
 
   - name: cmatrix
     source:
