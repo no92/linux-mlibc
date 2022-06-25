@@ -1,4 +1,41 @@
 packages:
+  - name: curl
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/curl/curl.git'
+      tag: 'curl-7_80_0'
+      version: '7.80.0'
+      tools_required:
+        - cross-toolchain
+        - cross-autoconf-archive
+      regenerate:
+        - args: ['autoreconf', '-fiv']
+    tools_required:
+      - cross-toolchain
+      - virtual: pkgconfig-for-target
+        triple: "@OPTION:arch-triple@"
+    pkgs_required:
+      - mlibc
+      - libidn2
+      - libpsl
+      - openssl
+      - zlib
+      - zstd
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-static'
+        - '--with-ca-path=/etc/ssl/certs'
+        - '--enable-threaded-resolver'
+        - '--with-openssl'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
   - name: wget
     source:
       subdir: ports
