@@ -335,6 +335,39 @@ packages:
           DESTDIR: '@THIS_COLLECT_DIR@'
         quiet: true
 
+  - name: libinput
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/wayland-project/libinput.git'
+      tag: '1.19.2'
+      version: '1.19.2'
+    tools_required:
+      - cross-toolchain
+      - virtual: pkgconfig-for-target
+        triple: "@OPTION:arch-triple@"
+    pkgs_required:
+      - eudev
+      - libevdev
+      - mtdev
+    configure:
+      - args:
+          - 'meson'
+          - '--cross-file'
+          - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+          - '--prefix=/usr'
+          - '--libdir=lib'
+          - '--buildtype=debugoptimized'
+          - '-Dlibwacom=false'
+          - '-Ddebug-gui=false'
+          - '-Dtests=false'
+          - '-Ddocumentation=false'
+          - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
   - name: libintl
     from_source: gettext
     tools_required:

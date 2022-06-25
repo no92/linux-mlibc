@@ -1,0 +1,25 @@
+From fe65cd21f2c98da1252b5aa414ef57c4318f5554 Mon Sep 17 00:00:00 2001
+From: Dennis Bonke <admin@dennisbonke.com>
+Date: Sat, 25 Jun 2022 16:44:03 +0200
+Subject: [PATCH] Add mlibc support
+
+Signed-off-by: Dennis Bonke <admin@dennisbonke.com>
+---
+ tools/libinput-debug-tablet.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tools/libinput-debug-tablet.c b/tools/libinput-debug-tablet.c
+index 73948de..a055be1 100644
+--- a/tools/libinput-debug-tablet.c
++++ b/tools/libinput-debug-tablet.c
+@@ -36,6 +36,7 @@
+ #include <unistd.h>
+ #include <libinput.h>
+ #include <libevdev/libevdev.h>
++#include <termios.h>
+ 
+ #include "shared.h"
+ #include "util-macros.h"
+-- 
+2.36.1
+
