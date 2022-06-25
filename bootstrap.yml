@@ -272,7 +272,7 @@ packages:
           install -dv -m 0750 @THIS_COLLECT_DIR@/root
           install -dv -m 1777 @THIS_COLLECT_DIR@/tmp @THIS_COLLECT_DIR@/var/tmp
           install --directory --mode=0755 @THIS_COLLECT_DIR@/etc/profile.d
-          cp @THIS_SOURCE_DIR@/{group,hosts,passwd,profile,bashrc,dircolors,shells,inputrc,hostname} @THIS_COLLECT_DIR@/etc
+          cp @THIS_SOURCE_DIR@/{group,hosts,passwd,profile,bashrc,dircolors,shells,inputrc,hostname,resolv.conf} @THIS_COLLECT_DIR@/etc
           cp @THIS_SOURCE_DIR@/bash_completion.sh @THIS_COLLECT_DIR@/etc/profile.d
           cp @THIS_SOURCE_DIR@/dircolors.sh @THIS_COLLECT_DIR@/etc/profile.d
           cp @THIS_SOURCE_DIR@/extrapaths.sh @THIS_COLLECT_DIR@/etc/profile.d
