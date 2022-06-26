@@ -28,3 +28,36 @@ packages:
       - args: ['ninja', 'install']
         environ:
           DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: wpebackend-fdo
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/Igalia/WPEBackend-fdo.git'
+      tag: '1.12.0'
+      version: '1.12.0'
+    tools_required:
+      - cross-toolchain
+      - virtual: pkgconfig-for-target
+        triple: "@OPTION:arch-triple@"
+      - wayland-scanner
+    pkgs_required:
+      - mlibc
+      - libwpe
+      - libepoxy
+      - glib
+      - wayland-protocols
+    configure:
+      - args:
+        - 'meson'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+        - '--prefix=/usr'
+        #- '--libdir=lib'
+        - '--buildtype=debugoptimized'
+        - '-Dbuild_docs=false'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
