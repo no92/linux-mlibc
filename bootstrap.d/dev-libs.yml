@@ -5,6 +5,14 @@ sources:
     tag: '2.70.3'
     version: '2.70.3'
 
+  - name: gobject-introspection
+    subdir: 'ports'
+    git: 'https://gitlab.gnome.org/GNOME/gobject-introspection.git'
+    # New meson versions break old builds, but the fix isn't in a stable release yet
+    branch: 'main'
+    commit: '7368d58a2d615e7cade85afd3f88df65256b699f'
+    version: '1.70.0.glib1'
+
   - name: icu
     subdir: 'ports'
     git: 'https://github.com/unicode-org/icu.git'
@@ -38,6 +46,28 @@ tools:
         - 'meson'
         - '--prefix=@PREFIX@'
         - '--libdir=lib'
+        - '@THIS_SOURCE_DIR@'
+    compile:
+      - args: ['ninja']
+    install:
+      - args: ['ninja', 'install']
+
+  - name: host-gobject-introspection
+    exports_aclocal: true
+    from_source: gobject-introspection
+    tools_required:
+      - host-python
+      - host-glib
+      - cross-pkg-config
+      - virtual: pkgconfig-for-host
+        program_name: host-pkg-config
+    configure:
+      - args:
+        - 'meson'
+        - '--prefix=@PREFIX@'
+        - '--native-file'
+        - '@SOURCE_ROOT@/scripts/meson.native-file'
+        - '-Dbuild_introspection_data=false'
         - '@THIS_SOURCE_DIR@'
     compile:
       - args: ['ninja']
