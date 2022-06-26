@@ -264,6 +264,28 @@ packages:
           DESTDIR: '@THIS_COLLECT_DIR@'
         quiet: true
 
+  - name: icu
+    from_source: icu
+    tools_required:
+      - cross-toolchain
+      - host-icu
+    pkgs_required:
+      - mlibc
+    configure:
+      - args: ['cp',
+          '@THIS_SOURCE_DIR@/icu4c/source/config/mh-linux',
+          '@THIS_SOURCE_DIR@/icu4c/source/config/mh-unknown']
+      - args:
+        - '@THIS_SOURCE_DIR@/icu4c/source/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--with-cross-build=@BUILD_ROOT@/tool-builds/host-icu'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
   - name: libevdev
     source:
       subdir: 'ports'
