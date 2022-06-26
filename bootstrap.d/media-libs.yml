@@ -266,6 +266,35 @@ packages:
       - args: ["make", "-j@PARALLELISM@"]
       - args: ["make", "DESTDIR=@THIS_COLLECT_DIR@", "install"]
 
+  - name: libvorbis
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/xiph/vorbis.git'
+      tag: 'v1.3.7'
+      version: '1.3.7'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+          environ:
+            NOCONFIGURE: '1'
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - libogg
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-static'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
   - name: mesa
     # labels: [aarch64]
     # architecture: '@OPTION:arch@'
