@@ -266,6 +266,42 @@ packages:
       - args: ["make", "-j@PARALLELISM@"]
       - args: ["make", "DESTDIR=@THIS_COLLECT_DIR@", "install"]
 
+  - name: libtheora
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/xiph/theora.git'
+      tag: 'v1.1.1'
+      version: '1.1.1'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - libogg
+      - libvorbis
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-static'
+        - '--disable-spec'
+        - '--disable-sdltest'
+        - '--disable-vorbistest'
+        - '--disable-oggtest'
+        - '--disable-examples'
+        - '--disable-asm'
+        environ:
+          HAVE_DOXYGEN: 'false'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
   - name: libvorbis
     source:
       subdir: 'ports'
