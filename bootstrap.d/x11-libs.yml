@@ -73,6 +73,42 @@ packages:
         environ:
           DESTDIR: '@THIS_COLLECT_DIR@'
 
+  - name: gdk-pixbuf
+    source:
+      subdir: ports
+      git: 'https://gitlab.gnome.org/GNOME/gdk-pixbuf.git'
+      tag: '2.40.0'
+      version: '2.40.0'
+    tools_required:
+      - cross-toolchain
+      - virtual: pkgconfig-for-target
+        triple: "@OPTION:arch-triple@"
+    pkgs_required:
+      - glib
+      - libjpeg-turbo
+      - libpng
+      - shared-mime-info
+      - libx11
+    configure:
+      - args:
+        - 'meson'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+        - '--prefix=/usr'
+        - '-Dgir=false'
+        - '-Dman=false'
+        - '--wrap-mode=nofallback'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+    # xbps broke?
+    # scripts:
+    #     post_install:
+    #       - args: ['gdk-pixbuf-query-loaders', '--update-cache']
+
   - name: libdrm
     source:
       subdir: 'ports'
