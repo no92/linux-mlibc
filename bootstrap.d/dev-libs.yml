@@ -370,6 +370,33 @@ packages:
           DESTDIR: '@THIS_COLLECT_DIR@'
         quiet: true
 
+  - name: libgudev
+    source:
+      subdir: 'ports'
+      git: 'https://gitlab.gnome.org/GNOME/libgudev.git'
+      tag: '237'
+      version: '237'
+    tools_required:
+      - cross-toolchain
+      - virtual: pkgconfig-for-target
+        triple: "@OPTION:arch-triple@"
+    pkgs_required:
+      - eudev
+      - glib
+    configure:
+      - args:
+          - 'meson'
+          - '--cross-file'
+          - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+          - '--prefix=/usr'
+          - '--buildtype=debugoptimized'
+          - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
   - name: libiconv
     source:
       subdir: 'ports'
