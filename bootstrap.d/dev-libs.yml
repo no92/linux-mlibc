@@ -5,6 +5,18 @@ sources:
     tag: '2.70.3'
     version: '2.70.3'
 
+  - name: icu
+    subdir: 'ports'
+    git: 'https://github.com/unicode-org/icu.git'
+    tag: 'release-70-1'
+    version: '70.1'
+    tools_required:
+      - cross-toolchain
+    regenerate:
+      - args: ['cp',
+          '@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.sub',
+          '@THIS_SOURCE_DIR@/icu4c/source']
+
   - name: nss
     subdir: 'ports'
     git: 'https://github.com/nss-dev/nss.git'
@@ -31,6 +43,17 @@ tools:
       - args: ['ninja']
     install:
       - args: ['ninja', 'install']
+
+  - name: host-icu
+    from_source: icu
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/icu4c/source/configure'
+        - '--prefix=@PREFIX@'
+    compile:
+      - args: ['make', '-j@PARALLELISM@']
+    install:
+      - args: ['make', 'install']
 
   - name: wayland-scanner
     # labels: [aarch64]
