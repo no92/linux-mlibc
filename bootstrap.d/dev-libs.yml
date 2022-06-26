@@ -435,6 +435,50 @@ packages:
           DESTDIR: '@THIS_COLLECT_DIR@'
         quiet: true
 
+  - name: libgcrypt
+    architecture: '@OPTION:arch@'
+    metadata:
+      summary: General purpose crypto library based on the code used in GnuPG
+      description: This package contains a general purpose crypto library based on the code used in GnuPG. The library provides a high level interface to cryptographic building blocks using an extendable and flexible API.
+      spdx: 'LGPL-2.0-only'
+      website: 'https://www.gnupg.org/'
+      maintainer: "Dennis Bonke <dennis@managarm.org>"
+      categories: ['dev-libs']
+    source:
+      subdir: 'ports'
+      git: 'https://dev.gnupg.org/source/libgcrypt.git'
+      tag: 'libgcrypt-1.9.4'
+      version: '1.9.4'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+        - args: ['autoreconf', '-fvi']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - libgpg-error
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--enable-shared'
+        - '--disable-static'
+        - '--prefix=/usr'
+        - '--disable-nls'
+        - '--disable-doc'
+        - '--disable-dev-random'
+        - '--with-libgpg-error-prefix=@SYSROOT_DIR@/usr'
+        - '--disable-asm'
+        environ:
+          LIBS: '-lgpg-error'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
   - name: libgudev
     source:
       subdir: 'ports'
