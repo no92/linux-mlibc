@@ -615,6 +615,46 @@ packages:
         environ:
           DESTDIR: '@THIS_COLLECT_DIR@'
 
+  - name: pango
+    source:
+      subdir: ports
+      git: 'https://gitlab.gnome.org/GNOME/pango.git'
+      tag: '1.48.10'
+      version: '1.48.10'
+    tools_required:
+      - cross-toolchain
+      - host-glib
+      - virtual: pkgconfig-for-target
+        triple: "@OPTION:arch-triple@"
+    pkgs_required:
+      - mlibc
+      - glib
+      - fontconfig
+      - freetype
+      - fribidi
+      - cairo
+      - xorg-proto
+      - libx11
+      - libxtrans
+      - libxext
+      - harfbuzz
+      - libxft
+    configure:
+      - args:
+        - 'meson'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+        - '--prefix=/usr'
+        - '--buildtype=release'
+        - '-Dintrospection=disabled'
+        - '--wrap-mode=nofallback'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
   - name: pixman
     source:
       subdir: 'ports'
