@@ -1,0 +1,78 @@
+From fc3ab7aba6b4f70b3867cf83113c61dd4817d444 Mon Sep 17 00:00:00 2001
+From: Dennis Bonke <admin@dennisbonke.com>
+Date: Sun, 3 Apr 2022 22:48:43 +0200
+Subject: [PATCH] Initial Managarm support
+
+Signed-off-by: Dennis Bonke <admin@dennisbonke.com>
+---
+ gtk/a11y/gtkaccessibility.c |  4 ++++
+ gtk/gtkutils.c              | 10 ++++++++--
+ meson.build                 |  2 +-
+ 3 files changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/gtk/a11y/gtkaccessibility.c b/gtk/a11y/gtkaccessibility.c
+index 7f0e5207d9..7231eb3fb6 100644
+--- a/gtk/a11y/gtkaccessibility.c
++++ b/gtk/a11y/gtkaccessibility.c
+@@ -974,6 +974,9 @@ do_window_event_initialization (void)
+ void
+ _gtk_accessibility_init (void)
+ {
++#ifdef __managarm__
++	return;
++#else
+   if (initialized)
+     return;
+ 
+@@ -993,4 +996,5 @@ _gtk_accessibility_init (void)
+ #endif
+ 
+   atk_misc_instance = g_object_new (GTK_TYPE_MISC_IMPL, NULL);
++#endif
+ }
+diff --git a/gtk/gtkutils.c b/gtk/gtkutils.c
+index 6a1d51560e..7174722807 100644
+--- a/gtk/gtkutils.c
++++ b/gtk/gtkutils.c
+@@ -147,8 +147,11 @@ gtk_read_line (FILE *stream, GString *str)
+ 
+                 if (!(next_c == EOF ||
+                       (c == '\r' && next_c == '\n') ||
+-                      (c == '\n' && next_c == '\r')))
++                      (c == '\n' && next_c == '\r'))) {
++		  funlockfile(stream);
+                   ungetc (next_c, stream);
++		  flockfile(stream);
++		}
+ 
+                 lines++;
+ 
+@@ -176,8 +179,11 @@ gtk_read_line (FILE *stream, GString *str)
+ 
+                 if (!(c == EOF ||
+                       (c == '\r' && next_c == '\n') ||
+-                      (c == '\n' && next_c == '\r')))
++                      (c == '\n' && next_c == '\r'))) {
++		  funlockfile(stream);
+                   ungetc (next_c, stream);
++		  flockfile(stream);
++		}
+ 
+                 goto done;
+               }
+diff --git a/meson.build b/meson.build
+index a8f1383a0c..32118df6d5 100644
+--- a/meson.build
++++ b/meson.build
+@@ -307,7 +307,7 @@ elif cc.get_id() == 'gcc' or cc.get_id() == 'clang'
+     '-Werror=sequence-point',
+     '-Werror=return-type',
+     '-Werror=trigraphs',
+-    '-Werror=array-bounds',
++    #'-Werror=array-bounds',
+     '-Werror=write-strings',
+     '-Werror=address',
+     '-Werror=int-to-pointer-cast',
+-- 
+2.35.1
+
