@@ -73,6 +73,50 @@ packages:
         environ:
           DESTDIR: '@THIS_COLLECT_DIR@'
 
+  - name: harfbuzz
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/harfbuzz/harfbuzz.git'
+      tag: '3.1.2'
+      version: '3.1.2'
+    tools_required:
+      - cross-toolchain
+      - virtual: pkgconfig-for-target
+        triple: "@OPTION:arch-triple@"
+    pkgs_required:
+      - mlibc
+      - graphite2
+      - glib
+      - zlib
+      - freetype
+      - cairo
+      - icu
+    configure:
+      - args:
+        - 'meson'
+        - '--native-file'
+        - '@SOURCE_ROOT@/scripts/meson.native-file'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+        - '--prefix=/usr'
+        - '--libdir=lib'
+        - '--buildtype=debugoptimized'
+        - '-Dgraphite2=enabled'
+        - '-Dglib=enabled'
+        - '-Dgobject=disabled'
+        - '-Dicu=enabled'
+        - '-Dfreetype=enabled'
+        - '-Dcairo=enabled'
+        - '-Dintrospection=disabled'
+        - '-Ddocs=disabled'
+        - '-Dtests=disabled' # Disabled due to a linking error
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
   - name: libglvnd
     source:
       subdir: 'ports'
