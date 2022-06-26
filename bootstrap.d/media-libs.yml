@@ -71,6 +71,36 @@ packages:
         environ:
           DESTDIR: '@THIS_COLLECT_DIR@'
 
+  - name: freeglut
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/FreeGLUTProject/freeglut.git'
+      tag: 'v3.2.2'
+      version: '3.2.2'
+    tools_required:
+      - cross-cmake
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - libxi
+      - mesa
+      - glu
+    configure:
+      - args:
+        - 'cmake'
+        - '-GNinja'
+        - '-DCMAKE_TOOLCHAIN_FILE=@SOURCE_ROOT@/scripts/CMakeToolchain-@OPTION:arch-triple@.txt'
+        - '-DCMAKE_INSTALL_PREFIX=/usr'
+        - '-DBUILD_SHARED_LIBS=ON'
+        - '-DFREEGLUT_BUILD_DEMOS=OFF'
+        - '-DFREEGLUT_BUILD_STATIC_LIBS=OFF'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
   - name: freetype
     source:
       subdir: 'ports'
