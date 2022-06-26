@@ -1,0 +1,30 @@
+packages:
+  - name: libwpe
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/WebPlatformForEmbedded/libwpe.git'
+      tag: '1.12.0'
+      version: '1.12.0'
+    tools_required:
+      - cross-toolchain
+      - virtual: pkgconfig-for-target
+        triple: "@OPTION:arch-triple@"
+    pkgs_required:
+      - mlibc
+      - libxkbcommon
+      - mesa
+    configure:
+      - args:
+        - 'meson'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+        - '--prefix=/usr'
+        #- '--libdir=lib'
+        - '--buildtype=debugoptimized'
+        - '-Dbuild-docs=false'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
