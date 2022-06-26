@@ -1,4 +1,37 @@
 packages:
+  - name: alsa-lib
+    architecture: '@OPTION:arch@'
+    metadata:
+      summary: alsa-lib
+      description: Placeholder
+      spdx: 'LGPL-2.1-only'
+      website: 'https://alsa-project.org/wiki/Main_Page'
+      maintainer: "Dennis Bonke <dennis@managarm.org>"
+      categories: ['media-libs']
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/alsa-project/alsa-lib.git'
+      tag: 'v1.2.6.1'
+      version: '1.2.6.1'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['autoreconf', '-fvi']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
   - name: fontconfig
     source:
       subdir: ports
