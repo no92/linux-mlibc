@@ -28,3 +28,39 @@ packages:
     #     post_install:
     #       - args: 'echo "Running gtk-update-icon-cache; this may take a few seconds..."'
           # - args: '/usr/bin/gtk-update-icon-cache -f /usr/share/icons/Adwaita/'
+
+  - name: hicolor-icon-theme
+    architecture: '@OPTION:arch@'
+    metadata:
+      summary: Fallback theme for the freedesktop icon theme specification
+      description: This package contains a default fallback theme for implementations of the icon theme specification.
+      spdx: 'GPL-2.0-only'
+      website: 'https://freedesktop.org/wiki/Software/icon-theme'
+      maintainer: "Dennis Bonke <dennis@managarm.org>"
+      categories: ['x11-themes']
+    source:
+      subdir: 'ports'
+      git: 'https://gitlab.freedesktop.org/xdg/default-icon-theme.git'
+      tag: '0.17'
+      version: '0.17'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh', '--no-configure']
+    tools_required:
+      - cross-toolchain
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+    # xbps broke?
+    # scripts:
+    #     post_install:
+    #       - args: 'echo "Running gtk-update-icon-cache; this may take a few seconds..."'
+    #       - args: ['/usr/bin/gtk-update-icon-cache -f /usr/share/icons/']
