@@ -137,6 +137,41 @@ packages:
           DESTDIR: '@THIS_COLLECT_DIR@'
       - args: ['rm', '-rv', '@THIS_COLLECT_DIR@/usr/bin']
 
+  - name: fribidi
+    metadata:
+      summary: A free implementation of the unicode bidirectional algorithm
+      description: This package provides a library with an implementation of the Unicode Bidirectional Algorithm (BIDI). This is used for supporting Arabic and Hebrew alphabets in other packages.
+      spdx: 'LGPL-2.1-or-later'
+      website: 'https://fribidi.org/'
+      maintainer: "Dennis Bonke <dennis@managarm.org>"
+      categories: ['dev-libs']
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/fribidi/fribidi.git'
+      tag: 'v1.0.11'
+      version: '1.0.11'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+          environ:
+            'NOCONFIGURE': 'yes'
+        - args: 'sed -i s/"SUBDIRS = gen.tab lib bin doc test"/"SUBDIRS = gen.tab lib bin test"/ @THIS_SOURCE_DIR@/Makefile.am'
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
   - name: glib
     from_source: glib
     tools_required:
