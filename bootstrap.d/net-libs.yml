@@ -173,6 +173,50 @@ packages:
         environ:
           DESTDIR: '@THIS_COLLECT_DIR@'
 
+  - name: libsoup
+    source:
+      subdir: 'ports'
+      git: 'https://gitlab.gnome.org/GNOME/libsoup.git'
+      tag: '2.74.2'
+      version: '2.74.2'
+    tools_required:
+      - cross-toolchain
+      - virtual: pkgconfig-for-target
+        triple: "@OPTION:arch-triple@"
+    pkgs_required:
+      - mlibc
+      - glib
+      - glib-networking
+      - zlib
+      - libxml
+      - sqlite
+      - libpsl
+    configure:
+      - args:
+        - 'meson'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+        - '--prefix=/usr'
+        #- '--libdir=lib'
+        - '--buildtype=debugoptimized'
+        - '-Dintrospection=disabled'
+        - '-Dinstalled_tests=false'
+        - '-Dsysprof=disabled'
+        - '-Dgtk_doc=false'
+        - '-Dvapi=disabled'
+        - '-Dgnome=false'
+        - '-Dtls_check=false'
+        - '-Dbrotli=disabled'
+        - '-Dntlm=disabled'
+        - '-Dgssapi=disabled'
+        - '-Dtests=false'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
   - name: libtirpc
     source:
       subdir: ports
