@@ -284,6 +284,7 @@ packages:
           cp @THIS_SOURCE_DIR@/readline.sh @THIS_COLLECT_DIR@/etc/profile.d
           cp @THIS_SOURCE_DIR@/umask.sh @THIS_COLLECT_DIR@/etc/profile.d
           cp @THIS_SOURCE_DIR@/.bashrc @THIS_COLLECT_DIR@/root
+          cp @THIS_SOURCE_DIR@/post-boot-fixup.sh @THIS_COLLECT_DIR@/root
           install --directory --mode=0755 @THIS_COLLECT_DIR@/etc/bash_completion.d
           touch @THIS_COLLECT_DIR@/{boot,home,mnt,opt,root,srv,tmp}/.keep
           touch @THIS_COLLECT_DIR@/etc/{opt,sysconfig}/.keep
