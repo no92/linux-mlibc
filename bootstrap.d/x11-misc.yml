@@ -27,6 +27,45 @@ tools:
       - args: ['make', 'install']
 
 packages:
+  - name: shared-mime-info
+    source:
+      subdir: ports
+      git: 'https://gitlab.freedesktop.org/xdg/shared-mime-info.git'
+      tag: 'Release-1-15'
+      version: '1.15'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+          environ:
+            'NOCONFIGURE': 'yes'
+    tools_required:
+      - cross-toolchain
+      - host-python
+    pkgs_required:
+      - mlibc
+      - glib
+      - libxml
+      - itstool
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-update-mimedb'
+        environ:
+          'ITSTOOL': '/usr/bin/itstool'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+    # xbps broke?
+    # scripts:
+    #     post_install:
+    #       - args: 'echo "Running update-mime-database; this may take a minute or 2..."'
+    #       - args: '/usr/bin/update-mime-database /usr/share/mime/'
+
   - name: xkeyboard-config
     source:
       subdir: 'ports'
