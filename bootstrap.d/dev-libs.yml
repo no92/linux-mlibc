@@ -18,6 +18,20 @@ sources:
     version: '1.20.0'
 
 tools:
+  - name: host-glib
+    exports_aclocal: true
+    from_source: glib
+    configure:
+      - args:
+        - 'meson'
+        - '--prefix=@PREFIX@'
+        - '--libdir=lib'
+        - '@THIS_SOURCE_DIR@'
+    compile:
+      - args: ['ninja']
+    install:
+      - args: ['ninja', 'install']
+
   - name: wayland-scanner
     # labels: [aarch64]
     # architecture: noarch
