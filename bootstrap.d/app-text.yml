@@ -1,4 +1,27 @@
 packages:
+  - name: iso-codes
+    source:
+      subdir: ports
+      git: 'https://salsa.debian.org/iso-codes-team/iso-codes.git'
+      tag: 'v4.10.0'
+      version: '4.10.0'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./bootstrap']
+    tools_required:
+      - cross-toolchain
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
   - name: tree
     source:
       subdir: ports
