@@ -36,6 +36,42 @@ packages:
       - args: ['ln', '-sf', 'bzip2', '@THIS_COLLECT_DIR@/usr/bin/bunzip2']
       - args: ['rm', '-fv', '@THIS_COLLECT_DIR@/usr/lib/libbz2.a']
 
+  - name: gzip
+    metadata:
+      summary: The standard GNU compressor
+      description: This package provides the standard GNU file compression utilities.
+      spdx: 'GPL-3.0-only'
+      website: 'https://www.gnu.org/software/gzip/'
+      maintainer: "Dennis Bonke <dennis@managarm.org>"
+      categories: ['app-arch']
+    source:
+      subdir: ports
+      git: 'https://git.savannah.gnu.org/git/gzip.git'
+      tag: 'v1.11'
+      version: '1.11'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./bootstrap']
+        - args: ['cp',
+            '@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.sub',
+            '@THIS_SOURCE_DIR@/build-aux/']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+      - args: 'sed -i s/-Werror//g @THIS_BUILD_DIR@/lib/Makefile'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
   - name: libarchive
     labels: [aarch64]
     architecture: '@OPTION:arch@'
