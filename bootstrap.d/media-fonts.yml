@@ -54,3 +54,30 @@ packages:
     #     post_install:
     #       - args: 'echo "Running fc-cache; this may take a few seconds..."'
     #       - args: ['fc-cache']
+
+  - name: xorg-font-util
+    metadata:
+      summary: X.Org font utilities
+      description: This package provides various X.Org font utilities.
+      spdx: 'MIT'
+      website: 'https://gitlab.freedesktop.org/xorg/font/util'
+      maintainer: "Dennis Bonke <dennis@managarm.org>"
+      categories: ['media-fonts']
+    from_source: xorg-font-util
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--sysconfdir=/etc'
+        - '--localstatedir=/var'
+        - '--disable-static'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
