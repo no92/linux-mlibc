@@ -20,9 +20,9 @@ loopback_file="${build_root}/loopback"
 system_root="${build_root}/system-root"
 
 if [ ! -f ${image_path} ]; then
-  # Calculate the needed image size + around 256M headroom for the file system and user
+  # Calculate the needed image size + around 512M headroom for the file system and user
   real_image_size=`du -bs ${system_root} | cut -f1`
-  image_size=`expr ${real_image_size} + 1024 \* 1024 \* 256`
+  image_size=`expr ${real_image_size} + 1024 \* 1024 \* 512`
 
   sudo -u ${SUDO_USER} dd if=/dev/zero of=${image_path} bs=4096 count=`expr ${image_size} / 4096`
   parted -s ${image_path} mklabel gpt
