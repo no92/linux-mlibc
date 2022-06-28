@@ -1,0 +1,87 @@
+From a9ee52c3006c5b3bd0cdac6f04926837e6185480 Mon Sep 17 00:00:00 2001
+From: Dennis Bonke <admin@dennisbonke.com>
+Date: Tue, 28 Jun 2022 20:16:24 +0200
+Subject: [PATCH] Add mlibc support
+
+Signed-off-by: Dennis Bonke <admin@dennisbonke.com>
+---
+ libweston/compositor.c                  | 2 +-
+ shared/signal.c                         | 2 +-
+ shared/{signal.h => xsignal.h}          | 0
+ tests/safe-signal-output-removal-test.c | 2 +-
+ tests/safe-signal-test.c                | 2 +-
+ tools/zunitc/src/zunitc_impl.c          | 1 +
+ 6 files changed, 5 insertions(+), 4 deletions(-)
+ rename shared/{signal.h => xsignal.h} (100%)
+
+diff --git a/libweston/compositor.c b/libweston/compositor.c
+index 1670c50..f7ab921 100644
+--- a/libweston/compositor.c
++++ b/libweston/compositor.c
+@@ -68,7 +68,7 @@
+ #include "shared/os-compatibility.h"
+ #include "shared/string-helpers.h"
+ #include "shared/timespec-util.h"
+-#include "shared/signal.h"
++#include "shared/xsignal.h"
+ #include "git-version.h"
+ #include <libweston/version.h>
+ #include <libweston/plugin-registry.h>
+diff --git a/shared/signal.c b/shared/signal.c
+index 68870f0..d4c3f77 100644
+--- a/shared/signal.c
++++ b/shared/signal.c
+@@ -22,7 +22,7 @@
+ 
+ /* Implementation copied from wlroots util/signal.c file */
+ 
+-#include "signal.h"
++#include "xsignal.h"
+ 
+ static void
+ handle_noop(struct wl_listener *listener, void *data)
+diff --git a/shared/signal.h b/shared/xsignal.h
+similarity index 100%
+rename from shared/signal.h
+rename to shared/xsignal.h
+diff --git a/tests/safe-signal-output-removal-test.c b/tests/safe-signal-output-removal-test.c
+index 0a74730..97c028f 100644
+--- a/tests/safe-signal-output-removal-test.c
++++ b/tests/safe-signal-output-removal-test.c
+@@ -29,7 +29,7 @@
+ #include <stdlib.h>
+ #include <stdio.h>
+ 
+-#include "../shared/signal.h"
++#include "../shared/xsignal.h"
+ #include "../shared/shell-utils.h"
+ #include "weston-test-client-helper.h"
+ #include "weston-test-fixture-compositor.h"
+diff --git a/tests/safe-signal-test.c b/tests/safe-signal-test.c
+index 3248f0f..bb7daf6 100644
+--- a/tests/safe-signal-test.c
++++ b/tests/safe-signal-test.c
+@@ -29,7 +29,7 @@
+ #include <stdlib.h>
+ #include <stdio.h>
+ 
+-#include "../shared/signal.h"
++#include "../shared/xsignal.h"
+ #include "weston-test-client-helper.h"
+ 
+ struct test_surface_state {
+diff --git a/tools/zunitc/src/zunitc_impl.c b/tools/zunitc/src/zunitc_impl.c
+index 395bdd7..2fbc77a 100644
+--- a/tools/zunitc/src/zunitc_impl.c
++++ b/tools/zunitc/src/zunitc_impl.c
+@@ -36,6 +36,7 @@
+ #include <sys/wait.h>
+ #include <time.h>
+ #include <unistd.h>
++#include <signal.h>
+ 
+ #include "zunitc/zunitc_impl.h"
+ #include "zunitc/zunitc.h"
+-- 
+2.36.1
+

@@ -1162,3 +1162,63 @@ packages:
       - args: ['ninja', 'install']
         environ:
           DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: weston
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/wayland-project/weston.git'
+      tag: '10.0.0'
+      version: '10.0.0'
+    tools_required:
+      - cross-toolchain
+      - wayland-scanner
+      - virtual: pkgconfig-for-target
+        triple: "@OPTION:arch-triple@"
+      - virtual: pkgconfig-for-host
+        program_name: host-pkg-config
+    pkgs_required:
+      - mlibc
+      - cairo
+      - libinput
+      - libxkbcommon
+      - mesa
+      - wayland
+      - wayland-protocols
+      - dejavu
+      - libxcursor
+      - xorg-server
+      - pango
+      - glib
+      - libjpeg-turbo
+      - libwebp
+    configure:
+      - args:
+        - 'meson'
+        - '--native-file'
+        - '@SOURCE_ROOT@/scripts/meson.native-file'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+        - '--prefix=/usr'
+        - '--libdir=lib'
+        - '--buildtype=debugoptimized'
+        - '-Dbackend-x11=false'
+        - '-Dsimple-clients=damage,im,egl,shm,touch'
+        - '-Dlauncher-logind=false'
+        - '-Dbackend-drm-screencast-vaapi=false'
+        - '-Dbackend-rdp=false'
+        - '-Dcolor-management-colord=false'
+        - '-Dcolor-management-lcms=false'
+        - '-Dsystemd=false'
+        - '-Dremoting=false'
+        - '-Dpipewire=false'
+        - '-Dxwayland=true'
+        - '-Ddeprecated-weston-launch=true'
+        - '@THIS_SOURCE_DIR@'
+        environ:
+          PKG_CONFIG_SYSROOT_DIR: '@BUILD_ROOT@/system-root'
+          PKG_CONFIG_LIBDIR: '@BUILD_ROOT@/system-root/usr/lib/pkgconfig:@BUILD_ROOT@/system-root/usr/share/pkgconfig'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
