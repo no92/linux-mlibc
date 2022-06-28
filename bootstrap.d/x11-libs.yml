@@ -760,7 +760,14 @@ packages:
       - cross-toolchain
       - virtual: pkgconfig-for-target
         triple: "@OPTION:arch-triple@"
+      - virtual: pkgconfig-for-host
+        program_name: host-pkg-config
+      - wayland-scanner
     pkgs_required:
+      - wayland
+      - wayland-protocols
+      - libxcb
+      - libxml
       - xkeyboard-config
     configure:
       - args:
@@ -772,8 +779,8 @@ packages:
         - '--prefix=/usr'
         - '--libdir=lib'
         - '--buildtype=debugoptimized'
-        - '-Denable-x11=false'
-        - '-Denable-wayland=false'
+        - '-Denable-x11=true'
+        - '-Denable-wayland=true'
         - '-Denable-xkbregistry=false'
         - '-Denable-docs=false'
         - '@THIS_SOURCE_DIR@'
