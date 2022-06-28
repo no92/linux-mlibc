@@ -344,6 +344,7 @@ packages:
           - "-Dheaders_only=true"
           - "-Ddisable_iconv_option=true"
           - "-Ddisable_intl_option=true"
+          - "-Ddisable_crypt_option=true"
           - "-Dbuildtype=debug"
           - "@THIS_SOURCE_DIR@"
     build:
@@ -371,6 +372,7 @@ packages:
           - "-Dmlibc_no_headers=true"
           - "-Ddisable_iconv_option=true"
           - "-Ddisable_intl_option=true"
+          - "-Ddisable_crypt_option=true"
           - "-Dbuildtype=debug"
           - "@THIS_SOURCE_DIR@"
     build:
