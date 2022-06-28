@@ -332,6 +332,35 @@ packages:
         environ:
           DESTDIR: '@THIS_COLLECT_DIR@'
 
+  - name: iproute2
+    source:
+      subdir: ports
+      git: 'https://git.kernel.org/pub/scm/network/iproute2/iproute2.git'
+      tag: 'v5.18.0'
+      version: '5.18.0'
+    tools_required:
+      - cross-toolchain
+    configure:
+      - args: ['cp', '-r', '@THIS_SOURCE_DIR@/.', '@THIS_BUILD_DIR@']
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--prefix=/usr'
+        - '--libdir=lib'
+        - '--include_dir=@THIS_SOURCE_DIR@/include'
+        environ:
+          SBINDIR: '/usr/sbin'
+          CC: 'x86_64-linux-mlibc-gcc'
+          CXX: 'x86_64-linux-mlibc-g++'
+      - args: ['rm', '-r', 'include/netinet']
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+        environ:
+          SBINDIR: '/usr/sbin'
+      - args: ['make', 'install']
+        environ:
+          SBINDIR: '/usr/sbin'
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
   - name: kmscon
     source:
       subdir: 'ports'
