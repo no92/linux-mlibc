@@ -107,6 +107,7 @@ packages:
     tools_required:
       - cross-toolchain
     pkgs_required:
+      - kernel-headers
       - elfutils
     configure:
       - args:
