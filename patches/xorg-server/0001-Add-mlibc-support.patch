@@ -1,0 +1,65 @@
+From 843a8a6c6c75816e618bc9af934f3f08fbae4353 Mon Sep 17 00:00:00 2001
+From: Dennis Bonke <admin@dennisbonke.com>
+Date: Tue, 28 Jun 2022 18:26:44 +0200
+Subject: [PATCH] Add mlibc support
+
+Signed-off-by: Dennis Bonke <admin@dennisbonke.com>
+---
+ config/udev.c  | 1 +
+ mi/mibitblt.c  | 1 +
+ mi/miinitext.c | 2 ++
+ os/oscolor.c   | 1 +
+ 4 files changed, 5 insertions(+)
+
+diff --git a/config/udev.c b/config/udev.c
+index 3a73189..fd17622 100644
+--- a/config/udev.c
++++ b/config/udev.c
+@@ -30,6 +30,7 @@
+ #include <libudev.h>
+ #include <ctype.h>
+ #include <unistd.h>
++#include <strings.h>
+ 
+ #include "input.h"
+ #include "inputstr.h"
+diff --git a/mi/mibitblt.c b/mi/mibitblt.c
+index 43d9bd9..5850594 100644
+--- a/mi/mibitblt.c
++++ b/mi/mibitblt.c
+@@ -51,6 +51,7 @@ SOFTWARE.
+ 
+ #include <X11/X.h>
+ #include <X11/Xprotostr.h>
++#include <strings.h>
+ 
+ #include "misc.h"
+ #include "gcstruct.h"
+diff --git a/mi/miinitext.c b/mi/miinitext.c
+index b7c7021..a44f15e 100644
+--- a/mi/miinitext.c
++++ b/mi/miinitext.c
+@@ -107,6 +107,8 @@ SOFTWARE.
+ #include "os.h"
+ #include "globals.h"
+ 
++#include <strings.h>
++
+ /* List of built-in (statically linked) extensions */
+ static const ExtensionModule staticExtensions[] = {
+     {GEExtensionInit, "Generic Event Extension", &noGEExtension},
+diff --git a/os/oscolor.c b/os/oscolor.c
+index af83c6a..75231cc 100644
+--- a/os/oscolor.c
++++ b/os/oscolor.c
+@@ -49,6 +49,7 @@ SOFTWARE.
+ #endif
+ 
+ #include <X11/keysym.h>
++#include <strings.h>
+ #include "dix.h"
+ #include "os.h"
+ 
+-- 
+2.36.1
+
