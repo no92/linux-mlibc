@@ -1,0 +1,33 @@
+packages:
+  - name: xkbcomp
+    source:
+      subdir: ports
+      git: 'https://gitlab.freedesktop.org/xorg/app/xkbcomp.git'
+      tag: 'xkbcomp-1.4.5'
+      version: '1.4.5'
+      tools_required:
+        - cross-toolchain
+        - host-xorg-macros
+      regenerate:
+        - args: ['./autogen.sh']
+          environ:
+            'NOCONFIGURE': 'yes'
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - xorg-util-macros
+      - libx11
+      - libxkbfile
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--sysconfdir=/etc'
+        - '--localstatedir=/var'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
