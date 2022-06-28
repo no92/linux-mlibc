@@ -1,0 +1,24 @@
+From 07dbdea9e02e4454beabef0698160557cd49e064 Mon Sep 17 00:00:00 2001
+From: no92 <no92.mail@gmail.com>
+Date: Wed, 29 Jun 2022 00:29:35 +0200
+Subject: [PATCH] Add mlibc fixes
+
+---
+ misc/ss.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/misc/ss.c b/misc/ss.c
+index 4b3ca9c..ecaf5a7 100644
+--- a/misc/ss.c
++++ b/misc/ss.c
+@@ -28,6 +28,7 @@
+ #include <stdbool.h>
+ #include <limits.h>
+ #include <stdarg.h>
++#include <termios.h>
+ 
+ #include "ss_util.h"
+ #include "utils.h"
+-- 
+2.36.1
+
