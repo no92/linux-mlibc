@@ -58,37 +58,37 @@ packages:
       - pcre2
       - double-conversion
       - libiconv
-      # - icu
+      - icu
       - glib
       - libxkbcommon
-      # - libinput
-      # - libevdev
-      # - mtdev
-      # - mesa
-      # - freetype
-      # - fontconfig
+      - libinput
+      - libevdev
+      - mtdev
+      - mesa
+      - freetype
+      - fontconfig
       - libpng
-      # - harfbuzz
+      - harfbuzz
       - libx11
-      # - libjpeg-turbo
-      # - libsm
-      # - libice
+      - libjpeg-turbo
+      - libsm
+      - libice
       - libdrm
       - libxcb
-      # - xcb-util-image
-      # - xcb-util-keysyms
-      # - xcb-util-wm
-      # - xcb-util-render-util
+      - xcb-util-image
+      - xcb-util-keysyms
+      - xcb-util-wm
+      - xcb-util-render-util
       - openssl
-      # - wayland
-      # - wayland-protocols
-      # - libxcursor
-      # - libxinerama
-      # - libxrender
-      # - libxi
+      - wayland
+      - wayland-protocols
+      - libxcursor
+      - libxinerama
+      - libxrender
+      - libxi
       - sqlite
       # - brotli
-      # - dbus
+      - dbus
     configure:
       - args:
         - 'cmake'
@@ -115,31 +115,31 @@ packages:
         - '-DQT_BUILD_TESTS=OFF'
         - '-DFEATURE_concurrent=ON'
         - '-DFEATURE_dbus=OFF'
-        - '-DFEATURE_gui=OFF'
+        - '-DFEATURE_gui=ON'
         - '-DFEATURE_network=ON'
-        - '-DFEATURE_printsupport=OFF'
+        - '-DFEATURE_printsupport=ON'
         - '-DFEATURE_sql=ON'
         - '-DFEATURE_testlib=ON'
-        - '-DFEATURE_widgets=OFF'
-        - '-DFEATURE_libudev=OFF'
-        - '-DFEATURE_icu=OFF'
+        - '-DFEATURE_widgets=ON'
+        - '-DFEATURE_libudev=ON'
+        - '-DFEATURE_icu=ON'
         - '-DFEATURE_glib=ON'
         - '-DFEATURE_pcre2=ON'
         - '-DFEATURE_xml=ON'
-        - '-DFEATURE_harfbuzz=OFF'
+        - '-DFEATURE_harfbuzz=ON'
         - '-DFEATURE_xkbcommon=ON'
-        - '-DFEATURE_xkbcommon_x11=OFF'
-        - '-DFEATURE_libinput=OFF'
-        - '-DFEATURE_evdev=OFF'
-        - '-DFEATURE_mtdev=OFF'
-        - '-DFEATURE_egl=OFF'
-        - '-DFEATURE_opengl=OFF'
+        - '-DFEATURE_xkbcommon_x11=ON'
+        - '-DFEATURE_libinput=ON'
+        - '-DFEATURE_evdev=ON'
+        - '-DFEATURE_mtdev=ON'
+        - '-DFEATURE_egl=ON'
+        - '-DFEATURE_opengl=ON'
         - '-DFEATURE_accessibility=OFF'
         - '-DFEATURE_xlib=ON'
         - '-DFEATURE_xcb=ON'
         - '-DFEATURE_xcb_xlib=ON'
-        - '-DFEATURE_eglfs_gbm=OFF'
-        - '-DFEATURE_eglfs_egldevice=OFF'
+        - '-DFEATURE_eglfs_gbm=ON'
+        - '-DFEATURE_eglfs_egldevice=ON'
         - '-DFEATURE_gtk3=OFF'
         - '-DFEATURE_system_sqlite=ON'
         - '-DFEATURE_cups=OFF'
