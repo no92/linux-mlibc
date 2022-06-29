@@ -497,15 +497,17 @@ packages:
       regenerate:
         - args: ['autoreconf', '-fvi']
     tools_required:
-        - cross-toolchain
+      - cross-toolchain
+    pkgs_required:
+      - zlib
     configure:
       - args:
-        - "@THIS_SOURCE_DIR@/configure"
-        - "--host=@OPTION:arch-triple@"
-        - "--prefix=/usr"
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
     build:
-      - args: ["make", "-j@PARALLELISM@"]
-      - args: ["make", "DESTDIR=@THIS_COLLECT_DIR@", "install"]
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'DESTDIR=@THIS_COLLECT_DIR@', 'install']
 
   - name: libtheora
     source:
