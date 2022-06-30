@@ -3,8 +3,8 @@ packages:
     source:
       subdir: ports
       git: 'https://gitlab.freedesktop.org/xorg/proto/xcbproto.git'
-      tag: 'xcb-proto-1.14'
-      version: '1.14'
+      tag: 'xcb-proto-1.15.2'
+      version: '1.15.2'
       tools_required:
         - cross-toolchain
         - host-xorg-macros
