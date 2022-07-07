@@ -1191,6 +1191,7 @@ packages:
       - glib
       - libjpeg-turbo
       - libwebp
+      - linux-pam
     configure:
       - args:
         - 'meson'
