@@ -300,8 +300,8 @@ packages:
           touch @THIS_COLLECT_DIR@/var/{cache,local,log,mail,opt,spool}/.keep
           touch @THIS_COLLECT_DIR@/var/lib/{color,misc,locate}/.keep
           touch @THIS_COLLECT_DIR@/{tmp,var/tmp}/.keep
-          ln -sfv run @THIS_COLLECT_DIR@/var/run
-          ln -sfv run/lock @THIS_COLLECT_DIR@/var/lock
+          ln -sfv /run @THIS_COLLECT_DIR@/var/run
+          ln -sfv /run/lock @THIS_COLLECT_DIR@/var/lock
 
   - name: kernel-headers
     from_source: linux
