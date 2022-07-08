@@ -533,7 +533,7 @@ packages:
       #   - '--prefix=/usr'
       #   - '--sysconfdir=/etc'
     build:
-      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', '-j@PARALLELISM@', 'CFLAGS=-O2 -ggdb']
         environ:
           CC: '@OPTION:arch-triple@-gcc'
       - args: ['make', 'ROOT=@THIS_COLLECT_DIR@', 'install']
