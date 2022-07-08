@@ -61,3 +61,48 @@ packages:
       - args: ['ninja', 'install']
         environ:
           DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: wlroots
+    source:
+      subdir: ports
+      git: 'https://gitlab.freedesktop.org/wlroots/wlroots/'
+      branch: master
+      version: "0.15.1"
+    tools_required:
+      - cross-toolchain
+      - wayland-scanner
+      - virtual: pkgconfig-for-target
+        triple: "@OPTION:arch-triple@"
+      - virtual: pkgconfig-for-host
+        program_name: host-pkg-config
+    pkgs_required:
+      - eudev
+      - libdrm
+      - libinput
+      - libxkbcommon
+      - pixman
+      - wayland
+      - wayland-protocols
+      - xorg-server
+      - libxcb
+      - libxkbcommon
+      - xcb-util-image
+      - xcb-util-wm
+    configure:
+      - args: 'sed -i s#{XBSTRAP_SYSTEM_ROOT}#@SYSROOT_DIR@# @THIS_SOURCE_DIR@/xwayland/meson.build'
+      - args:
+        - 'meson'
+        - '--native-file'
+        - '@SOURCE_ROOT@/scripts/meson.native-file'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+        - '--prefix=/usr'
+        - '--buildtype=debugoptimized'
+        - '-Dexamples=false'
+        - '-Dxwayland=enabled'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
