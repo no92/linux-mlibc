@@ -1,0 +1,46 @@
+packages:
+  - name: sway
+    source:
+      subdir: ports
+      git: 'https://github.com/swaywm/sway'
+      branch: master
+      version: '1.7'
+    tools_required:
+      - cross-toolchain
+      - wayland-scanner
+      - virtual: pkgconfig-for-target
+        triple: "@OPTION:arch-triple@"
+      - virtual: pkgconfig-for-host
+        program_name: host-pkg-config
+    pkgs_required:
+      - mlibc
+      - cairo
+      - json-c
+      - pango
+      - pcre2
+      - wayland
+      - wayland-protocols
+      - wlroots
+      - xorg-server
+    configure:
+      - args:
+        - 'meson'
+        - '--native-file'
+        - '@SOURCE_ROOT@/scripts/meson.native-file'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+        - '--prefix=/usr'
+        - '--libdir=lib'
+        - '--buildtype=debugoptimized'
+        - '-Dbash-completions=false'
+        - '-Dfish-completions=false'
+        - '-Dgdk-pixbuf=disabled'
+        - '-Dman-pages=disabled'
+        - '-Dxwayland=enabled'
+        - '-Dzsh-completions=false'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
