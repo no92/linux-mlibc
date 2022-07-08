@@ -1,0 +1,29 @@
+packages:
+  - name: seatd
+    source:
+      subdir: 'ports'
+      git: 'https://git.sr.ht/~kennylevinsen/seatd/'
+      tag: '0.7.0'
+      version: '0.7.0'
+    tools_required:
+      - cross-toolchain
+      - virtual: pkgconfig-for-target
+        triple: "@OPTION:arch-triple@"
+    pkgs_required:
+      - mlibc
+    configure:
+      - args:
+        - 'meson'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+        - '--prefix=/usr'
+        - '--buildtype=debugoptimized'
+        - '-Dlibseat-logind=disabled'
+        - '@THIS_SOURCE_DIR@'
+        environ:
+          PKG_CONFIG_SYSROOT_DIR: '@BUILD_ROOT@/system-root'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
