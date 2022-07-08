@@ -48,6 +48,8 @@ packages:
             '@THIS_SOURCE_DIR@/config']
     tools_required:
       - cross-toolchain
+    pkgs_required:
+      - kernel-headers
     configure:
       - args:
         - '@THIS_SOURCE_DIR@/configure'
