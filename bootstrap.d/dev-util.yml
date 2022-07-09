@@ -123,3 +123,34 @@ packages:
       - args: ['make', 'install']
         environ:
           DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: ltrace
+    source:
+      subdir: 'ports'
+      git: 'https://gitlab.com/cespedes/ltrace.git'
+      branch: 'main'
+      commit: '0670fae5e63994357df7f7a2c5b998fec3c6abce'
+      version: '0.7.3' # slight lie
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+          environ:
+            NOCONFIGURE: 'yes'
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - kernel-headers
+      - elfutils
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+      - args: 'sed -i s/-Werror//g @THIS_BUILD_DIR@/Makefile'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
