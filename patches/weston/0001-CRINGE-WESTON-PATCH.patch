@@ -1,0 +1,408 @@
+From 70c9d17e01b0f2b4971f9fd8cab46464464b1c97 Mon Sep 17 00:00:00 2001
+From: Dennis Bonke <admin@dennisbonke.com>
+Date: Sun, 10 Jul 2022 00:32:07 +0200
+Subject: [PATCH] CRINGE WESTON PATCH
+
+Signed-off-by: Dennis Bonke <admin@dennisbonke.com>
+---
+ clients/keyboard.c                  | 19 ++++++++++++++++
+ clients/window.c                    | 21 +++++++++++++++++
+ libweston/renderer-gl/gl-renderer.c |  9 ++++++++
+ libweston/renderer-gl/gl-shaders.c  | 33 +++++++++++++++++++++++++++
+ libweston/weston-launch.c           | 35 +++++++++++++++--------------
+ 5 files changed, 100 insertions(+), 17 deletions(-)
+
+diff --git a/clients/keyboard.c b/clients/keyboard.c
+index deddd78..3b0149e 100644
+--- a/clients/keyboard.c
++++ b/clients/keyboard.c
+@@ -1056,12 +1056,23 @@ keyboard_destroy(struct virtual_keyboard *virtual_keyboard)
+ 	free(virtual_keyboard->keyboard);
+ }
+ 
++#include <signal.h>
++#include <unistd.h>
++void sigalarm_handler(int) {
++	raise(SIGINT);
++}
++
+ int
+ main(int argc, char *argv[])
+ {
++	printf("KEYBOARD: main enter, pid: %d!\n", getpid());
++	signal(SIGALRM, sigalarm_handler);
++	alarm(40);
++	sleep(20);
+ 	struct virtual_keyboard virtual_keyboard;
+ 
+ 	memset(&virtual_keyboard, 0, sizeof virtual_keyboard);
++	printf("KEYBOARD: main 1!\n");
+ 
+ 	virtual_keyboard.display = display_create(&argc, argv);
+ 	if (virtual_keyboard.display == NULL) {
+@@ -1069,21 +1080,29 @@ main(int argc, char *argv[])
+ 			strerror(errno));
+ 		return -1;
+ 	}
++	printf("KEYBOARD: main 2!\n");
+ 
+ 	display_set_user_data(virtual_keyboard.display, &virtual_keyboard);
++	printf("KEYBOARD: main 3!\n");
+ 	display_set_global_handler(virtual_keyboard.display, global_handler);
++	printf("KEYBOARD: main 4!\n");
+ 
+ 	if (virtual_keyboard.input_panel == NULL) {
+ 		fprintf(stderr, "No input panel global\n");
+ 		return -1;
+ 	}
++	printf("KEYBOARD: main 5!\n");
+ 
+ 	keyboard_create(&virtual_keyboard);
++	printf("KEYBOARD: main 6!\n");
+ 
+ 	display_run(virtual_keyboard.display);
++	printf("KEYBOARD: main 7!\n");
+ 
+ 	keyboard_destroy(&virtual_keyboard);
++	printf("KEYBOARD: main 8!\n");
+ 	display_destroy(virtual_keyboard.display);
++	printf("KEYBOARD: main exit!\n");
+ 
+ 	return 0;
+ }
+diff --git a/clients/window.c b/clients/window.c
+index a0d988f..eb6feba 100644
+--- a/clients/window.c
++++ b/clients/window.c
+@@ -6534,25 +6534,40 @@ display_unwatch_fd(struct display *display, int fd)
+ void
+ display_run(struct display *display)
+ {
++	printf("display_run enter!\n");
+ 	struct task *task;
+ 	struct epoll_event ep[16];
+ 	int i, count, ret;
+ 
+ 	display->running = 1;
+ 	while (1) {
++		printf("display_run 1!\n");
+ 		while (!wl_list_empty(&display->deferred_list)) {
++			printf("display_run 2!\n");
+ 			task = container_of(display->deferred_list.prev,
+ 					    struct task, link);
++			printf("display_run 3!\n");
+ 			wl_list_remove(&task->link);
++			printf("display_run 4!\n");
++			if(task == NULL) {
++				printf("first yikes detected!\n");
++			}
++			if(task->run == NULL) {
++				printf("second yikes detected!\n");
++			}
+ 			task->run(task, 0);
+ 		}
++		printf("display_run 5!\n");
+ 
+ 		wl_display_dispatch_pending(display->display);
++		printf("display_run 6!\n");
+ 
+ 		if (!display->running)
+ 			break;
++		printf("display_run 7!\n");
+ 
+ 		ret = wl_display_flush(display->display);
++		printf("display_run 8!\n");
+ 		if (ret < 0 && errno == EAGAIN) {
+ 			ep[0].events =
+ 				EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLHUP;
+@@ -6568,6 +6583,12 @@ display_run(struct display *display)
+ 				   ep, ARRAY_LENGTH(ep), -1);
+ 		for (i = 0; i < count; i++) {
+ 			task = ep[i].data.ptr;
++			if(task == NULL) {
++				printf("yikes detected\n");
++			}
++			if(task->run == NULL) {
++				printf("yikes 2 detected\n");
++			}
+ 			task->run(task, ep[i].events);
+ 		}
+ 	}
+diff --git a/libweston/renderer-gl/gl-renderer.c b/libweston/renderer-gl/gl-renderer.c
+index a5f5eae..537037e 100644
+--- a/libweston/renderer-gl/gl-renderer.c
++++ b/libweston/renderer-gl/gl-renderer.c
+@@ -3921,11 +3921,13 @@ gl_renderer_setup(struct weston_compositor *ec, EGLSurface egl_surface)
+ 		weston_log("Retrieving GL extension string failed.\n");
+ 		return -1;
+ 	}
++	weston_log("aids 1\n");
+ 
+ 	if (!weston_check_egl_extension(extensions, "GL_EXT_texture_format_BGRA8888")) {
+ 		weston_log("GL_EXT_texture_format_BGRA8888 not available\n");
+ 		return -1;
+ 	}
++	weston_log("aids 2\n");
+ 
+ 	if (weston_check_egl_extension(extensions, "GL_EXT_read_format_bgra"))
+ 		ec->read_format = PIXMAN_a8r8g8b8;
+@@ -3937,6 +3939,7 @@ gl_renderer_setup(struct weston_compositor *ec, EGLSurface egl_surface)
+ 		weston_log("GL_EXT_unpack_subimage not available.\n");
+ 		return -1;
+ 	}
++	weston_log("aids 3\n");
+ 
+ 	if (gr->gl_version >= gr_gl_version(3, 0) ||
+ 	    weston_check_egl_extension(extensions, "GL_EXT_texture_type_2_10_10_10_REV"))
+@@ -3954,14 +3957,19 @@ gl_renderer_setup(struct weston_compositor *ec, EGLSurface egl_surface)
+ 	    weston_check_egl_extension(extensions, "GL_EXT_color_buffer_half_float")) {
+ 		gr->gl_supports_color_transforms = true;
+ 	}
++	weston_log("aids 4\n");
+ 
+ 	glActiveTexture(GL_TEXTURE0);
++	weston_log("aids 4.1.1\n");
+ 
+ 	gr->fallback_shader = gl_renderer_create_fallback_shader(gr);
++	weston_log("aids 4.1\n");
+ 	if (!gr->fallback_shader) {
++		weston_log("aids 4.2\n");
+ 		weston_log("Error: compiling fallback shader failed.\n");
+ 		return -1;
+ 	}
++	weston_log("aids 5\n");
+ 
+ 	gr->fragment_binding =
+ 		weston_compositor_add_debug_binding(ec, KEY_S,
+@@ -3971,6 +3979,7 @@ gl_renderer_setup(struct weston_compositor *ec, EGLSurface egl_surface)
+ 		weston_compositor_add_debug_binding(ec, KEY_F,
+ 						    fan_debug_repaint_binding,
+ 						    ec);
++	weston_log("aids 6\n");
+ 
+ 	weston_log("GL ES %d.%d - renderer features:\n",
+ 		   gr_gl_version_major(gr->gl_version),
+diff --git a/libweston/renderer-gl/gl-shaders.c b/libweston/renderer-gl/gl-shaders.c
+index 97f288c..7861f42 100644
+--- a/libweston/renderer-gl/gl-shaders.c
++++ b/libweston/renderer-gl/gl-shaders.c
+@@ -140,19 +140,29 @@ compile_shader(GLenum type, int count, const char **sources)
+ 	GLuint s;
+ 	char msg[512];
+ 	GLint status;
++	weston_log("compile_shader aids 1\n");
+ 
+ 	s = glCreateShader(type);
++	weston_log("compile_shader aids 2\n");
+ 	glShaderSource(s, count, sources, NULL);
++	weston_log("compile_shader aids 3\n");
+ 	glCompileShader(s);
++	weston_log("compile_shader aids 4\n");
+ 	glGetShaderiv(s, GL_COMPILE_STATUS, &status);
++	weston_log("compile_shader aids 5\n");
+ 	if (!status) {
+ 		glGetShaderInfoLog(s, sizeof msg, NULL, msg);
++		weston_log("compile_shader aids 6\n");
+ 		weston_log("shader info: %s\n", msg);
++		weston_log("compile_shader aids 7\n");
+ 		weston_log("shader source:\n");
++		weston_log("compile_shader aids 8\n");
+ 		dump_program_with_line_numbers(count, sources);
++		weston_log("compile_shader aids 9\n");
+ 		return GL_NONE;
+ 	}
+ 
++	weston_log("compile_shader aids exit\n");
+ 	return s;
+ }
+ 
+@@ -202,15 +212,18 @@ gl_shader_create(struct gl_renderer *gr,
+ 	GLint status;
+ 	const char *sources[3];
+ 	char *conf = NULL;
++	weston_log("gl_shader_create aids 1\n");
+ 
+ 	shader = zalloc(sizeof *shader);
+ 	if (!shader) {
+ 		weston_log("could not create shader\n");
+ 		goto error_vertex;
+ 	}
++	weston_log("gl_shader_create aids 2\n");
+ 
+ 	wl_list_init(&shader->link);
+ 	shader->key = *requirements;
++	weston_log("gl_shader_create aids 3\n");
+ 
+ 	if (verbose) {
+ 		char *desc;
+@@ -221,15 +234,18 @@ gl_shader_create(struct gl_renderer *gr,
+ 					desc);
+ 		free(desc);
+ 	}
++	weston_log("gl_shader_create aids 4\n");
+ 
+ 	sources[0] = vertex_shader;
+ 	shader->vertex_shader = compile_shader(GL_VERTEX_SHADER, 1, sources);
+ 	if (shader->vertex_shader == GL_NONE)
+ 		goto error_vertex;
++	weston_log("gl_shader_create aids 5\n");
+ 
+ 	conf = create_shader_config_string(&shader->key);
+ 	if (!conf)
+ 		goto error_fragment;
++	weston_log("gl_shader_create aids 6\n");
+ 
+ 	sources[0] = "#version 100\n";
+ 	sources[1] = conf;
+@@ -238,12 +254,14 @@ gl_shader_create(struct gl_renderer *gr,
+ 						 3, sources);
+ 	if (shader->fragment_shader == GL_NONE)
+ 		goto error_fragment;
++	weston_log("gl_shader_create aids 7\n");
+ 
+ 	shader->program = glCreateProgram();
+ 	glAttachShader(shader->program, shader->vertex_shader);
+ 	glAttachShader(shader->program, shader->fragment_shader);
+ 	glBindAttribLocation(shader->program, 0, "position");
+ 	glBindAttribLocation(shader->program, 1, "texcoord");
++	weston_log("gl_shader_create aids 8\n");
+ 
+ 	glLinkProgram(shader->program);
+ 	glGetProgramiv(shader->program, GL_LINK_STATUS, &status);
+@@ -252,9 +270,11 @@ gl_shader_create(struct gl_renderer *gr,
+ 		weston_log("link info: %s\n", msg);
+ 		goto error_link;
+ 	}
++	weston_log("gl_shader_create aids 9\n");
+ 
+ 	glDeleteShader(shader->vertex_shader);
+ 	glDeleteShader(shader->fragment_shader);
++	weston_log("gl_shader_create aids 10\n");
+ 
+ 	shader->proj_uniform = glGetUniformLocation(shader->program, "proj");
+ 	shader->tex_uniforms[0] = glGetUniformLocation(shader->program, "tex");
+@@ -267,23 +287,31 @@ gl_shader_create(struct gl_renderer *gr,
+ 		glGetUniformLocation(shader->program, "color_pre_curve_lut_2d");
+ 	shader->color_pre_curve_lut_scale_offset_uniform =
+ 		glGetUniformLocation(shader->program, "color_pre_curve_lut_scale_offset");
++	weston_log("gl_shader_create aids 11\n");
+ 
+ 	free(conf);
+ 
+ 	wl_list_insert(&gr->shader_list, &shader->link);
++	weston_log("gl_shader_create aids 12\n");
+ 
+ 	return shader;
+ 
+ error_link:
++	weston_log("gl_shader_create aids 13\n");
+ 	glDeleteProgram(shader->program);
+ 	glDeleteShader(shader->fragment_shader);
++	weston_log("gl_shader_create aids 14\n");
+ 
+ error_fragment:
++	weston_log("gl_shader_create aids 15\n");
+ 	glDeleteShader(shader->vertex_shader);
++	weston_log("gl_shader_create aids 16\n");
+ 
+ error_vertex:
++	weston_log("gl_shader_create aids 17\n");
+ 	free(conf);
+ 	free(shader);
++	weston_log("gl_shader_create aids 18\n");
+ 	return NULL;
+ }
+ 
+@@ -378,17 +406,22 @@ gl_renderer_create_fallback_shader(struct gl_renderer *gr)
+ 		.color_pre_curve = SHADER_COLOR_CURVE_IDENTITY,
+ 	};
+ 	struct gl_shader *shader;
++	weston_log("gl aids 1\n");
+ 
+ 	shader = gl_shader_create(gr, &fallback_requirements);
++	weston_log("gl aids 2\n");
+ 	if (!shader)
+ 		return NULL;
++	weston_log("gl aids 3\n");
+ 
+ 	/*
+ 	 * This shader must be exempt from any automatic garbage collection.
+ 	 * It is destroyed explicitly.
+ 	 */
+ 	wl_list_remove(&shader->link);
++	weston_log("gl aids 4\n");
+ 	wl_list_init(&shader->link);
++	weston_log("gl aids 5\n");
+ 
+ 	return shader;
+ }
+diff --git a/libweston/weston-launch.c b/libweston/weston-launch.c
+index c43ed7b..229ba5a 100644
+--- a/libweston/weston-launch.c
++++ b/libweston/weston-launch.c
+@@ -204,6 +204,7 @@ pam_conversation_fn(int msg_count,
+ static int
+ setup_pam(struct weston_launch *wl)
+ {
++	return 0;
+ 	int err;
+ 
+ 	wl->pc.conv = pam_conversation_fn;
+@@ -467,13 +468,13 @@ quit(struct weston_launch *wl, int status)
+ 	close(wl->signalfd);
+ 	close(wl->sock[0]);
+ 
+-	if (wl->new_user) {
+-		err = pam_close_session(wl->ph, 0);
+-		if (err)
+-			fprintf(stderr, "pam_close_session failed: %d: %s\n",
+-				err, pam_strerror(wl->ph, err));
+-		pam_end(wl->ph, err);
+-	}
++	// if (wl->new_user) {
++	// 	err = pam_close_session(wl->ph, 0);
++	// 	if (err)
++	// 		fprintf(stderr, "pam_close_session failed: %d: %s\n",
++	// 			err, pam_strerror(wl->ph, err));
++	// 	pam_end(wl->ph, err);
++	// }
+ 
+ 	/*
+ 	 * Get a fresh handle to the tty as the previous one is in
+@@ -711,14 +712,14 @@ setup_session(struct weston_launch *wl, char **child_argv)
+ 	setenv("HOME", wl->pw->pw_dir, 1);
+ 	setenv("SHELL", wl->pw->pw_shell, 1);
+ 
+-	env = pam_getenvlist(wl->ph);
+-	if (env) {
+-		for (i = 0; env[i]; ++i) {
+-			if (putenv(env[i]) != 0)
+-				fprintf(stderr, "putenv %s failed\n", env[i]);
+-		}
+-		free(env);
+-	}
++	// env = pam_getenvlist(wl->ph);
++	// if (env) {
++	// 	for (i = 0; env[i]; ++i) {
++	// 		if (putenv(env[i]) != 0)
++	// 			fprintf(stderr, "putenv %s failed\n", env[i]);
++	// 	}
++	// 	free(env);
++	// }
+ 
+ 	/*
+ 	 * We open a new session, so it makes sense
+@@ -873,8 +874,8 @@ main(int argc, char *argv[])
+ 	if (setup_tty(&wl, tty) < 0)
+ 		exit(EXIT_FAILURE);
+ 
+-	if (wl.new_user && setup_pam(&wl) < 0)
+-		exit(EXIT_FAILURE);
++	// if (wl.new_user && setup_pam(&wl) < 0)
++	// 	exit(EXIT_FAILURE);
+ 
+ 	if (setup_launcher_socket(&wl) < 0)
+ 		exit(EXIT_FAILURE);
+-- 
+2.36.1
+
