@@ -1,0 +1,25 @@
+From a6baa8fd1ff690d1c24576f967fbcb8df1ddb8fa Mon Sep 17 00:00:00 2001
+From: Dennis Bonke <admin@dennisbonke.com>
+Date: Sat, 9 Jul 2022 13:25:25 +0200
+Subject: [PATCH] Add mlibc support
+
+Signed-off-by: Dennis Bonke <admin@dennisbonke.com>
+---
+ options.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/options.c b/options.c
+index e602848..a56eb41 100644
+--- a/options.c
++++ b/options.c
+@@ -37,6 +37,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
++#include <termios.h>
+ 
+ #include "common.h"
+ #include "filter.h"
+-- 
+2.36.1
+
