@@ -113,11 +113,19 @@ packages:
       tag: 'v4.4.26'
       version: '4.4.26'
       tools_required:
-        - cross-toolchain
+        - tool: cross-gcc
+          stage_dependencies: ["compiler"]
+        - tool: cross-binutils
+        - tool: cross-autoconf-v2.69
+        - tool: cross-automake-v1.15
+        - tool: cross-pkg-config
+        - tool: cross-libtool
       regenerate:
         - args: ['./autogen.sh']
     tools_required:
-      - cross-toolchain
+      - tool: cross-gcc
+        stage_dependencies: ["compiler"]
+      - tool: cross-binutils
     pkgs_required:
       - mlibc
     configure:
