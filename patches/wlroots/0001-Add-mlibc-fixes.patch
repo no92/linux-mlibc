@@ -1,0 +1,91 @@
+From 6f884cab80faf166f4910b81e9b8ed46a288cb5b Mon Sep 17 00:00:00 2001
+From: no92 <no92.mail@gmail.com>
+Date: Sat, 9 Jul 2022 22:22:10 +0200
+Subject: [PATCH] Add mlibc fixes
+
+---
+ include/wlr/backend.h        | 2 ++
+ render/allocator/drm_dumb.c  | 2 +-
+ types/wlr_export_dmabuf_v1.c | 1 +
+ types/wlr_linux_dmabuf_v1.c  | 1 +
+ xwayland/meson.build         | 2 ++
+ xwayland/server.c            | 1 +
+ 6 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/include/wlr/backend.h b/include/wlr/backend.h
+index 86decad..ab3ea6a 100644
+--- a/include/wlr/backend.h
++++ b/include/wlr/backend.h
+@@ -12,6 +12,8 @@
+ #include <wayland-server-core.h>
+ #include <wlr/backend/session.h>
+ 
++#include <time.h>
++
+ struct wlr_backend_impl;
+ 
+ /**
+diff --git a/render/allocator/drm_dumb.c b/render/allocator/drm_dumb.c
+index e2812ec..9c57519 100644
+--- a/render/allocator/drm_dumb.c
++++ b/render/allocator/drm_dumb.c
+@@ -205,7 +205,7 @@ static const struct wlr_allocator_interface allocator_impl = {
+ struct wlr_allocator *wlr_drm_dumb_allocator_create(int drm_fd) {
+ 	if (drmGetNodeTypeFromFd(drm_fd) != DRM_NODE_PRIMARY) {
+ 		wlr_log(WLR_ERROR, "Cannot use DRM dumb buffers with non-primary DRM FD");
+-		return NULL;
++		// return NULL;
+ 	}
+ 
+ 	uint64_t has_dumb = 0;
+diff --git a/types/wlr_export_dmabuf_v1.c b/types/wlr_export_dmabuf_v1.c
+index b47758c..0a290a8 100644
+--- a/types/wlr_export_dmabuf_v1.c
++++ b/types/wlr_export_dmabuf_v1.c
+@@ -1,5 +1,6 @@
+ #include <assert.h>
+ #include <stdlib.h>
++#include <stdio.h>
+ #include <unistd.h>
+ #include <wlr/interfaces/wlr_output.h>
+ #include <wlr/render/dmabuf.h>
+diff --git a/types/wlr_linux_dmabuf_v1.c b/types/wlr_linux_dmabuf_v1.c
+index a124d52..cc51e54 100644
+--- a/types/wlr_linux_dmabuf_v1.c
++++ b/types/wlr_linux_dmabuf_v1.c
+@@ -3,6 +3,7 @@
+ #include <drm_fourcc.h>
+ #include <stdlib.h>
+ #include <sys/mman.h>
++#include <stdio.h>
+ #include <unistd.h>
+ #include <wlr/interfaces/wlr_buffer.h>
+ #include <wlr/render/wlr_renderer.h>
+diff --git a/xwayland/meson.build b/xwayland/meson.build
+index 4d8ed5f..53e3b97 100644
+--- a/xwayland/meson.build
++++ b/xwayland/meson.build
+@@ -11,6 +11,8 @@ xwayland_optional = {
+ 	'xcb-errors': 'Required for printing X11 errors.',
+ }
+ 
++meson.override_find_program('Xwayland', files('{XBSTRAP_SYSTEM_ROOT}/usr/bin/Xwayland'))
++
+ msg = []
+ if get_option('xwayland').enabled()
+ 	msg += 'Install "@0@" or pass "-Dxwayland=disabled".'
+diff --git a/xwayland/server.c b/xwayland/server.c
+index 0086ad6..36a930c 100644
+--- a/xwayland/server.c
++++ b/xwayland/server.c
+@@ -136,6 +136,7 @@ noreturn static void exec_xwayland(struct wlr_xwayland_server *server,
+ 	wlr_log_errno(WLR_ERROR, "failed to exec %s", xwayland_path);
+ 	close(devnull);
+ 	_exit(EXIT_FAILURE);
++	__builtin_unreachable();
+ }
+ 
+ static void server_finish_process(struct wlr_xwayland_server *server) {
+-- 
+2.36.1
+
