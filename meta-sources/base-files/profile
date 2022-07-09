@@ -63,7 +63,12 @@ export HISTIGNORE="&:[bf]g:exit"
 # Set some defaults for graphical systems
 export XDG_DATA_DIRS=${XDG_DATA_DIRS:-/usr/share/}
 export XDG_CONFIG_DIRS=${XDG_CONFIG_DIRS:-/etc/xdg/}
-export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/tmp/xdg-$USER}
+#export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/tmp/xdg-$USER}
+export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run}
+
+export MESA_GLSL_CACHE_DISABLE=1
+export WLR_RENDERER_ALLOW_SOFTWARE=1
+export WLR_XWAYLAND=/usr/bin/Xwayland
 
 # Setup a red prompt for root and a green one for users.
 NORMAL="\[\e[0m\]"
