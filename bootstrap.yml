@@ -457,4 +457,6 @@ tasks:
       - 'q35,accel=kvm:whpx:tcg'
       - '-m'
       - '2G'
+      - '-vga'
+      - 'virtio'
     containerless: true
