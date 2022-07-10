@@ -1,0 +1,37 @@
+packages:
+  - name: swaybg
+    source:
+      subdir: ports
+      git: 'https://github.com/swaywm/swaybg'
+      tag: 'v1.1'
+      version: "1.1"
+    tools_required:
+      - cross-toolchain
+      - wayland-scanner
+      - virtual: pkgconfig-for-target
+        triple: "@OPTION:arch-triple@"
+      - virtual: pkgconfig-for-host
+        program_name: host-pkg-config
+    pkgs_required:
+      - mlibc
+      - cairo
+      - wayland
+      - wayland-protocols
+      - gdk-pixbuf
+    configure:
+      - args:
+        - 'meson'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+        - '--native-file'
+        - '@SOURCE_ROOT@/scripts/meson.native-file'
+        - '--prefix=/usr'
+        - '--buildtype=release'
+        - '-Dman-pages=disabled'
+        - '-Dgdk-pixbuf=disabled'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'

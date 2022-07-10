@@ -1,0 +1,25 @@
+From e65bb0f226c4de18bfbf6d8394702d36da8b3325 Mon Sep 17 00:00:00 2001
+From: no92 <no92.mail@gmail.com>
+Date: Mon, 21 Feb 2022 01:27:28 +0100
+Subject: [PATCH] Add managarm-specific patches
+
+---
+ pool-buffer.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pool-buffer.c b/pool-buffer.c
+index 0016c1f..ed80b7a 100644
+--- a/pool-buffer.c
++++ b/pool-buffer.c
+@@ -62,7 +62,7 @@ bool create_buffer(struct pool_buffer *buf, struct wl_shm *shm,
+ 	uint32_t stride = width * 4;
+ 	size_t size = stride * height;
+ 
+-	char *name;
++	char *name = 0;
+ 	int fd = create_pool_file(size, &name);
+ 	assert(fd != -1);
+ 	void *data = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+-- 
+2.35.1
+
