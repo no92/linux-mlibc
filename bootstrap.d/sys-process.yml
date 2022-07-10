@@ -1,4 +1,40 @@
 packages:
+  - name: psmisc
+    source:
+      subdir: ports
+      git: 'https://gitlab.com/psmisc/psmisc.git'
+      tag: 'v23.4'
+      version: '23.4'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ["@THIS_SOURCE_DIR@/autogen.sh"]
+        # - args: ['cp',
+        #     '@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.sub',
+        #     '@THIS_SOURCE_DIR@/build-aux/']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - ncurses
+      - libintl
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-harden-flags'
+        - '--enable-ipv6'
+        - '--enable-nls'
+        environ:
+          ac_cv_func_malloc_0_nonnull: 'yes'
+          ac_cv_func_realloc_0_nonnull: 'yes'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
   - name: time
     source:
       subdir: ports
