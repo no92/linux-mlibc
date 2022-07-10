@@ -1,0 +1,39 @@
+From 2dd6805105da4a1164da9bb250c96e182048cadc Mon Sep 17 00:00:00 2001
+From: Dennis Bonke <admin@dennisbonke.com>
+Date: Sun, 10 Jul 2022 19:02:35 +0200
+Subject: [PATCH] Add mlibc support
+
+Signed-off-by: Dennis Bonke <admin@dennisbonke.com>
+---
+ proc/escape.c | 2 ++
+ top/top.c     | 1 +
+ 2 files changed, 3 insertions(+)
+
+diff --git a/proc/escape.c b/proc/escape.c
+index 2e8fb7d..4494ba5 100644
+--- a/proc/escape.c
++++ b/proc/escape.c
+@@ -33,6 +33,8 @@
+ # include <langinfo.h>
+ #endif
+ 
++#include <langinfo.h>
++
+ #define SECURE_ESCAPE_ARGS(dst, bytes, cells) do { \
+   if ((bytes) <= 0) return 0; \
+   *(dst) = '\0'; \
+diff --git a/top/top.c b/top/top.c
+index 2ec6357..30721dd 100644
+--- a/top/top.c
++++ b/top/top.c
+@@ -21,6 +21,7 @@
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <float.h>
++#include <strings.h>
+ #include <limits.h>
+ #include <pwd.h>
+ #include <signal.h>
+-- 
+2.36.1
+
