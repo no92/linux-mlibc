@@ -471,4 +471,10 @@ tasks:
       - '2G'
       - '-vga'
       - 'virtio'
+      - '-device'
+      - 'qemu-xhci,id=xhci'
+      - '-device'
+      - 'usb-kbd,bus=xhci.0'
+      - '-device'
+      - 'usb-tablet,bus=xhci.0'
     containerless: true
