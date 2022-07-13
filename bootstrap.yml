@@ -234,6 +234,17 @@ tools:
         install:
           - args: ["make", "install-strip-target-libstdc++-v3"]
 
+      - name: libeverything
+        tools_required:
+          - tool: cross-gcc
+            stage_dependencies: [libstdc++]
+        pkgs_required:
+          - libxcrypt
+        compile:
+          - args: ['make', '-j@PARALLELISM@', 'all-target-libsanitizer', 'all-target-libatomic', 'all-target-libssp', 'all-target-libquadmath']
+        install:
+          - args: ['make', 'install-target-libsanitizer', 'install-target-libatomic', 'install-target-libssp', 'install-target-libquadmath']
+
   - name: cross-toolchain
     source:
       subdir: meta-sources

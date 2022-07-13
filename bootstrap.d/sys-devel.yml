@@ -189,8 +189,8 @@ packages:
         - 'CFLAGS=-O2'
         - 'CXXFLAGS=-O2'
     build:
-      - args: ['make', 'all-gcc', 'all-target-libgcc', 'all-target-libstdc++-v3', 'all-target-libsanitizer', '-j@PARALLELISM@']
-      - args: ['make', 'install-gcc', 'install-target-libgcc', 'install-target-libstdc++-v3', 'install-target-libsanitizer']
+      - args: ['make', 'all-gcc', 'all-target-libgcc', 'all-target-libstdc++-v3', 'all-target-libsanitizer', 'all-target-libatomic', 'all-target-libssp', 'all-target-libquadmath', '-j@PARALLELISM@']
+      - args: ['make', 'install-gcc', 'install-target-libgcc', 'install-target-libstdc++-v3', 'install-target-libsanitizer', 'install-target-libatomic', 'install-target-libssp', 'install-target-libquadmath']
         environ:
           DESTDIR: '@THIS_COLLECT_DIR@'
         quiet: true

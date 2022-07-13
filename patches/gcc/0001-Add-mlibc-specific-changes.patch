@@ -1,7 +1,7 @@
 From f801bba22adf2453611695459255894f06b59485 Mon Sep 17 00:00:00 2001
 From: czapek1337 <czapek1337@gmail.com>
 Date: Thu, 7 Apr 2022 19:35:51 +0200
-Subject: [PATCH] Add mlibc-specific changes
+Subject: [PATCH 1/2] Add mlibc-specific changes
 
 Signed-off-by: Dennis Bonke <admin@dennisbonke.com>
 ---
