@@ -1,0 +1,25 @@
+From a69ac9d89d5c94350808a680819d7823d1e40d09 Mon Sep 17 00:00:00 2001
+From: Dennis Bonke <admin@dennisbonke.com>
+Date: Wed, 13 Jul 2022 16:24:33 +0200
+Subject: [PATCH] Add mlibc support
+
+Signed-off-by: Dennis Bonke <admin@dennisbonke.com>
+---
+ src/platformsupport/kmsconvenience/qkmsdevice.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/platformsupport/kmsconvenience/qkmsdevice.cpp b/src/platformsupport/kmsconvenience/qkmsdevice.cpp
+index 4206b20a..71127dd8 100644
+--- a/src/platformsupport/kmsconvenience/qkmsdevice.cpp
++++ b/src/platformsupport/kmsconvenience/qkmsdevice.cpp
+@@ -48,6 +48,7 @@
+ #include <QtCore/QLoggingCategory>
+ 
+ #include <errno.h>
++#include <strings.h>
+ 
+ #define ARRAY_LENGTH(a) (sizeof (a) / sizeof (a)[0])
+ 
+-- 
+2.36.1
+
