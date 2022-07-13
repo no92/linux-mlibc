@@ -24,10 +24,7 @@ if [ ! -f ${image_path} ]; then
   real_image_size=`du -bs ${system_root} | cut -f1`
   image_size=`expr ${real_image_size} + 1024 \* 1024 \* 512`
 
-  sudo -u ${SUDO_USER} dd if=/dev/zero of=${image_path} bs=4096 count=`expr ${image_size} / 4096`
-  parted -s ${image_path} mklabel gpt
-  parted -s ${image_path} mkpart primary ext4 2048s 100%
-
+  sudo -u ${SUDO_USER} qemu-img create -f qcow2 -o preallocation=metadata ${image_path} 40G
   create_fs=1
 fi
 
@@ -46,6 +43,9 @@ loopback=`losetup -Pf --show ${image_path}`
 echo ${loopback} > ${loopback_file}
 
 if [ "${create_fs}" == "1" ]; then
+  parted -s ${image_path} mklabel gpt
+  parted -s ${image_path} mkpart primary ext4 2048s 100%
+  partprobe ${loopback}
   mkfs.ext4 ${loopback}p1
 fi
 
