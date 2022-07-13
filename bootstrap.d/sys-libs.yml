@@ -42,7 +42,7 @@ packages:
       - args:
           - "meson"
           - "--cross-file"
-          - "@SOURCE_ROOT@/scripts/cross.ini"
+          - "@SOURCE_ROOT@/scripts/meson-x86_64-linux-mlibc.cross-file"
           - "--prefix=/usr"
           - "-Dbuildtype=release"
           - "@THIS_SOURCE_DIR@"

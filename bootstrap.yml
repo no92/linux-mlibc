@@ -353,7 +353,7 @@ packages:
       - args:
           - "meson"
           - "--cross-file"
-          - "@SOURCE_ROOT@/scripts/cross.ini"
+          - "@SOURCE_ROOT@/scripts/meson-x86_64-linux-mlibc.cross-file"
           - "--prefix=/usr"
           - "-Dheaders_only=true"
           - "-Ddisable_iconv_option=true"
@@ -380,7 +380,7 @@ packages:
       - args:
           - "meson"
           - "--cross-file"
-          - "@SOURCE_ROOT@/scripts/cross.ini"
+          - "@SOURCE_ROOT@/scripts/meson-x86_64-linux-mlibc.cross-file"
           - "--prefix=/usr"
           - "--libdir=lib"
           - "-Dmlibc_no_headers=true"

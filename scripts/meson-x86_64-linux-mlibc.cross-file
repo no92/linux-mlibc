@@ -1,4 +1,3 @@
-
 [binaries]
 c = 'x86_64-linux-mlibc-gcc'
 cpp = 'x86_64-linux-mlibc-g++'
@@ -12,4 +11,3 @@ system = 'linux-mlibc'
 cpu_family = 'x86_64'
 cpu = 'x86_64'
 endian = 'little'
-
