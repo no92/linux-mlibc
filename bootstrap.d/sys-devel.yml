@@ -288,7 +288,7 @@ packages:
         - '-Wno-dev'
         - '@THIS_SOURCE_DIR@/llvm'
     build:
-      - args: ['ninja', '-j8']
+      - args: ['ninja', '-j4']
       - args: ['ninja', 'install']
         environ:
           DESTDIR: '@THIS_COLLECT_DIR@'
