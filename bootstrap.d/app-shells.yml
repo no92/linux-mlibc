@@ -18,18 +18,17 @@ packages:
     pkgs_required:
       - readline
       - ncurses
-      - coreutils
     configure:
       - args:
-          - "@THIS_SOURCE_DIR@/configure"
-          - "--host=@OPTION:arch-triple@"
-          - "--prefix=/usr"
-          - "--without-bash-malloc"
-          - "--disable-nls"
-          - "--enable-readline"
-          - "--with-installed-readline=$SYSROOT_DIR$/usr"
-          - "--with-curses"
+          - '@THIS_SOURCE_DIR@/configure'
+          - '--host=@OPTION:arch-triple@'
+          - '-prefix=/usr'
+          - '--without-bash-malloc'
+          - '--disable-nls'
+          - '--enable-readline'
+          - '--with-installed-readline=$SYSROOT_DIR$/usr'
+          - '--with-curses'
     build:
-      - args: ["make", "-j", "@PARALLELISM@"]
-      - args: ["make", "DESTDIR=@THIS_COLLECT_DIR@", "install"]
-      - args: ["ln", "-svf", "bash", "@THIS_COLLECT_DIR@/usr/bin/sh"]
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'DESTDIR=@THIS_COLLECT_DIR@', 'install']
+      - args: ['ln', '-svf', 'bash', '@THIS_COLLECT_DIR@/usr/bin/sh']
