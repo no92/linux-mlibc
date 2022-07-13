@@ -7,7 +7,7 @@ pkgconfig = 'x86_64-linux-mlibc-pkg-config'
 # sed adds binaries here.
 
 [host_machine]
-system = 'linux-mlibc'
+system = 'linux'
 cpu_family = 'x86_64'
 cpu = 'x86_64'
 endian = 'little'
