@@ -477,4 +477,10 @@ tasks:
       - 'usb-kbd,bus=xhci.0'
       - '-device'
       - 'usb-tablet,bus=xhci.0'
+      # - '-netdev'
+      # - 'user,id=net0'
+      # - '-device'
+      # - 'virtio-net,disable-modern=on,netdev=net0'
+      # - '-object'
+      # - 'filter-dump,id=fd1,netdev=net0,file=net0dump'
     containerless: true
