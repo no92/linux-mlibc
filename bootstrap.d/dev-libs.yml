@@ -37,7 +37,61 @@ sources:
     tag: '1.21.0'
     version: '1.21.0'
 
+  - name: wayland-old
+    subdir: 'ports'
+    git: 'https://github.com/wayland-project/wayland.git'
+    tag: '1.18.0'
+    version: '1.18.0'
+
 tools:
+  - name: cross-wayland
+    # labels: [aarch64]
+    # architecture: noarch
+    from_source: wayland-old
+    tools_required:
+      - virtual: pkgconfig-for-host
+        program_name: host-pkg-config
+      - wayland-scanner
+    configure:
+      - args:
+        - 'meson'
+        - '--native-file'
+        - '@SOURCE_ROOT@/scripts/meson.native-file'
+        - '--prefix=@PREFIX@'
+        - '-Ddtd_validation=false'
+        - '-Ddocumentation=false'
+        # - '-Dscanner=true'
+        # - '-Dlibraries=true'
+        # - '-Dtests=false'
+        - '@THIS_SOURCE_DIR@'
+    compile:
+      - args: ['ninja']
+    install:
+      - args: ['ninja', 'install']
+
+  - name: cross-wayland-protocols
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/wayland-project/wayland-protocols.git'
+      tag: '1.25'
+      version: '1.25'
+    tools_required:
+      - cross-toolchain
+      - wayland-scanner
+    configure:
+      - args:
+        - 'meson'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson.native-file'
+        - '--prefix=@PREFIX@'
+        - '--buildtype=release'
+        - '-Dtests=false'
+        - '@THIS_SOURCE_DIR@'
+    compile:
+      - args: ['ninja']
+    install:
+      - args: ['ninja', 'install']
+
   - name: host-glib
     exports_aclocal: true
     from_source: glib
