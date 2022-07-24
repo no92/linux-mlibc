@@ -399,3 +399,36 @@ packages:
       - args: ['ninja', 'install']
         environ:
           DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: qtwayland6
+    source:
+      subdir: 'ports'
+      git: 'http://code.qt.io/qt/qtwayland.git'
+      tag: 'v6.3.0'
+      version: '6.3.0'
+    tools_required:
+      - cross-toolchain
+      - cross-cmake
+      - cross-qt6
+      - wayland-scanner
+    pkgs_required:
+      - mlibc
+      - qtbase6
+      - qtdeclarative6
+      - mesa
+      - wayland
+      - libxkbcommon
+    configure:
+      - args:
+        - 'cmake'
+        - '-GNinja'
+        - '-DQT_HOST_PATH=@BUILD_ROOT@/tools/cross-qt6'
+        - '-DCMAKE_INSTALL_PREFIX=/usr'
+        - '-DCMAKE_TOOLCHAIN_FILE=@SOURCE_ROOT@/scripts/CMakeToolchain-@OPTION:arch-triple@.txt'
+        - '-DCMAKE_BUILD_TYPE=Debug'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
