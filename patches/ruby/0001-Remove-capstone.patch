@@ -1,0 +1,32 @@
+From 7a96cb941f43dc8190a09ebf01ea02c93d491e48 Mon Sep 17 00:00:00 2001
+From: no92 <no92.mail@gmail.com>
+Date: Sun, 23 Oct 2022 18:39:44 +0200
+Subject: [PATCH] Remove capstone
+
+---
+ configure.ac | 9 ---------
+ 1 file changed, 9 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 5a6b074..951a664 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1244,15 +1244,6 @@ AC_CHECK_LIB(dl, dlopen)	# Dynamic linking for SunOS/Solaris and SYSV
+ AC_CHECK_LIB(dld, shl_load)	# Dynamic linking for HP-UX
+ AC_CHECK_LIB(socket, shutdown)  # SunOS/Solaris
+ 
+-if pkg-config --exists capstone; then
+-   CAPSTONE_CFLAGS=`pkg-config --cflags capstone`
+-   CAPSTONE_LIB_L=`pkg-config --libs-only-L capstone`
+-   LDFLAGS="$LDFLAGS $CAPSTONE_LIB_L"
+-   CFLAGS="$CFLAGS $CAPSTONE_CFLAGS"
+-fi
+-
+-AC_CHECK_LIB(capstone, cs_open) # Capstone disassembler for debugging YJIT
+-
+ dnl Checks for header files.
+ AC_HEADER_DIRENT
+ dnl AC_HEADER_STDC has been checked in AC_USE_SYSTEM_EXTENSIONS
+-- 
+2.38.0
+
