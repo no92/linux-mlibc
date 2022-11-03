@@ -690,8 +690,8 @@ packages:
     source:
       subdir: 'ports'
       git: 'https://github.com/wayland-project/libinput.git'
-      tag: '1.19.2'
-      version: '1.19.2'
+      tag: '1.21.0'
+      version: '1.21.0'
     tools_required:
       - cross-toolchain
       - virtual: pkgconfig-for-target
