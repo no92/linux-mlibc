@@ -183,8 +183,8 @@ packages:
     source:
       subdir: 'ports'
       git: 'https://gitlab.freedesktop.org/mesa/drm'
-      tag: 'libdrm-2.4.112'
-      version: '2.4.112'
+      tag: 'libdrm-2.4.113'
+      version: '2.4.113'
       # tools_required:
       #   - cross-toolchain
       #   - virtual: pkgconfig-for-target
@@ -202,14 +202,14 @@ packages:
         - '--prefix=/usr'
         - '--libdir=lib'
         - '--buildtype=debugoptimized'
-        - '-Dintel=false'
-        - '-Dvmwgfx=false'
-        - '-Dradeon=false'
-        - '-Damdgpu=false'
-        - '-Dnouveau=false'
+        - '-Dintel=enabled'
+        - '-Dvmwgfx=enabled'
+        - '-Dradeon=enabled'
+        - '-Damdgpu=enabled'
+        - '-Dnouveau=enabled'
         # We might want to build cairo with OpenGL support.
         # Doing so would introduce a circular dependency here.
-        - '-Dcairo-tests=false'
+        - '-Dcairo-tests=disabled'
         - '@THIS_SOURCE_DIR@'
     build:
       - args: ['ninja']
