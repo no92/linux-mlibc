@@ -73,8 +73,8 @@ tools:
     source:
       subdir: 'ports'
       git: 'https://github.com/wayland-project/wayland-protocols.git'
-      tag: '1.25'
-      version: '1.25'
+      tag: '1.27'
+      version: '1.27'
     tools_required:
       - cross-toolchain
       - wayland-scanner
