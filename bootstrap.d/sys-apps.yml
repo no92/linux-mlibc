@@ -92,10 +92,10 @@ packages:
   - name: bootscripts
     source:
       subdir: ports
-      url: 'https://www.linuxfromscratch.org/lfs/downloads/development/lfs-bootscripts-20220623.tar.xz'
+      url: 'https://www.linuxfromscratch.org/lfs/downloads/11.2/lfs-bootscripts-20220723.tar.xz'
       format: 'tar.xz'
-      extract_path: 'lfs-bootscripts-20220623'
-      version: '20220623'
+      extract_path: 'lfs-bootscripts-20220723'
+      version: '20220723'
       patch-path-strip: 1
     configure:
       - args: ['cp', '-r', '@THIS_SOURCE_DIR@/.', '@THIS_BUILD_DIR@']
