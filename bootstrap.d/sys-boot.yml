@@ -2,12 +2,12 @@ sources:
   - name: limine
     subdir: 'ports'
     git: 'https://github.com/limine-bootloader/limine.git'
-    tag: 'v3.7.1'
-    version: '3.7.1'
+    tag: 'v4.20221102.0'
+    version: '4.20221102.0'
     tools_required:
       - cross-toolchain
     regenerate:
-      - args: ['./autogen.sh']
+      - args: ['./bootstrap']
         environ:
           NOCONFIGURE: 'yes'
 
