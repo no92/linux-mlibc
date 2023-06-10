@@ -40,8 +40,8 @@ packages:
     source:
       subdir: ports
       git: https://git.kernel.org/pub/scm/fs/ext2/e2fsprogs.git
-      tag: 'v1.46.5'
-      version: '1.46.5'
+      tag: 'v1.47.0'
+      version: '1.47.0'
       regenerate:
         - args: ['cp',
             '@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.sub',
