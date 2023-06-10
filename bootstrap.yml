@@ -363,6 +363,7 @@ packages:
           - "-Ddisable_intl_option=true"
           - "-Ddisable_crypt_option=true"
           - "-Dbuildtype=debug"
+          - '-Dlinux_kernel_headers=@SYSROOT_DIR@/usr/include'
           - "@THIS_SOURCE_DIR@"
     build:
       - args: ["ninja"]
@@ -391,6 +392,7 @@ packages:
           - "-Ddisable_intl_option=true"
           - "-Ddisable_crypt_option=true"
           - "-Dbuildtype=debug"
+          - '-Dlinux_kernel_headers=@SYSROOT_DIR@/usr/include'
           - "@THIS_SOURCE_DIR@"
     build:
       - args: ["ninja"]
