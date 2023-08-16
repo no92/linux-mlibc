@@ -12,6 +12,9 @@ packages:
       regenerate:
         - args: ['autoreconf', '-f', '-i']
         - args: ['cp',
+              '@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.guess',
+              '@THIS_SOURCE_DIR@/tclconfig/']
+        - args: ['cp',
               '@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.sub',
               '@THIS_SOURCE_DIR@/tclconfig/']
     pkgs_required:
