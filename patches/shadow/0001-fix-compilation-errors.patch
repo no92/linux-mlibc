@@ -1,0 +1,38 @@
+From 43d01c52d509dbc2d56822269471cae6006cec2a Mon Sep 17 00:00:00 2001
+From: no92 <no92.mail@gmail.com>
+Date: Fri, 18 Aug 2023 22:59:12 +0200
+Subject: [PATCH] fix compilation errors
+
+---
+ libmisc/readpassphrase.h | 2 --
+ libmisc/utmp.c           | 1 +
+ 2 files changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/libmisc/readpassphrase.h b/libmisc/readpassphrase.h
+index 2462ecc..9d09ed8 100644
+--- a/libmisc/readpassphrase.h
++++ b/libmisc/readpassphrase.h
+@@ -36,8 +36,6 @@
+ #endif
+ #include <sys/types.h>
+ 
+-__BEGIN_DECLS
+ char * readpassphrase(const char *, char *, size_t, int);
+-__END_DECLS
+ 
+ #endif /* !LIBBSD_READPASSPHRASE_H */
+diff --git a/libmisc/utmp.c b/libmisc/utmp.c
+index 7c7da69..312bc76 100644
+--- a/libmisc/utmp.c
++++ b/libmisc/utmp.c
+@@ -21,6 +21,7 @@
+ #include <netdb.h>
+ #include <stdio.h>
+ #include <fcntl.h>
++#include <netinet/in.h>
+ 
+ #include "alloc.h"
+ 
+-- 
+2.40.1
+
