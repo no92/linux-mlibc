@@ -1,0 +1,44 @@
+From 6a8f909adf6cec9863e65ff79d3c67980c4a6203 Mon Sep 17 00:00:00 2001
+From: no92 <no92.mail@gmail.com>
+Date: Sat, 19 Aug 2023 18:46:26 +0200
+Subject: [PATCH] Compilation fixes
+
+---
+ ifconfig/system/linux.c | 5 ++++-
+ libinetutils/logwtmp.c  | 4 ----
+ 2 files changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/ifconfig/system/linux.c b/ifconfig/system/linux.c
+index 46d89cd..4581075 100644
+--- a/ifconfig/system/linux.c
++++ b/ifconfig/system/linux.c
+@@ -49,7 +49,10 @@
+ #include <attribute.h>
+ 
+ #include "../ifconfig.h"
+-
++
++#ifndef PATH_PROCNET_DEV
++	#define PATH_PROCNET_DEV "/proc/net/dev"
++#endif
+ 
+ /* ARPHRD stuff.  */
+ 
+diff --git a/libinetutils/logwtmp.c b/libinetutils/logwtmp.c
+index 2bec317..b09ec61 100644
+--- a/libinetutils/logwtmp.c
++++ b/libinetutils/logwtmp.c
+@@ -44,10 +44,6 @@
+ #endif
+ #include <string.h>
+ 
+-#if !HAVE_DECL_ERRNO
+-extern int errno;
+-#endif
+-
+ #ifdef HAVE_UTMPX_H
+ static void
+ _logwtmp (struct utmpx *ut)
+-- 
+2.40.1
+
