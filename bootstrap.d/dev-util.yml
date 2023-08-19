@@ -173,6 +173,28 @@ packages:
           DESTDIR: '@THIS_COLLECT_DIR@'
 
 
+  - name: gperf
+    source:
+      subdir: ports
+      url: 'https://ftp.gnu.org/gnu/gperf/gperf-3.1.tar.gz'
+      extract_path: 'gperf-3.1'
+      format: 'tar.gz'
+      version: '3.1'
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--prefix=/usr'
+        - '--host=@OPTION:arch-triple@'
+    build:
+      - args: ["make", "-j@PARALLELISM@"]
+      - args: ["make", "install"]
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
   - name: pkg-config
     from_source: pkg-config
     tools_required:
