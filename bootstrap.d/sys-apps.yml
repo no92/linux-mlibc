@@ -332,6 +332,18 @@ packages:
         environ:
           DESTDIR: '@THIS_COLLECT_DIR@'
 
+  - name: iana-etc
+    source:
+      subdir: ports
+      url: 'https://github.com/Mic92/iana-etc/releases/download/20230810/iana-etc-20230810.tar.gz'
+      extract_path: 'iana-etc-20230810'
+      format: 'tar.gz'
+      version: '20230810'
+    build:
+      - args: ['mkdir', '-p', '@THIS_COLLECT_DIR@/etc']
+      - args: ['cp', '@THIS_SOURCE_DIR@/services', '@THIS_COLLECT_DIR@/etc/']
+      - args: ['cp', '@THIS_SOURCE_DIR@/protocols', '@THIS_COLLECT_DIR@/etc/']
+
   - name: iproute2
     source:
       subdir: ports
