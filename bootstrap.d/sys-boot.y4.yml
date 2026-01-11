@@ -1,0 +1,94 @@
+!<tag:y4.managarm.org:preamble>
+import:
+  - !managarm
+---
+sources:
+  - name: image_create
+    subdir: 'ports'
+    git: 'https://github.com/qookei/image_create.git'
+    branch: 'master'
+    rolling_version: true
+    version: '0.0pl@ROLLING_ID@'
+
+  - name: limine
+    subdir: 'ports'
+    git: 'https://github.com/limine-bootloader/limine.git'
+    tag: 'v10.6.1'
+    version: '10.6.1'
+    tools_required:
+      - cross-toolchain
+    regenerate:
+      - args: ['./bootstrap']
+        environ:
+          NOCONFIGURE: 'yes'
+
+tools:
+  - name: host-limine
+    architecture: '@OPTION:arch@'
+    labels: [aarch64, riscv64]
+    from_source: limine
+    tools_required:
+      - host-llvm-toolchain
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--prefix=@PREFIX@'
+        - '--enable-all'
+        - '--disable-uefi-loongarch64'
+        - 'LDFLAGS=-static'
+    compile:
+      - args: ['make', '-j@PARALLELISM@']
+    install:
+      - args: ['mkdir', '-p', '@PREFIX@/share/limine']
+      - args: ['cp', '-rv', 'bin/.', '@PREFIX@/share/limine/']
+
+packages:
+  - name: limine
+    labels: [aarch64, riscv64]
+    architecture: '@OPTION:arch@'
+    from_source: limine
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        # TODO(qookie): splice_if flattening the to-be-spliced list would help here
+        # x86_64 flags
+        - !managarm::arch_dep
+          arch: [x86_64]
+          item: '--enable-uefi-ia32'
+        - !managarm::arch_dep
+          arch: [x86_64]
+          item: '--enable-uefi-x86-64'
+        - !managarm::arch_dep
+          arch: [x86_64]
+          item: '--enable-uefi-cd'
+        - !managarm::arch_dep
+          arch: [x86_64]
+          item: '--enable-bios'
+        - !managarm::arch_dep
+          arch: [x86_64]
+          item: '--enable-bios-cd'
+        - !managarm::arch_dep
+          arch: [x86_64]
+          item: '--enable-bios-pxe'
+        # aarch64 flags
+        - !managarm::arch_dep
+          arch: [aarch64]
+          item: '--enable-uefi-aarch64'
+        # riscv64 flags
+        - !managarm::arch_dep
+          arch: [riscv64]
+          item: '--enable-uefi-riscv64'
+        - 'TOOLCHAIN_FOR_TARGET=@OPTION:arch-triple@-'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'

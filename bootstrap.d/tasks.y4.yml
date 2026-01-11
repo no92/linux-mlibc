@@ -1,0 +1,108 @@
+!<tag:y4.managarm.org:preamble>
+import:
+  - !managarm
+---
+tasks:
+  - name: version-check
+    args: ['@SOURCE_ROOT@/scripts/version-check.sh']
+
+  - name: mount
+    args:
+      - sudo
+      - '@SOURCE_ROOT@/scripts/lfs.sh'
+      - '@BUILD_ROOT@'
+      - mount
+    containerless: true
+
+  - name: unmount
+    args:
+      - sudo
+      - '@SOURCE_ROOT@/scripts/lfs.sh'
+      - '@BUILD_ROOT@'
+      - unmount
+    containerless: true
+
+  - name: chroot
+    tasks_required:
+      - mount
+    args:
+      - sudo
+      - '@SOURCE_ROOT@/scripts/lfs.sh'
+      - '@BUILD_ROOT@'
+      - chroot
+    containerless: true
+
+  - name: mount-image
+    args:
+      - sudo
+      - '@SOURCE_ROOT@/scripts/mount-image.sh'
+      - '@BUILD_ROOT@'
+    containerless: true
+
+  - name: update-image
+    tasks_required:
+      - mount-image
+    args:
+      - sudo
+      - '@SOURCE_ROOT@/scripts/update-image.sh'
+      - '@BUILD_ROOT@'
+    containerless: true
+
+  - name: unmount-image
+    args:
+      - sudo
+      - '@SOURCE_ROOT@/scripts/unmount-image.sh'
+      - '@BUILD_ROOT@'
+    containerless: true
+
+  - name: initialize-empty-image
+    sources_required:
+      - image_create
+    tools_required:
+      - host-limine
+    args: |
+      if [ "@OPTION:arch@" == x86_64 ]; then
+          biosboot=-b # Install the BIOS bootloader only on x86_64.
+      fi
+      @SOURCE_ROOT@/ports/image_create/image_create.sh \
+      -oimage \
+      -s@OPTION:image-size@ \
+      -pgpt \
+      -text2 \
+      -llimine \
+      -a@OPTION:arch@ \
+      -e \
+      $biosboot
+    environ:
+      'LIMINE_BIN_DIR': '@BUILD_ROOT@/tools/host-limine/share/limine'
+      'LIMINE_TOOL': '@BUILD_ROOT@/tools/host-limine/share/limine/limine'
+      'GPT_TYPE': '64212B3B-56A1-4DFB-971E-BC8CD027996A'
+    workdir: '@BUILD_ROOT@'
+
+  - name: make-image
+    tools_required:
+      - tool: host-limine
+        expose: false
+    args:
+      - '@SOURCE_ROOT@/scripts/update-image.py'
+      - '--triple'
+      - '@OPTION:arch-triple@'
+      - '--mount-using'
+      - '@OPTION:mount-using@'
+    workdir: '@BUILD_ROOT@'
+    containerless: true
+  
+  - name: qemu
+    tools_required:
+      - tool: ovmf
+        expose: false
+    tasks_required:
+      - task: make-image
+        order_only: true
+    args:
+      - '@SOURCE_ROOT@/scripts/vm-util.py'
+      - 'qemu'
+      - '--arch'
+      - '@OPTION:arch@'
+    workdir: '@BUILD_ROOT@'
+    containerless: true

@@ -1,0 +1,295 @@
+packages:
+  - name: glib-networking
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    metadata:
+      summary: Network-related giomodules for glib
+      description: This package contains network related gio modules for GLib.
+      spdx: 'LGPL-2.1-or-later'
+      website: 'https://gitlab.gnome.org/GNOME/glib-networking'
+      maintainer: 'Dennis Bonke <dennis@managarm.org>'
+      categories: ['net-libs']
+    source:
+      subdir: 'ports'
+      git: 'https://gitlab.gnome.org/GNOME/glib-networking.git'
+      tag: '2.70.0'
+      version: '2.70.0'
+    tools_required:
+      - cross-toolchain
+      - virtual: pkgconfig-for-target
+        triple: '@OPTION:arch-triple@'
+    pkgs_required:
+      - mlibc
+      - glib
+      - gnutls
+      - gsettings-desktop-schemas
+    revision: 1
+    configure:
+      - args:
+        - 'meson'
+        - 'setup'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+        - '--prefix=/usr'
+        #- '--libdir=lib'
+        - '--buildtype=debugoptimized'
+        - '-Dgnutls=enabled'
+        - '-Dopenssl=disabled'
+        - '-Dinstalled_tests=false'
+        - '-Dstatic_modules=false'
+        - '-Dlibproxy=disabled'
+        - '-Dgnome_proxy=disabled'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+    # xbps broke?
+    # scripts:
+    #     post_install:
+    #       - args: ['gio-querymodules', '/usr/lib/gio/modules']
+
+  - name: gnutls
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    metadata:
+      summary: A secure communications library implementing the SSL, TLS and DTLS protocols
+      description: This package contains libraries and userspace tools which provide a secure layer over a reliable transport layer. Currently the GnuTLS library implements the proposed standards by the IETF's TLS working group.
+      spdx: 'LGPL-2.1-or-later'
+      website: 'https://www.gnutls.org'
+      maintainer: 'Dennis Bonke <dennis@managarm.org>'
+      categories: ['net-libs']
+    source:
+      subdir: 'ports'
+      url: 'https://www.gnupg.org/ftp/gcrypt/gnutls/v3.7/gnutls-3.7.2.tar.xz'
+      format: 'tar.xz'
+      extract_path: 'gnutls-3.7.2'
+      version: '3.7.2'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['autoreconf', '-fvi']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - gmp
+      - libiconv
+      - libidn2
+      - libintl
+      - libunistring
+      - libtasn
+      - nettle
+      - p11-kit
+      - openssl
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-guile'
+        - '--disable-rpath'
+        - '--with-default-trust-store-pkcs11=pkcs11:'
+        - '--docdir=/usr/share/doc/gnutls-3.7.2'
+        - '--with-default-trust-store-file=/etc/pki/tls/certs/ca-bundle.crt'
+        - '--enable-openssl-compatibility'
+        - '--without-tpm'
+        - '--disable-libdane'
+        - '--disable-nls'
+        - '--enable-ssl3-support'
+        - '--enable-local-libopts'
+        - '--enable-cross-guesses=risky'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: libnsl
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: 'https://github.com/thkukuk/libnsl.git'
+      tag: 'v2.0.0'
+      version: '2.0.0'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - libtirpc
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--sysconfdir=/etc'
+        - '--disable-static'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: libpsl
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    metadata:
+      summary: C library for the Public Suffix List
+      description: This package provides a library for accessing and resolving information from the Public Suffix List (PSL). The PSL is a set of domain names beyond the standard suffixes, such as .com.
+      spdx: 'MIT'
+      website: 'https://github.com/rockdaboot/libpsl'
+      maintainer: 'Dennis Bonke <dennis@managarm.org>'
+      categories: ['net-libs']
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/rockdaboot/libpsl.git'
+      tag: '0.21.1'
+      version: '0.21.1'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - libiconv
+      - libidn2
+      - libunistring
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-static'
+        - '--enable-builtin=libidn2'
+        - '--enable-runtime=libidn2'
+        # Gentoo disables asan, cfi and ubsan
+        - '--disable-asan'
+        - '--disable-cfi'
+        - '--disable-ubsan'
+        - '--disable-man'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: libsoup
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: 'ports'
+      git: 'https://gitlab.gnome.org/GNOME/libsoup.git'
+      tag: '2.74.2'
+      version: '2.74.2'
+    tools_required:
+      - cross-toolchain
+      - virtual: pkgconfig-for-target
+        triple: '@OPTION:arch-triple@'
+    pkgs_required:
+      - mlibc
+      - glib
+      - glib-networking
+      - libpsl
+      - libxml
+      - sqlite
+      - zlib
+    revision: 1
+    configure:
+      - args:
+        - 'meson'
+        - 'setup'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+        - '--prefix=/usr'
+        #- '--libdir=lib'
+        - '--buildtype=debugoptimized'
+        - '-Dintrospection=disabled'
+        - '-Dinstalled_tests=false'
+        - '-Dsysprof=disabled'
+        - '-Dgtk_doc=false'
+        - '-Dvapi=disabled'
+        - '-Dgnome=false'
+        - '-Dtls_check=false'
+        - '-Dbrotli=disabled'
+        - '-Dntlm=disabled'
+        - '-Dgssapi=disabled'
+        - '-Dtests=false'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: libtirpc
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: 'git://git.linux-nfs.org/projects/steved/libtirpc.git'
+      tag: 'libtirpc-1-3-2'
+      version: '1.3.2'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['bash', 'bootstrap']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--sysconfdir=/etc'
+        - '--disable-static'
+        - '--disable-ipv6'
+        - '--disable-gssapi'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: rpcsvc-proto
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: 'https://github.com/thkukuk/rpcsvc-proto.git'
+      tag: 'v1.4.3'
+      version: '1.4.3'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    revision: 1
+    configure:
+      # Headers only, build the generator for the host
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--prefix=/usr'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+      # Nuke the generator, host only
+      - args: ['rm', '-rf', '@THIS_COLLECT_DIR@/usr/bin']

@@ -1,0 +1,131 @@
+sources:
+  - name: 'xorg-util-macros'
+    subdir: ports
+    git: 'https://gitlab.freedesktop.org/xorg/util/macros.git'
+    tag: 'util-macros-1.19.3'
+    version: '1.19.3'
+    tools_required:
+      - cross-toolchain
+    regenerate:
+      - args: ['./autogen.sh']
+        environ:
+          'NOCONFIGURE': 'yes'
+
+tools:
+  - name: host-xorg-macros
+    labels: [aarch64]
+    architecture: noarch
+    exports_aclocal: true
+    from_source: xorg-util-macros
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--prefix=@PREFIX@'
+    compile:
+      - args: ['make', '-j@PARALLELISM@']
+    install:
+      - args: ['make', 'install']
+
+packages:
+  - name: shared-mime-info
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: 'https://gitlab.freedesktop.org/xdg/shared-mime-info.git'
+      tag: 'Release-1-15'
+      version: '1.15'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+          environ:
+            'NOCONFIGURE': 'yes'
+    tools_required:
+      - cross-toolchain
+      - host-python
+    pkgs_required:
+      - mlibc
+      - glib
+      - itstool
+      - libxml
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-update-mimedb'
+        environ:
+          'ITSTOOL': '/usr/bin/itstool'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+    # xbps broke?
+    # scripts:
+    #     post_install:
+    #       - args: 'echo "Running update-mime-database; this may take a minute or 2..."'
+    #       - args: '/usr/bin/update-mime-database /usr/share/mime/'
+
+  - name: xkeyboard-config
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: 'ports'
+      git: 'https://gitlab.freedesktop.org/xkeyboard-config/xkeyboard-config.git'
+      tag: 'xkeyboard-config-2.34'
+      version: '2.34'
+      tools_required:
+        - cross-toolchain
+        - host-xorg-macros
+      regenerate:
+        - args: ['./autogen.sh']
+          environ:
+            'NOCONFIGURE': 'yes'
+    tools_required:
+      - cross-toolchain
+      - host-xorg-macros
+    pkgs_required:
+      - mlibc
+      - libx11
+      - xorg-proto
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--sysconfdir=/etc'
+        - '--localstatedir=/var'
+        - '--with-xkb-rules-symlink=xorg'
+        - '--disable-nls'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: xorg-util-macros
+    labels: [aarch64]
+    architecture: '@OPTION:arch@'
+    from_source: xorg-util-macros
+    tools_required:
+      - cross-toolchain
+      - host-xorg-macros
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--sysconfdir=/etc'
+        - '--localstatedir=/var'
+        - '--disable-static'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'

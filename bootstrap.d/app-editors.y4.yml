@@ -1,0 +1,116 @@
+packages:
+  - name: vim
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: 'https://github.com/vim/vim.git'
+      tag: 'v8.2.4928'
+      version: '8.2.4928'
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - ncurses # libiconv soon
+    revision: 1
+    configure:
+      # vim does not seem to support out-of-tree builds, so we just copy
+      # the source tree into the build directory instead
+      - args: ['cp', '-r', '@THIS_SOURCE_DIR@/.', '@THIS_BUILD_DIR@']
+      - args:
+          - './configure'
+          - '--host=@OPTION:arch-triple@'
+          - '--prefix=/usr'
+          - '--disable-gtktest'
+          - '--disable-icon-cache-update'
+          - '--disable-desktop-database-update'
+          - '--disable-canberra'
+          - '--disable-selinux'
+          - '--disable-xsmp'
+          - '--disable-channel'
+          - '--disable-netbeans'
+          - '--enable-multibyte'
+          - '--disable-acl'
+          - '--disable-gpm'
+          - '--disable-sysmouse'
+          - '--disable-nls'
+          - '--with-tlib=tinfo'
+          - '--enable-gui=no'
+          - '--without-x'
+        environ:
+          ac_cv_small_wchar_t: 'no'
+          ac_cv_func_sigsetjmp: 'no'
+          vim_cv_toupper_broken: 'no'
+          vim_cv_terminfo: 'yes'
+          vim_cv_tgetent: 'zero'
+          vim_cv_tty_group: ''
+          vim_cv_tty_mode: '0620'
+          vim_cv_getcwd_broken: 'no'
+          vim_cv_stat_ignores_slash: 'no'
+          vim_cv_memmove_handles_overlap: 'yes'
+          vim_cv_bcopy_handles_overlap: 'yes'
+          vim_cv_memcpy_handles_overlap: 'yes'
+          STRIP: '@OPTION:arch-triple@-strip'
+        workdir: '@THIS_BUILD_DIR@/src/'
+    build:
+      - args: ['make', '-j', '@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: nano
+    labels: [aarch64, riscv64]
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    metadata:
+      summary: GNU GPL'd Pico clone with more functionality
+      description: This package provides a mall, simple text editor which aims to replace Pico, the default editor in the Pine package.
+      spdx: 'LGPL-2.1-or-later GPL-3.0-or-later'
+      website: 'https://www.nano-editor.org/'
+      maintainer: 'Dennis Bonke <dennis@managarm.org>'
+      categories: ['app-editors']
+    source:
+      subdir: 'ports'
+      git: 'https://https.git.savannah.gnu.org/git/nano.git'
+      tag: 'v8.5'
+      version: '8.5'
+      sources_required:
+        - gnulib
+      tools_required:
+        - cross-autoconf-v2.69
+        - cross-automake-v1.15
+        - cross-pkg-config
+      regenerate:
+        - args: ['python3', '@SOURCE_ROOT@/scripts/checkout-gnulib.py', '@SOURCE_ROOT@/ports/gnulib']
+        - args: ['./autogen.sh']
+    tools_required:
+      - cross-toolchain
+      # - virtual: pkgconfig-for-target
+      #   triple: '@OPTION:arch-triple@'
+    pkgs_required:
+      - mlibc
+      - file
+      - ncurses
+      - libintl
+      - zlib
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--sysconfdir=/etc'
+        - '--docdir=/usr/share/doc/nano-8.5'
+        - 'CFLAGS=-DSLOW_BUT_NO_HACKS'
+        environ:
+          PKG_CONFIG_SYSROOT_DIR: '@BUILD_ROOT@/system-root'
+          PKG_CONFIG_LIBDIR: '@BUILD_ROOT@/system-root/usr/lib/pkgconfig:@BUILD_ROOT@/system-root/usr/share/pkgconfig'
+    build:
+      - args: ['make', '-j', '@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+      - args: ['mkdir', '-pv', '@THIS_COLLECT_DIR@/etc']
+      - args: ['mkdir', '-pv', '@THIS_COLLECT_DIR@/root']
+      - args: ['cp', '-v', '@SOURCE_ROOT@/meta-sources/base-files/nanorc', '@THIS_COLLECT_DIR@/etc/nanorc']
+      - args: ['cp', '-v', '@SOURCE_ROOT@/meta-sources/base-files/nanorc', '@THIS_COLLECT_DIR@/root/.nanorc']

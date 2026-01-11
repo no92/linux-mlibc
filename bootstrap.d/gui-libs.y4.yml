@@ -1,0 +1,119 @@
+packages:
+  - name: libwpe
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/WebPlatformForEmbedded/libwpe.git'
+      tag: '1.12.0'
+      version: '1.12.0'
+    tools_required:
+      - cross-toolchain
+      - virtual: pkgconfig-for-target
+        triple: '@OPTION:arch-triple@'
+    pkgs_required:
+      - mlibc
+      - libxkbcommon
+      - mesa
+    revision: 1
+    configure:
+      - args:
+        - 'meson'
+        - 'setup'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+        - '--prefix=/usr'
+        #- '--libdir=lib'
+        - '--buildtype=debugoptimized'
+        - '-Dbuild-docs=false'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: wpebackend-fdo
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/Igalia/WPEBackend-fdo.git'
+      tag: '1.12.0'
+      version: '1.12.0'
+    tools_required:
+      - cross-toolchain
+      - virtual: pkgconfig-for-target
+        triple: '@OPTION:arch-triple@'
+      - wayland-scanner
+    pkgs_required:
+      - mlibc
+      - glib
+      - libepoxy
+      - libwpe
+      - wayland-protocols
+    revision: 1
+    configure:
+      - args:
+        - 'meson'
+        - 'setup'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+        - '--prefix=/usr'
+        #- '--libdir=lib'
+        - '--buildtype=debugoptimized'
+        - '-Dbuild_docs=false'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: wlroots
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: 'https://gitlab.freedesktop.org/wlroots/wlroots/'
+      branch: master
+      version: '0.15.1'
+    tools_required:
+      - cross-toolchain
+      - wayland-scanner
+      - virtual: pkgconfig-for-target
+        triple: '@OPTION:arch-triple@'
+      - virtual: pkgconfig-for-host
+        program_name: host-pkg-config
+    pkgs_required:
+      - mlibc
+      - eudev
+      - libdrm
+      - libinput
+      - libxcb
+      - libxkbcommon
+      - pixman
+      - wayland
+      - wayland-protocols
+      - xcb-util-image
+      - xcb-util-wm
+      - xorg-server
+    configure:
+      - args: 'sed -i s#{XBSTRAP_SYSTEM_ROOT}#@SYSROOT_DIR@# @THIS_SOURCE_DIR@/xwayland/meson.build'
+      - args:
+        - 'meson'
+        - 'setup'
+        - '--native-file'
+        - '@SOURCE_ROOT@/scripts/meson.native-file'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+        - '--prefix=/usr'
+        - '--buildtype=debugoptimized'
+        - '-Dexamples=false'
+        - '-Dxwayland=enabled'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'

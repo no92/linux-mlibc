@@ -1,223 +1,462 @@
 imports:
-  - file: bootstrap.d/app-accessibility.yml
-  - file: bootstrap.d/app-arch.yml
-  - file: bootstrap.d/app-crypt.yml
-  - file: bootstrap.d/app-editors.yml
-  - file: bootstrap.d/app-misc.yml
-  - file: bootstrap.d/app-shells.yml
-  - file: bootstrap.d/app-text.yml
-  - file: bootstrap.d/dev-db.yml
-  - file: bootstrap.d/dev-lang.yml
-  - file: bootstrap.d/dev-libs.yml
-  - file: bootstrap.d/dev-qt.yml
-  - file: bootstrap.d/dev-tcltk.yml
-  - file: bootstrap.d/dev-util.yml
-  - file: bootstrap.d/games-board.yml
-  - file: bootstrap.d/games-misc.yml
-  - file: bootstrap.d/gnome-base.yml
-  - file: bootstrap.d/gui-apps.yml
-  - file: bootstrap.d/gui-libs.yml
-  - file: bootstrap.d/gui-wm.yml
-  - file: bootstrap.d/media-fonts.yml
-  - file: bootstrap.d/media-gfx.yml
-  - file: bootstrap.d/media-libs.yml
-  - file: bootstrap.d/net-dns.yml
-  - file: bootstrap.d/net-libs.yml
-  - file: bootstrap.d/net-misc.yml
-  - file: bootstrap.d/sys-apps.yml
-  - file: bootstrap.d/sys-auth.yml
-  - file: bootstrap.d/sys-boot.yml
-  - file: bootstrap.d/sys-devel.yml
-  - file: bootstrap.d/sys-fs.yml
-  - file: bootstrap.d/sys-libs.yml
-  - file: bootstrap.d/sys-process.yml
-  - file: bootstrap.d/www-client.yml
-  - file: bootstrap.d/x11-apps.yml
-  - file: bootstrap.d/x11-base.yml
-  - file: bootstrap.d/x11-libs.yml
-  - file: bootstrap.d/x11-misc.yml
-  - file: bootstrap.d/x11-themes.yml
+  - file: bootstrap.d/app-accessibility.y4.yml
+  - file: bootstrap.d/app-arch.y4.yml
+  - file: bootstrap.d/app-crypt.y4.yml
+  - file: bootstrap.d/app-editors.y4.yml
+  - file: bootstrap.d/app-emulation.y4.yml
+  - file: bootstrap.d/app-misc.y4.yml
+  - file: bootstrap.d/app-shells.y4.yml
+  - file: bootstrap.d/app-text.y4.yml
+  - file: bootstrap.d/dev-db.y4.yml
+  - file: bootstrap.d/dev-lang.y4.yml
+  - file: bootstrap.d/dev-libs.y4.yml
+  - file: bootstrap.d/dev-qt.y4.yml
+  - file: bootstrap.d/dev-tcltk.y4.yml
+  - file: bootstrap.d/dev-util.y4.yml
+  - file: bootstrap.d/games-board.y4.yml
+  - file: bootstrap.d/games-misc.y4.yml
+  - file: bootstrap.d/gnome-base.y4.yml
+  - file: bootstrap.d/gui-apps.y4.yml
+  - file: bootstrap.d/gui-libs.y4.yml
+  - file: bootstrap.d/gui-wm.y4.yml
+  - file: bootstrap.d/media-fonts.y4.yml
+  - file: bootstrap.d/media-gfx.y4.yml
+  - file: bootstrap.d/media-libs.y4.yml
+  - file: bootstrap.d/net-dns.y4.yml
+  - file: bootstrap.d/net-libs.y4.yml
+  - file: bootstrap.d/net-misc.y4.yml
+  - file: bootstrap.d/sys-apps.y4.yml
+  - file: bootstrap.d/sys-auth.y4.yml
+  - file: bootstrap.d/sys-boot.y4.yml
+  - file: bootstrap.d/sys-devel.y4.yml
+  - file: bootstrap.d/sys-fs.y4.yml
+  - file: bootstrap.d/sys-libs.y4.yml
+  - file: bootstrap.d/sys-process.y4.yml
+  - file: bootstrap.d/tasks.y4.yml
+  - file: bootstrap.d/www-client.y4.yml
+  - file: bootstrap.d/x11-apps.y4.yml
+  - file: bootstrap.d/x11-base.y4.yml
+  - file: bootstrap.d/x11-libs.y4.yml
+  - file: bootstrap.d/x11-misc.y4.yml
+  - file: bootstrap.d/x11-themes.y4.yml
 
 sources:
   - name: autoconf-v2.69
     subdir: ports
-    url: "https://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.xz"
-    format: "tar.xz"
-    extract_path: "autoconf-2.69"
-    version: "2.69"
+    url: 'https://ftpmirror.gnu.org/gnu/autoconf/autoconf-2.69.tar.xz'
+    format: 'tar.xz'
+    extract_path: 'autoconf-2.69'
+    version: '2.69'
 
   - name: autoconf-archive
     subdir: ports
-    git: "https://github.com/autoconf-archive/autoconf-archive.git"
-    tag: "v2019.01.06"
-    version: "2019.01.06"
+    git: 'https://github.com/autoconf-archive/autoconf-archive.git'
+    tag: 'v2019.01.06'
+    version: '2019.01.06'
 
   - name: automake-v1.15
     subdir: ports
-    git: "https://git.savannah.gnu.org/git/automake.git"
-    tag: "v1.15.1"
-    version: "1.15.1"
+    git: 'https://git.savannah.gnu.org/git/automake.git'
+    tag: 'v1.15.1'
+    version: '1.15.1'
     tools_required:
       - cross-autoconf-v2.69
     regenerate:
-      - args: ["./bootstrap"]
+      - args: ['./bootstrap']
 
   - name: libtool
-    subdir: ports
-    git: "https://git.savannah.gnu.org/git/libtool.git"
-    tag: "v2.4.6"
-    version: "2.4.6"
+    subdir: 'ports'
+    git: 'https://https.git.savannah.gnu.org/git/libtool.git'
+    tag: 'v2.5.4'
+    version: '2.5.4'
+    sources_required:
+      - gnulib
     tools_required:
       - cross-autoconf-v2.69
       - cross-automake-v1.15
     regenerate:
-      - args: ["git", "submodule", "update", "--init"]
-      - args: ["./bootstrap"]
+      - args: ['git', 'submodule', 'deinit', 'gnulib']
+      - args: ['python3', '@SOURCE_ROOT@/scripts/checkout-gnulib.py', '@SOURCE_ROOT@/ports/gnulib']
+      - args: ['./bootstrap', '--gnulib-srcdir=gnulib', '--skip-git']
+        isolate_network: false
+      - args: ['cp',
+          '@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.sub',
+          '@THIS_SOURCE_DIR@/build-aux/']
+      - args: ['cp',
+          '@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.guess',
+          '@THIS_SOURCE_DIR@/build-aux/']
 
   - name: pkg-config
     subdir: ports
-    git: "https://gitlab.freedesktop.org/pkg-config/pkg-config.git"
-    tag: "pkg-config-0.29.2"
-    version: "0.29.2"
+    git: 'https://gitlab.freedesktop.org/pkg-config/pkg-config.git'
+    tag: 'pkg-config-0.29.2'
+    version: '0.29.2'
     tools_required:
       - cross-autoconf-v2.69
       - cross-automake-v1.15
       - cross-libtool
     regenerate:
-      - args: ["./autogen.sh"]
+      - args: ['./autogen.sh']
         environ:
-          NOCONFIGURE: "yes"
+          NOCONFIGURE: 'yes'
 
   - name: binutils
-    subdir: ports
-    git: "https://github.com/bminor/binutils-gdb.git"
-    tag: "binutils-2_38"
-    version: "2.38"
-    tools_required:
-      - cross-automake-v1.15
+    subdir: 'ports'
+    git: 'https://github.com/managarm/binutils-gdb.git'
+    tag: 'managarm/binutils-2_43_1'
+    version: '2.43.1'
 
   - name: gcc
     subdir: ports
-    git: "https://github.com/gcc-mirror/gcc.git"
-    tag: "releases/gcc-11.2.0"
-    version: "11.2.0"
+    git: 'https://github.com/managarm/gcc.git'
+    tag: 'managarm/gcc-14_2_0'
+    version: '14.2.0'
+    tools_required:
+      - cross-autoconf-v2.69
+      - cross-automake-v1.11
+    regenerate:
+      - args: ['autoconf']
+        workdir: '@THIS_SOURCE_DIR@/libstdc++-v3'
 
   - name: linux
     subdir: ports
-    url: 'https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.2.9.tar.xz'
+    url: 'https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.12.8.tar.xz'
+    checksum: 'blake2b:62a3f435bbe7d24bea361f2545ba50f8b36030a98bd28d0979b86052d8af34dc7a4c27f7ca2890daba5e5bb51f5848e6b21cd5df4dbbd19919867bf67d38790d'
+    extract_path: 'linux-6.12.8'
     format: 'tar.xz'
-    checksum: 'blake2b:0e7ad5502767cb74fa0fea79884ce753be0421a56bbbe0a6cb66add5839b3329298671725595c0624886d9d2836c4e9d4bd152acefb2b3df1cf7a1013e0178ba'
-    extract_path: 'linux-6.2.9'
-    version: '6.2.9'
+    version: '6.12.8'
 
   - name: mlibc
-    subdir: ports
-    git: "https://github.com/no92/mlibc.git"
-    branch: "lfs"
-    version: "2.2.0"
+    git: 'https://github.com/managarm/mlibc.git'
+    branch: 'master'
+    commit: '5bc20bde80bbffe1cdd5a2c421279314440728ce'
+    rolling_version: true
+    version: '0.0pl@ROLLING_ID@'
+    # sources_required:
+    #   - libdrm
+    #   - managarm
+    #   - bragi
+    # regenerate:
+    #   - args: ['ln', '-sf', '@SOURCE_ROOT@/managarm', '@THIS_SOURCE_DIR@/subprojects/']
+    #   - args: ['ln', '-sf', '@SOURCE_ROOT@/ports/bragi', '@THIS_SOURCE_DIR@/subprojects/']
 
-declare_options:
-  - name: arch
-    default: x86_64
-  - name: arch-triple
-    default: x86_64-linux-mlibc
+  - name: gnuconfig
+    subdir: 'ports'
+    git: 'https://https.git.savannah.gnu.org/git/config.git'
+    branch: 'master'
+    commit: '63acb96f92473ceb5e21d873d7c0aee266b3d6d3'
+    version: '20230121'
 
 tools:
-  - name: cross-autoconf-v2.69
-    from_source: autoconf-v2.69
+  - name: host-iasl
+    labels: [aarch64, riscv64]
+    architecture: noarch
+    source:
+      subdir: ports
+      checksum: 'blake2b:6f4b4e329e87875eb14cf45b36f6213943b4c7da6fa7345ec2e888d567b067d243717cdf86b543e64120c27c3ef378eeedbae80fcc620140d549bc7a6fb53f5e'
+      url: https://github.com/user-attachments/files/17171017/acpica-unix2-20240927.tar.gz
+      format: tar.gz
+      extract_path: 'acpica-unix2-20240927'
+    revision: 1
     configure:
-      - args: ["@THIS_SOURCE_DIR@/configure", "--prefix=@PREFIX@"]
+      - args: ['cp', '-r', '@THIS_SOURCE_DIR@/.', '@THIS_BUILD_DIR@']
     compile:
-      - args: ["make", "-j@PARALLELISM@"]
+      - args: ['make', 'iasl']
     install:
-      - args: ["make", "install"]
+      - args: ['make', 'install', 'PREFIX=@PREFIX@']
+
+  - name: ovmf
+    labels: [aarch64, riscv64]
+    architecture: '@OPTION:arch@'
+    source:
+      subdir: ports
+      git: 'https://github.com/tianocore/edk2.git'
+      tag: 'edk2-stable202408'
+      version: '2024.08'
+      patch_keep_crlf: true
+      # don't judge, submodules are borked so we gotta do it manually
+      # which is why we need to run this in regenerate instead of checkout
+      regenerate:
+        - args:
+          - 'git'
+          - 'submodule'
+          - 'update'
+          - '--init'
+          - 'BaseTools/Source/C/BrotliCompress/brotli'
+          - 'CryptoPkg/Library/MbedTlsLib/mbedtls'
+          - 'CryptoPkg/Library/OpensslLib/openssl'
+          - 'MdeModulePkg/Library/BrotliCustomDecompressLib/brotli'
+          - 'MdeModulePkg/Universal/RegularExpressionDxe/oniguruma'
+          - 'MdePkg/Library/BaseFdtLib/libfdt'
+          - 'MdePkg/Library/MipiSysTLib/mipisyst'
+          - 'RedfishPkg/Library/JsonLib/jansson'
+          - 'SecurityPkg/DeviceSecurity/SpdmLib/libspdm'
+          - 'ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3'
+          isolate_network: false
+    tools_required:
+      - host-llvm-toolchain
+      - host-python
+      - host-iasl
+    revision: 1
+    configure:
+      - args: ['cp', '-r', '@THIS_SOURCE_DIR@/.', '@THIS_BUILD_DIR@']
+    compile:
+      - args: |
+          OVMF_ARCH=""
+          OVMF_PKG=""
+          case "@OPTION:arch@" in
+            "x86_64")
+              OVMF_ARCH="X64"
+              OVMF_PKG="OvmfPkg/OvmfPkgX64"
+              ;;
+            "aarch64")
+              OVMF_ARCH="AARCH64"
+              OVMF_PKG="ArmVirtPkg/ArmVirtQemu"
+              ;;
+            "riscv64")
+              OVMF_ARCH="RISCV64"
+              OVMF_PKG="OvmfPkg/RiscVVirt/RiscVVirtQemu"
+              ;;
+            *)
+              echo "Unhandled architecture"
+              exit 1
+              ;;
+          esac
+          . @THIS_BUILD_DIR@/edksetup.sh
+          make -C @THIS_BUILD_DIR@/BaseTools
+          build -a $OVMF_ARCH -b DEBUG -p $OVMF_PKG.dsc -t CLANGDWARF -DNETWORK_HTTP_BOOT_ENABLE
+        environ:
+          PYTHON_COMMAND: 'python3'
+    install:
+      - args: |
+          ARCH="@OPTION:arch@"
+          TRUNCATE_SIZE=""
+          case "$ARCH" in
+            "x86_64")
+              OVMF_CODE="OvmfX64/DEBUG_CLANGDWARF/FV/OVMF_CODE.fd"
+              OVMF_VARS="OvmfX64/DEBUG_CLANGDWARF/FV/OVMF_VARS.fd"
+              ;;
+            "aarch64")
+              OVMF_CODE="ArmVirtQemu-AARCH64/DEBUG_CLANGDWARF/FV/QEMU_EFI.fd"
+              OVMF_VARS="ArmVirtQemu-AARCH64/DEBUG_CLANGDWARF/FV/QEMU_VARS.fd"
+              TRUNCATE_SIZE="64M"
+              ;;
+            "riscv64")
+              OVMF_CODE="RiscVVirtQemu/DEBUG_CLANGDWARF/FV/RISCV_VIRT_CODE.fd"
+              OVMF_VARS="RiscVVirtQemu/DEBUG_CLANGDWARF/FV/RISCV_VIRT_VARS.fd"
+              TRUNCATE_SIZE="32M"
+              ;;
+            *)
+              echo "Unhandled architecture"
+              exit 1
+              ;;
+          esac
+          cp "@THIS_BUILD_DIR@/Build/$OVMF_CODE" @PREFIX@/OVMF_CODE_@OPTION:arch@.fd
+          cp "@THIS_BUILD_DIR@/Build/$OVMF_VARS" @PREFIX@/OVMF_VARS_@OPTION:arch@.fd
+          if [[ ! -z $TRUNCATE_SIZE ]]; then
+            truncate -s $TRUNCATE_SIZE @PREFIX@/OVMF_CODE_@OPTION:arch@.fd
+            truncate -s $TRUNCATE_SIZE @PREFIX@/OVMF_VARS_@OPTION:arch@.fd
+          fi
+          mkdir @PREFIX@/bin
+          cp "@THIS_BUILD_DIR@/BaseTools/Source/C/bin/GenFw" "@PREFIX@/bin/"
+
+  - name: cross-autoconf-v2.69
+    architecture: '@OPTION:arch@'
+    from_source: autoconf-v2.69
+    revision: 1
+    configure:
+      - args: ['@THIS_SOURCE_DIR@/configure', '--prefix=@PREFIX@']
+    compile:
+      - args: ['make', '-j@PARALLELISM@']
+    install:
+      - args: ['make', 'install']
+
+  - name: cross-autoconf-v2.71
+    labels: [aarch64, riscv64]
+    architecture: noarch
+    source:
+      name: autoconf-v2.71
+      subdir: 'ports'
+      git: 'https://https.git.savannah.gnu.org/git/autoconf.git'
+      tag: 'v2.71'
+      version: '2.71'
+      sources_required:
+        - gnuconfig
+        - gnulib
+      tools_required:
+        - cross-autoconf-v2.69
+        - cross-automake-v1.15
+      regenerate:
+        - args: ['cp', '@SOURCE_ROOT@/ports/gnuconfig/config.sub', '@THIS_SOURCE_DIR@/lib/']
+        - args: ['cp', '@SOURCE_ROOT@/ports/gnuconfig/config.guess', '@THIS_SOURCE_DIR@/lib/']
+        - args: ['python3', '@SOURCE_ROOT@/scripts/checkout-gnulib.py', '@SOURCE_ROOT@/ports/gnulib']
+        - args: ['autoreconf', '-fvi']
+    revision: 1
+    configure:
+      - args: ['@THIS_SOURCE_DIR@/configure', '--prefix=@PREFIX@']
+    compile:
+      - args: ['make', '-j@PARALLELISM@']
+    install:
+      - args: ['make', 'install']
 
   - name: cross-autoconf-archive
+    architecture: '@OPTION:arch@'
     from_source: autoconf-archive
     exports_aclocal: true
+    revision: 1
     install:
-      - args: ["mkdir", "-p", "@BUILD_ROOT@/tools/cross-autoconf-archive/share/"]
-      - args: ["cp", "-r", "@THIS_SOURCE_DIR@/m4", "@BUILD_ROOT@/tools/cross-autoconf-archive/share/aclocal"]
+      - args: ['mkdir', '-p', '@BUILD_ROOT@/tools/cross-autoconf-archive/share/']
+      - args: ['cp', '-r', '@THIS_SOURCE_DIR@/m4', '@BUILD_ROOT@/tools/cross-autoconf-archive/share/aclocal']
+
+  - name: cross-autoconf-v2.64
+    labels: [aarch64]
+    architecture: noarch
+    source:
+      name: autoconf-v2.64
+      subdir: 'ports'
+      url: 'https://ftpmirror.gnu.org/gnu/autoconf/autoconf-2.64.tar.xz'
+      format: 'tar.xz'
+      checksum: blake2b:598873209a67725150cd4cf09c4b78b26b3d1782f259846da48dc8106a1d32ae2b24f3a864c3be0e9e8dc7d6b6ca8781b83ff33a691c88e68391d1ea861ccf23
+      extract_path: 'autoconf-2.64'
+      version: '2.64'
+    revision: 1
+    configure:
+      # Despite its efforts to be POSIX-compatible, autoconf 2.64 fails to configure on dash
+      # (as it assumes that echo does not evaluate backslash escapes).
+      # It *also* fails when setting CONFIG_SHELL to /bin/bash.
+      # The manual (in section "Defining Variables") mentions this bug and the following
+      # workaround: We set *both* CONFIG_SHELL *and* execute the script using /bin/bash.
+      - args: ['/bin/bash', '@THIS_SOURCE_DIR@/configure', '--prefix=@PREFIX@']
+        environ:
+          'CONFIG_SHELL': '/bin/bash'
+    compile:
+      - args: ['make', '-j@PARALLELISM@']
+    install:
+      - args: ['make', 'install']
+
+  - name: cross-automake-v1.11
+    labels: [aarch64, riscv64]
+    architecture: noarch
+    source:
+      name: automake-v1.11
+      subdir: 'ports'
+      git: 'https://https.git.savannah.gnu.org/git/automake.git'
+      tag: 'v1.11.6'
+      version: '1.11.6'
+      sources_required:
+        - gnuconfig
+        - gnulib
+      tools_required:
+        - cross-autoconf-v2.69
+      regenerate:
+        - args: ['cp', '@SOURCE_ROOT@/ports/gnuconfig/config.sub', '@THIS_SOURCE_DIR@/lib/']
+        - args: ['cp', '@SOURCE_ROOT@/ports/gnuconfig/config.guess', '@THIS_SOURCE_DIR@/lib/']
+        - args: ['python3', '@SOURCE_ROOT@/scripts/checkout-gnulib.py', '@SOURCE_ROOT@/ports/gnulib']
+        - args: ['./bootstrap']
+    tools_required:
+      - cross-autoconf-v2.69
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--prefix=@PREFIX@'
+        - 'MAKEINFO=/bin/true'
+    compile:
+      - args: ['make', '-j@PARALLELISM@']
+    install:
+      - args: ['make', 'install']
+      # Stop aclocal from complaining.
+      - args: ['ln', '-sf', '@PREFIX@/share/aclocal-1.11', '@PREFIX@/share/aclocal']
 
   - name: cross-automake-v1.15
+    architecture: '@OPTION:arch@'
     from_source: automake-v1.15
     tools_required:
       - cross-autoconf-v2.69
+    revision: 1
     configure:
-      - args: ["@THIS_SOURCE_DIR@/configure", "--prefix=@PREFIX@", "MAKEINFO=/bin/true"]
+      - args: ['@THIS_SOURCE_DIR@/configure', '--prefix=@PREFIX@', 'MAKEINFO=/bin/true']
     compile:
-      - args: ["make", "-j@PARALLELISM@"]
+      - args: ['make', '-j@PARALLELISM@']
     install:
-      - args: ["make", "install"]
-      - args: ["ln", "-sf", "@PREFIX@/share/aclocal-1.15", "@PREFIX@/share/aclocal"]
+      - args: ['make', 'install']
+      - args: ['ln', '-sf', '@PREFIX@/share/aclocal-1.15', '@PREFIX@/share/aclocal']
 
   - name: cross-libtool
+    architecture: '@OPTION:arch@'
     exports_aclocal: true
     from_source: libtool
     tools_required:
       - cross-autoconf-v2.69
       - cross-automake-v1.15
+    revision: 1
     configure:
-      - args: ["@THIS_SOURCE_DIR@/configure", "--prefix=@PREFIX@"]
+      - args: ['@THIS_SOURCE_DIR@/configure', '--prefix=@PREFIX@']
     compile:
-      - args: ["make", "-j@PARALLELISM@"]
+      - args: ['make', '-j@PARALLELISM@']
     install:
-      - args: ["make", "install"]
+      - args: ['make', 'install']
 
   - name: cross-pkg-config
+    architecture: '@OPTION:arch@'
     exports_aclocal: true
     from_source: pkg-config
+    revision: 1
     configure:
-      - args: ["@THIS_SOURCE_DIR@/configure", "--prefix=@PREFIX@", "--with-internal-glib"]
+      - args: ['@THIS_SOURCE_DIR@/configure', '--prefix=@PREFIX@', '--with-internal-glib']
     compile:
-      - args: ["make", "-j@PARALLELISM@"]
+      - args: ['make', '-j@PARALLELISM@']
     install:
-      - args: ["make", "install"]
+      - args: ['make', 'install']
 
   - name: cross-binutils
+    architecture: '@OPTION:arch@'
     from_source: binutils
     tools_required:
       - cross-automake-v1.15
+    revision: 1
     configure:
       - args:
-          - "@THIS_SOURCE_DIR@/configure"
-          - "--prefix=@PREFIX@"
-          - "--with-sysroot=@SYSROOT_DIR@"
-          - "--target=@OPTION:arch-triple@"
-          - "--disable-nls"
-          - "--disable-werror"
+          - '@THIS_SOURCE_DIR@/configure'
+          - '--prefix=@PREFIX@'
+          - '--with-sysroot=@SYSROOT_DIR@'
+          - '--target=@OPTION:arch-triple@'
+          - '--disable-nls'
+          - '--disable-werror'
+          - '--disable-gdb'
     compile:
-      - args: ["make", "-j@PARALLELISM@", 'all-binutils', 'all-gas', 'all-ld']
+      - args: ['make', '-j@PARALLELISM@', 'all-binutils', 'all-gas', 'all-ld']
     install:
-      - args: ["make", 'install-binutils', 'install-gas', 'install-ld']
+      - args: ['make', 'install-binutils', 'install-gas', 'install-ld']
 
   - name: cross-gcc
+    architecture: '@OPTION:arch@'
     from_source: gcc
     tools_required:
       - cross-binutils
+    revision: 1
     configure:
       - args:
-          - "@THIS_SOURCE_DIR@/configure"
-          - "--prefix=@PREFIX@"
-          - "--with-sysroot=@SYSROOT_DIR@"
-          - "--target=@OPTION:arch-triple@"
-          - "--enable-languages=c,c++"
-          - "--disable-multilib"
-          - "--disable-nls"
-          - "--enable-initfini-array"
-          - "--enable-libstdcxx-filesystem-ts"
+          - '@THIS_SOURCE_DIR@/configure'
+          - '--prefix=@PREFIX@'
+          - '--with-sysroot=@SYSROOT_DIR@'
+          - '--target=@OPTION:arch-triple@'
+          - '--enable-languages=c,c++'
+          - '--disable-multilib'
+          - '--disable-nls'
+          - '--enable-initfini-array'
+          - '--enable-libstdcxx-filesystem-ts'
     stages:
       - name: compiler
         pkgs_required:
           - mlibc-headers
         compile:
-          - args: ["make", "-j@PARALLELISM@", "all-gcc"]
+          - args: ['make', '-j@PARALLELISM@', 'all-gcc']
         install:
-          - args: ["make", "install-gcc"]
-          - args: ["mkdir", "-p", "@PREFIX@/@OPTION:arch-triple@/bin"]
-          - args: ["ln", "-sf", "../../../cross-binutils/@OPTION:arch-triple@/bin/as", "@PREFIX@/@OPTION:arch-triple@/bin/as"]
-          - args: ["ln", "-sf", "../../../cross-binutils/@OPTION:arch-triple@/bin/ld", "@PREFIX@/@OPTION:arch-triple@/bin/ld"]
-
+          - args: ['make', 'install-gcc']
+          - args: ['mkdir', '-p', '@PREFIX@/@OPTION:arch-triple@/bin']
+          - args: ['ln', '-sf', '../../../cross-binutils/@OPTION:arch-triple@/bin/as', '@PREFIX@/@OPTION:arch-triple@/bin/as']
+          - args: ['ln', '-sf', '../../../cross-binutils/@OPTION:arch-triple@/bin/ld', '@PREFIX@/@OPTION:arch-triple@/bin/ld']
       - name: libgcc
         tools_required:
           - tool: cross-gcc
@@ -225,34 +464,23 @@ tools:
         pkgs_required:
           - mlibc
         compile:
-          - args: ["make", "-j@PARALLELISM@", "all-target-libgcc"]
+          - args: ['make', '-j@PARALLELISM@', 'all-target-libgcc']
         install:
-          - args: ["make", "install-target-libgcc"]
-
+          - args: ['make', 'install-target-libgcc']
       - name: libstdc++
         tools_required:
           - tool: cross-gcc
             stage_dependencies: [libgcc]
         compile:
-          - args: ["make", "-j@PARALLELISM@", "all-target-libstdc++-v3"]
+          - args: ['make', '-j@PARALLELISM@', 'all-target-libstdc++-v3']
         install:
-          - args: ["make", "install-strip-target-libstdc++-v3"]
-
-      - name: libeverything
-        tools_required:
-          - tool: cross-gcc
-            stage_dependencies: [libstdc++]
-        pkgs_required:
-          - libxcrypt
-        compile:
-          - args: ['make', '-j@PARALLELISM@', 'all-target-libsanitizer', 'all-target-libatomic', 'all-target-libssp', 'all-target-libquadmath']
-        install:
-          - args: ['make', 'install-target-libsanitizer', 'install-target-libatomic', 'install-target-libssp', 'install-target-libquadmath']
+          - args: ['make', 'install-strip-target-libstdc++-v3']
 
   - name: cross-toolchain
+    architecture: '@OPTION:arch@'
     source:
       subdir: meta-sources
-      version: "1.0"
+      version: '1.0'
     tools_required:
       - tool: cross-autoconf-v2.69
         recursive: true
@@ -266,17 +494,20 @@ tools:
         recursive: true
       - tool: cross-libtool
         recursive: true
+    revision: 1
     configure: []
     compile: []
     install: []
 
 packages:
   - name: base-files
+    architecture: '@OPTION:arch@'
     implict_package: true
     source:
       subdir: meta-sources
       version: '1.0'
     default: true
+    revision: 1
     build:
       - args: |
           mkdir -pv @THIS_COLLECT_DIR@/usr/{,local/}{bin,include,lib,sbin,src}
@@ -322,8 +553,10 @@ packages:
           ln -sfv /run/lock @THIS_COLLECT_DIR@/var/lock
 
   - name: kernel-headers
+    architecture: '@OPTION:arch@'
     from_source: linux
     implict_package: true
+    revision: 1
     configure:
       - args: ['rsync', '-ar', '@THIS_SOURCE_DIR@/', '@THIS_BUILD_DIR@/']
     build:
@@ -334,7 +567,11 @@ packages:
       - args: ['cp', '-rv', 'usr/include', '@THIS_COLLECT_DIR@/usr']
 
   - name: kernel
+    architecture: '@OPTION:arch@'
     from_source: linux
+    tools_required:
+      - tool: cross-gcc
+    revision: 1
     configure:
       - args: ['rsync', '-ar', '@THIS_SOURCE_DIR@/', '@THIS_BUILD_DIR@/']
       - args: ['make', 'mrproper']
@@ -349,144 +586,77 @@ packages:
       - args: ['cp', '-v', '@THIS_BUILD_DIR@/arch/x86/boot/bzImage', '@THIS_COLLECT_DIR@/boot/vmlinuz-linux']
 
   - name: mlibc-headers
+    architecture: '@OPTION:arch@'
     from_source: mlibc
     implict_package: true
     pkgs_required:
       - kernel-headers
+    revision: 1
     configure:
       - args:
-          - "meson"
-          - "--cross-file"
-          - "@SOURCE_ROOT@/scripts/meson-x86_64-linux-mlibc.cross-file"
-          - "--prefix=/usr"
-          - "-Dheaders_only=true"
-          - "-Ddisable_iconv_option=true"
-          - "-Ddisable_intl_option=true"
-          - "-Ddisable_crypt_option=true"
-          - "-Dbuildtype=debug"
+          - 'meson'
+          - 'setup'
+          - '--cross-file'
+          - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+          - '--prefix=/usr'
+          - '-Dheaders_only=true'
+          - '-Dbuildtype=debug'
           - '-Dlinux_kernel_headers=@SYSROOT_DIR@/usr/include'
-          - "@THIS_SOURCE_DIR@"
+          - '@THIS_SOURCE_DIR@'
     build:
-      - args: ["ninja"]
-      - args: ["ninja", "install"]
+      - args: ['ninja']
+      - args: ['ninja', 'install']
         environ:
-          DESTDIR: "@THIS_COLLECT_DIR@"
+          DESTDIR: '@THIS_COLLECT_DIR@'
 
   - name: mlibc
+    architecture: '@OPTION:arch@'
     from_source: mlibc
     tools_required:
       - tool: cross-gcc
-        stage_dependencies: ["compiler"]
+        stage_dependencies: [compiler]
       - tool: cross-binutils
     implict_package: true
     pkgs_required:
       - mlibc-headers
+    revision: 1
     configure:
+      - args: |
+          curl -Lo libgcc-x86_64.a https://github.com/osdev0/libgcc-binaries/releases/download/2025-08-21/libgcc-x86_64.a
+          b2sum libgcc-x86_64.a | grep -q f41054803d2c8475ca394b37e4368aa7ae900bb73409f3d9566b4348797a16efadc97e28ed5db1432c30ba8c4b5ae8fb5ff42ec6d77c2f749765cac89bd66b56
       - args:
-          - "meson"
-          - "--cross-file"
-          - "@SOURCE_ROOT@/scripts/meson-x86_64-linux-mlibc.cross-file"
-          - "--prefix=/usr"
-          - "--libdir=lib"
-          - "-Dmlibc_no_headers=true"
-          - "-Ddisable_iconv_option=true"
-          - "-Ddisable_intl_option=true"
-          - "-Ddisable_crypt_option=true"
-          - "-Dbuildtype=debug"
+          - 'meson'
+          - 'setup'
+          - '--cross-file'
+          - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+          - '--prefix=/usr'
+          - '--libdir=lib'
+          - '-Dno_headers=true'
+          - '-Dlibgcc_dependency=false'
+          - '-Dbuildtype=debug'
           - '-Dlinux_kernel_headers=@SYSROOT_DIR@/usr/include'
-          - "@THIS_SOURCE_DIR@"
-    build:
-      - args: ["ninja"]
-      - args: ["ninja", "install"]
+          - '-Dld_library_name=ld-linux-mlibc'
+          - '-Duse_freestnd_hdrs=enabled'
+          - '@THIS_SOURCE_DIR@'
         environ:
-          DESTDIR: "@THIS_COLLECT_DIR@"
+          LDFLAGS: '-Wl,@THIS_BUILD_DIR@/libgcc-x86_64.a'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
 
-tasks:
-  - name: version-check
-    args: ["@SOURCE_ROOT@/scripts/version-check.sh"]
-
-  - name: mount
-    args:
-      - sudo
-      - "@SOURCE_ROOT@/scripts/lfs.sh"
-      - "@BUILD_ROOT@"
-      - mount
-    containerless: true
-
-  - name: unmount
-    args:
-      - sudo
-      - "@SOURCE_ROOT@/scripts/lfs.sh"
-      - "@BUILD_ROOT@"
-      - unmount
-    containerless: true
-
-  - name: chroot
-    tasks_required:
-      - mount
-    args:
-      - sudo
-      - "@SOURCE_ROOT@/scripts/lfs.sh"
-      - "@BUILD_ROOT@"
-      - chroot
-    containerless: true
-
-  - name: mount-image
-    args:
-      - sudo
-      - '@SOURCE_ROOT@/scripts/mount-image.sh'
-      - '@BUILD_ROOT@'
-    containerless: true
-
-  - name: update-image
-    tasks_required:
-      - mount-image
-    args:
-      - sudo
-      - '@SOURCE_ROOT@/scripts/update-image.sh'
-      - '@BUILD_ROOT@'
-    containerless: true
-
-  - name: unmount-image
-    args:
-      - sudo
-      - '@SOURCE_ROOT@/scripts/unmount-image.sh'
-      - '@BUILD_ROOT@'
-    containerless: true
-
-  - name: make-image
-    tools_required:
-      - host-limine
-    args: |
-      sudo @SOURCE_ROOT@/scripts/make-image.sh @BUILD_ROOT@
-      sudo @BUILD_ROOT@/tools/host-limine/share/limine/limine-deploy @BUILD_ROOT@/image
-    containerless: true
-
-  - name: qemu
-    tasks_required:
-      - make-image
-    args:
-      - qemu-system-x86_64
-      - '-drive'
-      - 'format=raw,file=@BUILD_ROOT@/image'
-      - '-serial'
-      - 'stdio'
-      - '-machine'
-      - 'q35,accel=kvm:whpx:tcg'
-      - '-m'
-      - '2G'
-      - '-vga'
-      - 'virtio'
-      - '-device'
-      - 'qemu-xhci,id=xhci'
-      - '-device'
-      - 'usb-kbd,bus=xhci.0'
-      - '-device'
-      - 'usb-tablet,bus=xhci.0'
-      # - '-netdev'
-      # - 'user,id=net0'
-      # - '-device'
-      # - 'virtio-net,disable-modern=on,netdev=net0'
-      # - '-object'
-      # - 'filter-dump,id=fd1,netdev=net0,file=net0dump'
-    containerless: true
+# TODO: We currently don't support computed options or anything of that sort,
+#       so we just define the architecture, and the triple as 2 options
+#       (some packages, like llvm and libjpeg-turbo need the architecture)
+declare_options:
+  - name: arch
+    default: x86_64
+  - name: arch-triple
+    default: x86_64-linux-mlibc
+  - name: mount-using
+    default: guestfs
+  - name: image-size
+    default: 4G
+  - name: rust-arch
+    default: x86_64

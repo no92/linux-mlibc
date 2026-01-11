@@ -1,11 +1,12 @@
-From 1bc096f343b4f35b4e5ab4c3efd3d62ad6165a33 Mon Sep 17 00:00:00 2001
+From 0749e24c8bec5388139aae2e3901b42d3ef6c3e4 Mon Sep 17 00:00:00 2001
 From: czapek1337 <czapek1337@gmail.com>
 Date: Mon, 9 May 2022 16:44:45 +0200
 Subject: [PATCH] Accept linux-mlibc as a valid OS
 
 ---
- config.sub | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ config.sub     | 4 ++--
+ test/picsmap.c | 2 ++
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/config.sub b/config.sub
 index 0f2234c..a09757d 100755
@@ -29,6 +30,19 @@ index 0f2234c..a09757d 100755
  	     | uxpv* | beos* | mpeix* | udk* | moxiebox* \
  	     | interix* | uwin* | mks* | rhapsody* | darwin* \
  	     | openstep* | oskit* | conix* | pw32* | nonstopux* \
+diff --git a/test/picsmap.c b/test/picsmap.c
+index 432fbf7..b782ad4 100644
+--- a/test/picsmap.c
++++ b/test/picsmap.c
+@@ -53,6 +53,8 @@
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ 
++#include <strings.h>
++
+ #if HAVE_STDINT_H
+ #include <stdint.h>
+ #define my_intptr_t	intptr_t
 -- 
-2.35.1
+2.51.0
 

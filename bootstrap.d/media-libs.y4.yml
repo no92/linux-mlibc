@@ -1,0 +1,989 @@
+packages:
+  - name: alsa-lib
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    metadata:
+      summary: alsa-lib
+      description: Placeholder
+      spdx: 'LGPL-2.1-only'
+      website: 'https://alsa-project.org/wiki/Main_Page'
+      maintainer: 'Dennis Bonke <dennis@managarm.org>'
+      categories: ['media-libs']
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/alsa-project/alsa-lib.git'
+      tag: 'v1.2.6.1'
+      version: '1.2.6.1'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['autoreconf', '-fvi']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: fontconfig
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: 'https://gitlab.freedesktop.org/fontconfig/fontconfig'
+      tag: '2.13.92'
+      version: '2.13.92'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+          environ:
+            'NOCONFIGURE': 'yes'
+        # Make sure we regenerate this file
+        - args: ['rm', '-f', 'src/fcobjshash.h']
+    tools_required:
+      - cross-toolchain
+      - virtual: pkgconfig-for-target
+        triple: '@OPTION:arch-triple@'
+    pkgs_required:
+      - mlibc
+      - freetype
+      - libiconv
+      - libxml
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--sysconfdir=/etc'
+        - '--localstatedir=/var'
+        - '--disable-docs'
+        - '--with-sysroot=@SYSROOT_DIR@' # Set libtool's lt_sysroot.
+        - '--enable-libxml2'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: freeglut
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/FreeGLUTProject/freeglut.git'
+      tag: 'v3.2.2'
+      version: '3.2.2'
+    tools_required:
+      - cross-cmake
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - glu
+      - libxi
+      - mesa
+    revision: 1
+    configure:
+      - args:
+        - 'cmake'
+        - '-GNinja'
+        - '-DCMAKE_TOOLCHAIN_FILE=@SOURCE_ROOT@/scripts/CMakeToolchain-@OPTION:arch-triple@.txt'
+        - '-DCMAKE_INSTALL_PREFIX=/usr'
+        - '-DBUILD_SHARED_LIBS=ON'
+        - '-DFREEGLUT_BUILD_DEMOS=OFF'
+        - '-DFREEGLUT_BUILD_STATIC_LIBS=OFF'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: freetype
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: 'ports'
+      git: 'https://gitlab.freedesktop.org/freetype/freetype.git'
+      tag: 'VER-2-11-0'
+      version: '2.11.0'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+          environ:
+            NOCONFIGURE: '1'
+        - args: ['cp',
+            '@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.sub',
+            '@THIS_SOURCE_DIR@/builds/unix/']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - bzip2
+      - libpng
+      - zlib
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-static'
+        - '--with-harfbuzz=no'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: glew
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: 'ports'
+      url: 'https://github.com/nigels-com/glew/releases/download/glew-2.2.0/glew-2.2.0.tgz'
+      format: 'tar.gz'
+      extract_path: 'glew-2.2.0'
+      version: '2.2.0'
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - glu
+      - mesa
+    revision: 1
+    configure:
+      # These two seds lets the build system respect the GCC variable
+      - args: ['sed', '-i', 's/CC = cc/CC = $(GCC)/g', '@THIS_SOURCE_DIR@/config/Makefile.linux']
+      - args: ['sed', '-i', 's/LD = cc/LD = $(GCC)/g', '@THIS_SOURCE_DIR@/config/Makefile.linux']
+      - args: ['cp', '-r', '@THIS_SOURCE_DIR@/.', '@THIS_BUILD_DIR@']
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+        environ:
+          GCC: '@OPTION:arch-triple@-gcc'
+          # We don't want to install libs in /usr/lib64, so disable that (like gentoo does)
+          M_ARCH: ''
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+          GCC: '@OPTION:arch-triple@-gcc'
+          M_ARCH: ''
+
+  - name: glu
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: 'ports'
+      git: 'https://gitlab.freedesktop.org/mesa/glu.git'
+      tag: 'glu-9.0.2'
+      version: '9.0.2'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+          environ:
+            NOCONFIGURE: '1'
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - gcc
+      - mesa
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-static'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: gst-plugins-bad
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    metadata:
+      # summary: Basepack of plugins for GStreamer
+      # description: The GStreamer Base Plug-ins is a well-groomed and well-maintained collection of GStreamer plug-ins and elements, spanning the range of possible types of elements one would want to write for GStreamer.
+      spdx: 'LGPL-2.0-or-later GPL-2.0-or-later'
+      website: 'https://gstreamer.freedesktop.org/'
+      maintainer: "Dennis Bonke <dennis@managarm.org>"
+      categories: ['media-libs']
+    source:
+      subdir: 'ports'
+      git: 'https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad.git'
+      tag: '1.19.1'
+      version: '1.19.1'
+    tools_required:
+      - cross-toolchain
+      - virtual: pkgconfig-for-target
+        triple: '@OPTION:arch-triple@'
+      - wayland-scanner
+    pkgs_required:
+      - mlibc
+      - cairo
+      - curl
+      - glib
+      - gstreamer
+      - lcms
+      - libdrm
+      - libgudev
+      - libwebp
+      - libx11
+      - libxcb
+      - libxkbcommon
+      - mesa
+      - pango
+      - openssl
+      - opus
+      - wayland
+      - wayland-protocols
+      - wpebackend-fdo
+    revision: 1
+    configure:
+      - args:
+        - 'meson'
+        - 'setup'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+        - '--prefix=/usr'
+        - '--libdir=lib'
+        - '--buildtype=debugoptimized'
+        - '--wrap-mode=nodownload'
+        - '-Dexamples=disabled'
+        - '-Dpackage-origin=https://github.com/no92/linux-mlibc/'
+        - '-Dpackage-name="GStreamer 1.19.1 Linux-mlibc"'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: gst-plugins-base
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    metadata:
+      summary: Basepack of plugins for GStreamer
+      description: The GStreamer Base Plug-ins is a well-groomed and well-maintained collection of GStreamer plug-ins and elements, spanning the range of possible types of elements one would want to write for GStreamer.
+      spdx: 'LGPL-2.0-or-later GPL-2.0-or-later'
+      website: 'https://gstreamer.freedesktop.org/'
+      maintainer: "Dennis Bonke <dennis@managarm.org>"
+      categories: ['media-libs']
+    source:
+      subdir: 'ports'
+      git: 'https://gitlab.freedesktop.org/gstreamer/gst-plugins-base.git'
+      tag: '1.19.1'
+      version: '1.19.1'
+    tools_required:
+      - cross-toolchain
+      - virtual: pkgconfig-for-target
+        triple: "@OPTION:arch-triple@"
+      - wayland-scanner
+    pkgs_required:
+      - mlibc
+      - alsa-lib
+      # - gdk-pixbuf
+      - glib
+      - gstreamer
+      # - gtk+-3
+      - iso-codes
+      - libdrm
+      - libgudev
+      - libjpeg-turbo
+      - libpng
+      - libogg
+      - libtheora
+      - libvorbis
+      - libx11
+      - libxext
+      - mesa
+      - opus
+      - pango
+      - wayland
+      - wayland-protocols
+      - zlib
+    revision: 1
+    configure:
+      - args:
+        - 'meson'
+        - 'setup'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+        - '--prefix=/usr'
+        - '--libdir=lib'
+        - '--buildtype=debugoptimized'
+        - '-Dintrospection=disabled'
+        - '--wrap-mode=nodownload'
+        - '-Dorc=disabled'
+        - '-Dexamples=disabled'
+        - '-Dpackage-origin=https://github.com/no92/linux-mlibc/'
+        - '-Dpackage-name="GStreamer 1.19.1 Linux-mlibc"'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: gst-plugins-good
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    metadata:
+      # summary: Basepack of plugins for GStreamer
+      # description: The GStreamer Base Plug-ins is a well-groomed and well-maintained collection of GStreamer plug-ins and elements, spanning the range of possible types of elements one would want to write for GStreamer.
+      spdx: 'LGPL-2.0-or-later GPL-2.0-or-later'
+      website: 'https://gstreamer.freedesktop.org/'
+      maintainer: "Dennis Bonke <dennis@managarm.org>"
+      categories: ['media-libs']
+    source:
+      subdir: 'ports'
+      git: 'https://gitlab.freedesktop.org/gstreamer/gst-plugins-good.git'
+      tag: '1.19.1'
+      version: '1.19.1'
+    tools_required:
+      - cross-toolchain
+      - virtual: pkgconfig-for-target
+        triple: '@OPTION:arch-triple@'
+      - wayland-scanner
+    pkgs_required:
+      - mlibc
+      - bzip2
+      - cairo
+      - gdk-pixbuf
+      - glib
+      - gtk+-3
+      - gstreamer
+      - libjpeg-turbo
+      - libpng
+      - libsoup
+      - libx11
+      - libxext
+      - libxfixes
+      - libxdamage
+      - mesa
+      - nasm
+      - wayland-protocols
+      - zlib
+    revision: 1
+    configure:
+      - args:
+        - 'meson'
+        - 'setup'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+        - '--prefix=/usr'
+        - '--libdir=lib'
+        - '--buildtype=debugoptimized'
+        - '--wrap-mode=nodownload'
+        - '-Dexamples=disabled'
+        - '-Dpackage-origin=https://github.com/no92/linux-mlibc/'
+        - '-Dpackage-name="GStreamer 1.19.1 Linux-mlibc"'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: gstreamer
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    metadata:
+      summary: Open source multimedia framework
+      description: This package contains a streaming media framework that enables applications to share a common set of plugins for tasks such as video encoding and decoding, audio encoding and decoding, audio and video filters, audio visualisation, web streaming and anything else that streams in real-time or otherwise. This package only provides base functionality and libraries of the GStreamer stack.
+      spdx: 'LGPL-2.0-or-later'
+      website: 'https://gstreamer.freedesktop.org/'
+      maintainer: 'Dennis Bonke <dennis@managarm.org>'
+      categories: ['media-libs']
+    source:
+      subdir: 'ports'
+      git: 'https://gitlab.freedesktop.org/gstreamer/gstreamer.git'
+      tag: '1.19.1'
+      version: '1.19.1'
+    tools_required:
+      - cross-toolchain
+      - virtual: pkgconfig-for-target
+        triple: "@OPTION:arch-triple@"
+    pkgs_required:
+      - mlibc
+      - glib
+    revision: 1
+    configure:
+      - args:
+        - 'meson'
+        - 'setup'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+        - '--prefix=/usr'
+        - '--libdir=lib'
+        - '--buildtype=debugoptimized'
+        - '-Dintrospection=disabled'
+        - '-Dptp-helper-setuid-user=false'
+        - '-Dptp-helper-setuid-group=false'
+        - '-Dptp-helper-permissions=none'
+        - '-Dlibunwind=disabled'
+        - '-Dlibdw=disabled'
+        - '-Dgst_debug=false'
+        - '-Dcheck=disabled'
+        - '-Dpackage-origin=https://github.com/no92/linux-mlibc/'
+        - '-Dpackage-name="GStreamer 1.19.1 Linux-mlibc"'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: harfbuzz
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/harfbuzz/harfbuzz.git'
+      tag: '3.1.2'
+      version: '3.1.2'
+    tools_required:
+      - cross-toolchain
+      - virtual: pkgconfig-for-target
+        triple: '@OPTION:arch-triple@'
+    pkgs_required:
+      - mlibc
+      - cairo
+      - freetype
+      - glib
+      - graphite2
+      - icu
+      - zlib
+    revision: 1
+    configure:
+      - args:
+        - 'meson'
+        - 'setup'
+        - '--native-file'
+        - '@SOURCE_ROOT@/scripts/meson.native-file'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+        - '--prefix=/usr'
+        - '--libdir=lib'
+        - '--buildtype=debugoptimized'
+        - '-Dgraphite2=enabled'
+        - '-Dglib=enabled'
+        - '-Dgobject=disabled'
+        - '-Dicu=enabled'
+        - '-Dfreetype=enabled'
+        - '-Dcairo=enabled'
+        - '-Dintrospection=disabled'
+        - '-Ddocs=disabled'
+        - '-Dtests=disabled' # Disabled due to a linking error
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: lcms
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    architecture: '@OPTION:arch@'
+    metadata:
+      summary: A lightweight, speed optimized color management engine
+      description: The Little Color Management System is a small-footprint color management engine, with special focus on accuracy and performance. It uses the International Color Consortium standard (ICC), which is the modern standard for color management.
+      spdx: 'MIT'
+      website: 'http://www.littlecms.com/'
+      maintainer: "Dennis Bonke <dennis@managarm.org>"
+      categories: ['media-libs']
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/mm2/Little-CMS.git'
+      tag: 'lcms2.13.1'
+      version: '2.13.1'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+          environ:
+            NOCONFIGURE: '1'
+        - args: ['cp',
+            '@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.sub',
+            '@THIS_SOURCE_DIR@/']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - libjpeg-turbo
+      - libtiff
+      - zlib
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-static'
+        - '--with-zlib'
+        - '--with-jpeg'
+        - '--with-tiff'
+        - '--with-threads'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: libepoxy
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/anholt/libepoxy.git'
+      tag: '1.5.9'
+      version: '1.5.9'
+    tools_required:
+      - cross-toolchain
+      - virtual: pkgconfig-for-target
+        triple: '@OPTION:arch-triple@'
+    pkgs_required:
+      - mlibc
+      - libx11
+      - mesa
+      - xorg-proto
+    revision: 1
+    configure:
+      - args:
+        - 'meson'
+        - 'setup'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+        - '--prefix=/usr'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: libglvnd
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: 'ports'
+      git: 'https://gitlab.freedesktop.org/glvnd/libglvnd.git'
+      tag: 'v1.4.0'
+      version: '1.4.0'
+    tools_required:
+      - cross-toolchain
+      - virtual: pkgconfig-for-target
+        triple: '@OPTION:arch-triple@'
+    pkgs_required:
+      - mlibc
+      - libx11
+      - libxext
+    revision: 1
+    configure:
+      - args:
+        - 'meson'
+        - 'setup'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+        - '--prefix=/usr'
+        - '--libdir=lib'
+        - '--buildtype=debugoptimized'
+        - '-Dasm=disabled'
+        - '-Dx11=enabled'
+        - '-Degl=true'
+        - '-Dglx=enabled'
+        - '-Dgles1=true'
+        - '-Dgles2=true'
+        - '-Dtls=true'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: libjpeg-turbo
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/libjpeg-turbo/libjpeg-turbo.git'
+      tag: '2.1.2'
+      version: '2.1.2'
+    tools_required:
+      - cross-toolchain
+      - cross-cmake
+      - virtual: pkgconfig-for-target
+        triple: '@OPTION:arch-triple@'
+    pkgs_required:
+      - mlibc
+    revision: 1
+    configure:
+      - args:
+        - 'cmake'
+        - '-DCMAKE_TOOLCHAIN_FILE=@SOURCE_ROOT@/scripts/CMakeToolchain-@OPTION:arch-triple@.txt'
+        - '-DCMAKE_INSTALL_PREFIX=/usr'
+        - '-DCMAKE_BUILD_TYPE=RELEASE'
+        - '-DENABLE_STATIC=FALSE'
+        - '-DCMAKE_INSTALL_DOCDIR=/usr/share/doc/libjpeg-turbo-2.1.2'
+        - '-DCMAKE_INSTALL_DEFAULT_LIBDIR=lib'
+        - '-DWITH_JPEG8=ON'
+        - '-DCMAKE_SYSTEM_PROCESSOR=@OPTION:arch@'
+        - '@THIS_SOURCE_DIR@/'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: libogg
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/xiph/ogg.git'
+      tag: 'v1.3.5'
+      version: '1.3.5'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+          environ:
+            NOCONFIGURE: '1'
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-static'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: libpng
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: https://github.com/glennrp/libpng
+      tag: 'v1.6.37'
+      version: '1.6.37'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['autoreconf', '-fvi']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - zlib
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'DESTDIR=@THIS_COLLECT_DIR@', 'install']
+
+  - name: libtheora
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/xiph/theora.git'
+      tag: 'v1.1.1'
+      version: '1.1.1'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - libogg
+      - libvorbis
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-static'
+        - '--disable-spec'
+        - '--disable-sdltest'
+        - '--disable-vorbistest'
+        - '--disable-oggtest'
+        - '--disable-examples'
+        - '--disable-asm'
+        environ:
+          HAVE_DOXYGEN: 'false'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: libtiff
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    metadata:
+      summary: Tag Image File Format (TIFF) library
+      description: This package contains the TIFF libraries and associated utilities. The libraries are used by many programs for reading and writing TIFF files and the utilities are used for general work with TIFF files.
+      spdx: 'libtiff'
+      website: 'http://libtiff.maptools.org/'
+      maintainer: "Dennis Bonke <dennis@managarm.org>"
+      categories: ['media-libs']
+    source:
+      subdir: 'ports'
+      git: 'https://gitlab.com/libtiff/libtiff.git'
+      tag: 'v4.3.0'
+      version: '4.3.0'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+    tools_required:
+      - cross-cmake
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - freeglut
+      - libjpeg-turbo
+      - xz-utils
+      - zlib
+      - zstd
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-static'
+        - '--enable-shared'
+        - '--with-docdir=/usr/share/doc/libtiff-4.3.0'
+        - '--without-x'
+        - '--enable-zlib'
+        - '--enable-zstd'
+        - '--enable-jpeg'
+        - '--enable-lzma'
+        - '--disable-webp'
+        - '--enable-cxx'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: libvorbis
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/xiph/vorbis.git'
+      tag: 'v1.3.7'
+      version: '1.3.7'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+          environ:
+            NOCONFIGURE: '1'
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - libogg
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-static'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: libwebp
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    metadata:
+      summary: A lossy image compression format
+      description: This package contains a library and support programs to encode and decode images in WebP format.
+      spdx: 'BSD-3-Clause'
+      website: 'https://github.com/webmproject/libwebp'
+      maintainer: "Dennis Bonke <dennis@managarm.org>"
+      categories: ['media-libs']
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/webmproject/libwebp.git'
+      tag: 'v1.2.2'
+      version: '1.2.2'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - freeglut
+      - libjpeg-turbo
+      - libpng
+      - libtiff
+      # - sdl2
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--enable-libwebpmux'
+        - '--enable-libwebpdemux'
+        - '--enable-libwebpdecoder'
+        - '--enable-libwebpextras'
+        - '--enable-swap-16bit-csp'
+        - '--disable-static'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: mesa
+    # labels: [aarch64]
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: 'ports'
+      git: 'https://gitlab.freedesktop.org/mesa/mesa.git'
+      tag: 'mesa-21.3.5'
+      version: '21.3.5'
+      # tools_required:
+      #   - host-pkg-config
+    tools_required:
+      - cross-toolchain
+      - wayland-scanner
+      - virtual: pkgconfig-for-target
+        triple: '@OPTION:arch-triple@'
+      - virtual: pkgconfig-for-host
+        program_name: host-pkg-config
+    pkgs_required:
+      - mlibc
+      - libdrm
+      - libglvnd
+      - libx11
+      - libxcb
+      - libxdamage
+      - libxext
+      - libxfixes
+      - libxrandr
+      - libxshmfence
+      - libxxf86vm
+      - llvm
+      - wayland
+      - wayland-protocols
+      - zlib
+    revision: 1
+    configure:
+      - args: ['cp', '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file', 'meson.cross-file']
+      - args:
+        - 'sed'
+        - '-i'
+        - "/^# sed adds binaries here.$/a llvm-config = '@SOURCE_ROOT@/scripts/cross-llvm-config'"
+        - 'meson.cross-file'
+      - args:
+        - 'meson'
+        - 'setup'
+        - '--native-file'
+        - '@SOURCE_ROOT@/scripts/meson.native-file'
+        - '--cross-file'
+        - 'meson.cross-file'
+        - '--prefix=/usr'
+        - '--libdir=lib'
+        # The debug build type enables some additional output from Mesa.
+        - '--buildtype=debugoptimized'
+        #- '--buildtype=debug'
+        - '-Dglx=dri'
+        - '-Dplatforms=wayland,x11'
+        # The Gallium swrast driver seems to be preferred over dri-swrast.
+        - '-Ddri-drivers='
+        - '-Dgallium-drivers=swrast,virgl'
+        - '-Dvulkan-drivers='
+        - '-Dglvnd=true'
+        # - '-Dglvnd=false'
+        # Force Mesa to build with LLVM.
+        - '-Dllvm=enabled'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: opus
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    metadata:
+      summary: Open codec for interactive speech and music transmission over the Internet
+      description: Opus is a lossy audio compression format developed by the Internet Engineering Task Force (IETF) that is particularly suitable for interactive speech and audio transmission over the Internet. This package provides the Opus development library and headers.
+      spdx: 'BSD-3-Clause'
+      website: 'https://opus-codec.org/'
+      maintainer: 'Dennis Bonke <dennis@managarm.org>'
+      categories: ['media-libs']
+    source:
+      subdir: 'ports'
+      git: 'https://gitlab.xiph.org/xiph/opus.git'
+      tag: 'v1.3.1'
+      version: '1.3.1'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--docdir=/usr/share/doc/opus-1.3.1'
+        - '--disable-static'
+        - '--disable-intrinsics'
+        - '--disable-doc'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'

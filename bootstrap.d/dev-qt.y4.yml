@@ -1,0 +1,453 @@
+sources:
+  - name: qt6
+    subdir: 'ports'
+    # This may seem strange, but is actually correct
+    git: 'https://code.qt.io/qt/qt5.git'
+    tag: 'v6.3.1'
+    version: '6.3.1'
+    regenerate:
+      # Get the submodules that we'll need as a host tool
+      - args: ['./init-repository', '-f', '--module-subset', 'qtbase,qtsvg,qtimageformats,qtshadertools,qtlanguageserver,qtwayland,qtdeclarative,qtmultimedia']
+
+tools:
+  # We do a limited superbuild with only the needed modules of Qt6 to satisfy host tooling.
+  - name: cross-qt6
+    architecture: '@OPTION:arch@'
+    from_source: qt6
+    tools_required:
+      - cross-cmake
+      # - wayland-scanner
+      - cross-wayland
+      - cross-wayland-protocols
+    revision: 1
+    configure:
+      - args:
+        - 'cmake'
+        - '-GNinja'
+        - '-DCMAKE_INSTALL_PREFIX=@PREFIX@'
+        - '-DBUILD_SHARED_LIBS=ON'
+        - '-DQT_BUILD_EXAMPLES=OFF'
+        - '-DQT_BUILD_TESTS=OFF'
+        - '@THIS_SOURCE_DIR@'
+    compile:
+      - args: ['cmake', '--build', '.', '--parallel', '6']
+        # environ:
+        #   # Chromium (aka qtwebengine) will OOM otherwise
+        #   NINJAJOBS: '6'
+    install:
+      - args: ['cmake', '--install', '.']
+
+packages:
+  - name: qtbase6
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    metadata:
+      summary: The Qt6 base libraries
+      description: This package provides the Qt6 base libraries, including QtCore, QtGui, QtWidgets and QtNetwork.
+      spdx: 'GPL-2.0-only GPL-3.0-only LGPL-3.0-only GFDL-1.3-only'
+      website: 'https://code.qt.io/cgit/qt/qtbase.git/'
+      maintainer: 'Dennis Bonke <dennis@managarm.org>'
+      categories: ['dev-qt']
+    source:
+      subdir: 'ports'
+      git: 'https://code.qt.io/qt/qtbase.git'
+      tag: 'v6.3.0'
+      version: '6.3.0'
+    tools_required:
+      - cross-cmake
+      - cross-qt6
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      # - brotli
+      - dbus
+      - double-conversion
+      - fontconfig
+      - freetype
+      - glib
+      - harfbuzz
+      - icu
+      - libdrm
+      - libevdev
+      - libice
+      - libiconv
+      - libinput
+      - libjpeg-turbo
+      - libpng
+      - libsm
+      - libx11
+      - libxcb
+      - libxcursor
+      - libxkbcommon
+      - libxi
+      - libxinerama
+      - libxrender
+      - mesa
+      - mtdev
+      - openssl
+      - pcre2
+      - sqlite
+      - wayland
+      - wayland-protocols
+      - xcb-util-image
+      - xcb-util-keysyms
+      - xcb-util-render-util
+      - xcb-util-wm
+      - zlib
+      - zstd
+    revision: 1
+    configure:
+      - args:
+        - 'cmake'
+        - '-GNinja'
+        - '-DQT_HOST_PATH=@BUILD_ROOT@/tools/cross-qt6'
+        - '-DCMAKE_INSTALL_PREFIX=@THIS_COLLECT_DIR@/usr'
+        - '-DCMAKE_TOOLCHAIN_FILE=@SOURCE_ROOT@/scripts/CMakeToolchain-@OPTION:arch-triple@.txt'
+        - '-DCMAKE_BUILD_TYPE=Debug'
+        - '-DINSTALL_BINDIR=bin'
+        - '-DINSTALL_INCLUDEDIR=include/qt6'
+        - '-DINSTALL_LIBDIR=lib'
+        - '-DINSTALL_ARCHDATADIR=lib/qt6'
+        - '-DINSTALL_PLUGINSDIR=lib/qt6/plugins'
+        - '-DINSTALL_LIBEXECDIR=lib/qt6/libexec'
+        - '-DINSTALL_QMLDIR=lib/qt6/qml'
+        - '-DINSTALL_DATADIR=share/qt6'
+        - '-DINSTALL_DOCDIR=share/qt6-doc'
+        - '-DINSTALL_TRANSLATIONSDIR=share/qt6/translations'
+        - '-DINSTALL_SYSCONFDIR=/etc/xdg'
+        - '-DINSTALL_MKSPECSDIR=lib/qt6/mkspecs'
+        - '-DINSTALL_EXAMPLESDIR=share/qt6/examples'
+        - '-DBUILD_SHARED_LIBS=ON'
+        - '-DQT_BUILD_EXAMPLES=OFF'
+        - '-DQT_BUILD_TESTS=OFF'
+        - '-DFEATURE_concurrent=ON'
+        - '-DFEATURE_dbus=OFF'
+        - '-DFEATURE_gui=ON'
+        - '-DFEATURE_network=ON'
+        - '-DFEATURE_printsupport=ON'
+        - '-DFEATURE_sql=ON'
+        - '-DFEATURE_testlib=ON'
+        - '-DFEATURE_widgets=ON'
+        - '-DFEATURE_libudev=ON'
+        - '-DFEATURE_icu=ON'
+        - '-DFEATURE_glib=ON'
+        - '-DFEATURE_pcre2=ON'
+        - '-DFEATURE_xml=ON'
+        - '-DFEATURE_harfbuzz=ON'
+        - '-DFEATURE_xkbcommon=ON'
+        - '-DFEATURE_xkbcommon_x11=ON'
+        - '-DFEATURE_libinput=ON'
+        - '-DFEATURE_evdev=ON'
+        - '-DFEATURE_mtdev=ON'
+        - '-DFEATURE_egl=ON'
+        - '-DFEATURE_opengl=ON'
+        - '-DFEATURE_accessibility=OFF'
+        - '-DFEATURE_xlib=ON'
+        - '-DFEATURE_xcb=ON'
+        - '-DFEATURE_xcb_xlib=ON'
+        - '-DFEATURE_eglfs_gbm=ON'
+        - '-DFEATURE_eglfs_egldevice=ON'
+        - '-DFEATURE_gtk3=OFF'
+        - '-DFEATURE_system_sqlite=ON'
+        - '-DFEATURE_cups=OFF'
+        - '-DFEATURE_ssl=ON'
+        - '@THIS_SOURCE_DIR@'
+        environ:
+          PKG_CONFIG_SYSROOT_DIR: '@BUILD_ROOT@/system-root'
+          PKG_CONFIG_LIBDIR: '@BUILD_ROOT@/system-root/usr/lib/pkgconfig:@BUILD_ROOT@/system-root/usr/share/pkgconfig'
+    build:
+      - args: ['cmake', '--build', '.', '--parallel', '@PARALLELISM@']
+      - args: ['cmake', '--install', '.']
+      # Touch a file in empty directories to keep xbps happy
+      - args: ['touch', '@THIS_COLLECT_DIR@/usr/lib/cmake/Qt6/QtBuildInternals/QtStandaloneTestTemplateProject/.keep']
+      - args: ['touch', '@THIS_COLLECT_DIR@/usr/lib/cmake/Qt6/macos/.keep']
+      - args: ['touch', '@THIS_COLLECT_DIR@/usr/lib/cmake/Qt6/ios/.keep']
+
+  - name: qtdeclarative6
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    metadata:
+      summary: The Qt6 declarative library
+      description: This package provides the Qt6 declarative library, containing support for QML and QtQuick.
+      spdx: 'GPL-2.0-only GPL-3.0-only LGPL-3.0-only GFDL-1.3-only'
+      website: 'https://code.qt.io/cgit/qt/qtdeclarative.git/'
+      maintainer: "Dennis Bonke <dennis@managarm.org>"
+      categories: ['dev-qt']
+    source:
+      subdir: 'ports'
+      git: 'http://code.qt.io/qt/qtdeclarative.git'
+      tag: 'v6.3.0'
+      version: '6.3.0'
+    tools_required:
+      - cross-toolchain
+      - cross-cmake
+      - cross-qt6
+    pkgs_required:
+      - mlibc
+      - libxkbcommon
+      - mesa
+      - qtbase6
+      - qtimageformats6
+      - qtlanguageserver6
+      - qtshadertools6
+      - qtsvg6
+    revision: 1
+    configure:
+      - args:
+        - 'cmake'
+        - '-GNinja'
+        - '-DQT_HOST_PATH=@BUILD_ROOT@/tools/cross-qt6'
+        - '-DCMAKE_INSTALL_PREFIX=/usr'
+        - '-DCMAKE_TOOLCHAIN_FILE=@SOURCE_ROOT@/scripts/CMakeToolchain-@OPTION:arch-triple@.txt'
+        - '-DCMAKE_BUILD_TYPE=Debug'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: qtimageformats6
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    metadata:
+      summary: The Qt6 imageformats library
+      description: This package provides the Qt6 imageformats library, giving Qt6 support for several image formats.
+      spdx: 'GPL-2.0-only GPL-3.0-only LGPL-3.0-only GFDL-1.3-only'
+      website: 'https://code.qt.io/cgit/qt/qtimageformats.git/'
+      maintainer: "Dennis Bonke <dennis@managarm.org>"
+      categories: ['dev-qt']
+    source:
+      subdir: 'ports'
+      git: 'http://code.qt.io/qt/qtimageformats.git'
+      tag: 'v6.3.0'
+      version: '6.3.0'
+    tools_required:
+      - cross-toolchain
+      - cross-cmake
+      - cross-qt6
+    pkgs_required:
+      - mlibc
+      - libjpeg-turbo
+      - libtiff
+      - libwebp
+      - mesa
+      - qtbase6
+      - zlib
+    revision: 1
+    configure:
+      - args:
+        - 'cmake'
+        - '-GNinja'
+        - '-DQT_HOST_PATH=@BUILD_ROOT@/tools/cross-qt6'
+        - '-DCMAKE_INSTALL_PREFIX=/usr'
+        - '-DCMAKE_TOOLCHAIN_FILE=@SOURCE_ROOT@/scripts/CMakeToolchain-@OPTION:arch-triple@.txt'
+        - '-DCMAKE_BUILD_TYPE=Debug'
+        - '-DINPUT_webp=system'
+        - '-DINPUT_tiff=system'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: qtlanguageserver6
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    metadata:
+      summary: The Qt6 LSP library
+      description: This package provides the Qt6 LSP (Language Server Protocol) library, giving Qt6 support for LSP.
+      spdx: 'GPL-2.0-only GPL-3.0-only LGPL-3.0-only GFDL-1.3-only'
+      website: 'https://code.qt.io/cgit/qt/qtlanguageserver.git/'
+      maintainer: "Dennis Bonke <dennis@managarm.org>"
+      categories: ['dev-qt']
+    source:
+      subdir: 'ports'
+      git: 'http://code.qt.io/qt/qtlanguageserver.git'
+      tag: 'v6.3.0'
+      version: '6.3.0'
+    tools_required:
+      - cross-toolchain
+      - cross-cmake
+      - cross-qt6
+    pkgs_required:
+      - mlibc
+      - qtbase6
+    revision: 1
+    configure:
+      - args:
+        - 'cmake'
+        - '-GNinja'
+        - '-DQT_HOST_PATH=@BUILD_ROOT@/tools/cross-qt6'
+        - '-DCMAKE_INSTALL_PREFIX=/usr'
+        - '-DCMAKE_TOOLCHAIN_FILE=@SOURCE_ROOT@/scripts/CMakeToolchain-@OPTION:arch-triple@.txt'
+        - '-DCMAKE_BUILD_TYPE=Debug'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: qtmultimedia6
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    metadata:
+      summary: The Qt6 multimedia library
+      description: This package provides the Qt6 multimedia library, containing support for multimedia (audio, video, radio and camera's) in Qt6.
+      spdx: 'GPL-2.0-only GPL-3.0-only LGPL-3.0-only GFDL-1.3-only'
+      website: 'https://code.qt.io/cgit/qt/qtmultimedia.git/'
+      maintainer: "Dennis Bonke <dennis@managarm.org>"
+      categories: ['dev-qt']
+    source:
+      subdir: 'ports'
+      git: 'http://code.qt.io/qt/qtmultimedia.git'
+      tag: 'v6.3.0'
+      version: '6.3.0'
+    tools_required:
+      - cross-toolchain
+      - cross-cmake
+      - cross-qt6
+    pkgs_required:
+      - mlibc
+      - libglvnd
+      - gstreamer
+      - gst-plugins-base
+      - qtbase6
+      - qtdeclarative6
+      - qtshadertools6
+    revision: 1
+    configure:
+      - args:
+        - 'cmake'
+        - '-GNinja'
+        - '-DQT_HOST_PATH=@BUILD_ROOT@/tools/cross-qt6'
+        - '-DCMAKE_INSTALL_PREFIX=/usr'
+        - '-DCMAKE_TOOLCHAIN_FILE=@SOURCE_ROOT@/scripts/CMakeToolchain-@OPTION:arch-triple@.txt'
+        - '-DCMAKE_BUILD_TYPE=Debug'
+        - '-DFEATURE_gstreamer=ON'
+        - '-DFEATURE_alsa=OFF'
+        - '-DFEATURE_pulseaudio=OFF'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: qtshadertools6
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    metadata:
+      summary: The Qt6 shadertools library
+      description: This package provides the Qt6 shadertools library, giving Qt6 shader support.
+      spdx: 'GPL-2.0-only GPL-3.0-only LGPL-3.0-only GFDL-1.3-only'
+      website: 'https://code.qt.io/cgit/qt/qtshadertools.git/'
+      maintainer: "Dennis Bonke <dennis@managarm.org>"
+      categories: ['dev-qt']
+    source:
+      subdir: 'ports'
+      git: 'http://code.qt.io/qt/qtshadertools.git'
+      tag: 'v6.3.0'
+      version: '6.3.0'
+    tools_required:
+      - cross-toolchain
+      - cross-cmake
+      - cross-qt6
+    pkgs_required:
+      - mlibc
+      - libxkbcommon
+      - mesa
+      - qtbase6
+    revision: 1
+    configure:
+      - args:
+        - 'cmake'
+        - '-GNinja'
+        - '-DQT_HOST_PATH=@BUILD_ROOT@/tools/cross-qt6'
+        - '-DQT_BUILD_TOOLS_WHEN_CROSSCOMPILING=ON'
+        - '-DCMAKE_INSTALL_PREFIX=/usr'
+        - '-DCMAKE_TOOLCHAIN_FILE=@SOURCE_ROOT@/scripts/CMakeToolchain-@OPTION:arch-triple@.txt'
+        - '-DCMAKE_BUILD_TYPE=Debug'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: qtsvg6
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    metadata:
+      summary: The Qt6 SVG library
+      description: This package provides the Qt6 SVG library, giving Qt6 SVG support.
+      spdx: 'GPL-2.0-only GPL-3.0-only LGPL-3.0-only GFDL-1.3-only'
+      website: 'https://code.qt.io/cgit/qt/qtsvg.git/'
+      maintainer: "Dennis Bonke <dennis@managarm.org>"
+      categories: ['dev-qt']
+    source:
+      subdir: 'ports'
+      git: 'http://code.qt.io/qt/qtsvg.git'
+      tag: 'v6.3.0'
+      version: '6.3.0'
+    tools_required:
+      - cross-toolchain
+      - cross-cmake
+      - cross-qt6
+    pkgs_required:
+      - mlibc
+      - qtbase6
+      - zlib
+    revision: 1
+    configure:
+      - args:
+        - 'cmake'
+        - '-GNinja'
+        - '-DQT_HOST_PATH=@BUILD_ROOT@/tools/cross-qt6'
+        - '-DCMAKE_INSTALL_PREFIX=/usr'
+        - '-DCMAKE_TOOLCHAIN_FILE=@SOURCE_ROOT@/scripts/CMakeToolchain-@OPTION:arch-triple@.txt'
+        - '-DCMAKE_BUILD_TYPE=Debug'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: qtwayland6
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: 'ports'
+      git: 'http://code.qt.io/qt/qtwayland.git'
+      tag: 'v6.3.0'
+      version: '6.3.0'
+    tools_required:
+      - cross-toolchain
+      - cross-cmake
+      - cross-qt6
+      - wayland-scanner
+    pkgs_required:
+      - mlibc
+      - libxkbcommon
+      - mesa
+      - qtbase6
+      - qtdeclarative6
+      - wayland
+    revision: 1
+    configure:
+      - args:
+        - 'cmake'
+        - '-GNinja'
+        - '-DQT_HOST_PATH=@BUILD_ROOT@/tools/cross-qt6'
+        - '-DCMAKE_INSTALL_PREFIX=/usr'
+        - '-DCMAKE_TOOLCHAIN_FILE=@SOURCE_ROOT@/scripts/CMakeToolchain-@OPTION:arch-triple@.txt'
+        - '-DCMAKE_BUILD_TYPE=Debug'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'

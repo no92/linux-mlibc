@@ -1,4 +1,4 @@
-From a5c6cc303ddacf989abb557048b26500c9336daa Mon Sep 17 00:00:00 2001
+From 3b39514dde67b0b2e5f0bed2fbcee8f77246bbdd Mon Sep 17 00:00:00 2001
 From: no92 <no92.mail@gmail.com>
 Date: Fri, 17 Jun 2022 00:08:04 +0200
 Subject: [PATCH] Add managarm-specific changes
@@ -6,14 +6,14 @@ Subject: [PATCH] Add managarm-specific changes
 ---
  Configurations/10-main.conf | 4 ++++
  crypto/mem_sec.c            | 2 +-
- crypto/rand/rand_unix.c     | 2 +-
- 3 files changed, 6 insertions(+), 2 deletions(-)
+ crypto/rand/rand_unix.c     | 3 ++-
+ 3 files changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/Configurations/10-main.conf b/Configurations/10-main.conf
-index 61c6689a..17f05872 100644
+index f815a09b..dc6cc372 100644
 --- a/Configurations/10-main.conf
 +++ b/Configurations/10-main.conf
-@@ -806,6 +806,10 @@ my %targets = (
+@@ -813,6 +813,10 @@ my %targets = (
          perlasm_scheme   => "elf",
          multilib         => "64",
      },
@@ -38,10 +38,18 @@ index 222c786c..c4c93c93 100644
          if (errno == ENOSYS) {
              if (mlock(sh.arena, sh.arena_size) < 0)
 diff --git a/crypto/rand/rand_unix.c b/crypto/rand/rand_unix.c
-index 43f1069d..e650bfec 100644
+index 0f452510..1e51b397 100644
 --- a/crypto/rand/rand_unix.c
 +++ b/crypto/rand/rand_unix.c
-@@ -405,7 +405,7 @@ static ssize_t syscall_random(void *buf, size_t buflen)
+@@ -25,6 +25,7 @@
+ #  include <sys/shm.h>
+ #  include <sys/utsname.h>
+ # endif
++# include <sys/random.h>
+ #endif
+ #if (defined(__FreeBSD__) || defined(__NetBSD__)) && !defined(OPENSSL_SYS_UEFI)
+ # include <sys/types.h>
+@@ -402,7 +403,7 @@ static ssize_t syscall_random(void *buf, size_t buflen)
  
      /* Linux supports this since version 3.17 */
  #  if defined(__linux) && defined(__NR_getrandom)
@@ -51,5 +59,5 @@ index 43f1069d..e650bfec 100644
      return sysctl_random(buf, buflen);
  #  else
 -- 
-2.36.1
+2.51.0
 

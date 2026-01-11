@@ -1,0 +1,855 @@
+sources:
+  - name: coreutils
+    subdir: ports
+    url: 'https://ftpmirror.gnu.org/gnu/coreutils/coreutils-9.0.tar.xz'
+    format: 'tar.xz'
+    extract_path: 'coreutils-9.0'
+    version: '9.0'
+    tools_required:
+      - cross-automake-v1.15
+    regenerate:
+      - args: ['cp', '@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.sub', '@THIS_SOURCE_DIR@/build-aux/']
+
+  - name: file
+    subdir: ports
+    git: 'https://github.com/file/file.git'
+    tag: 'FILE5_41'
+    version: '5.41'
+    tools_required:
+      - cross-autoconf-v2.69
+      - cross-automake-v1.15
+      - cross-libtool
+    regenerate:
+      - args: ['autoreconf', '-f', '-i']
+
+tools:
+  - name: cross-file
+    architecture: '@OPTION:arch@'
+    from_source: file
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--prefix=@PREFIX@'
+    compile:
+      - args: ['make', '-j@PARALLELISM@']
+    install:
+      - args: ['make', 'install']
+
+packages:
+  - name: acl
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: 'https://git.savannah.gnu.org/git/acl.git'
+      tag: 'v2.3.1'
+      version: '2.3.1'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - attr
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-static'
+        - '--docdir=/usr/share/doc/acl-2.3.1'
+        - '--disable-nls'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: attr
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: 'https://git.savannah.gnu.org/git/attr.git'
+      tag: 'v2.5.1'
+      version: '2.5.1'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-static'
+        - '--docdir=/usr/share/doc/attr-2.5.1'
+        - '--disable-nls'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: bootscripts
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      url: 'https://www.linuxfromscratch.org/lfs/downloads/11.2/lfs-bootscripts-20220723.tar.xz'
+      format: 'tar.xz'
+      extract_path: 'lfs-bootscripts-20220723'
+      version: '20220723'
+      patch-path-strip: 1
+    revision: 1
+    configure:
+      - args: ['cp', '-r', '@THIS_SOURCE_DIR@/.', '@THIS_BUILD_DIR@']
+    build:
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: coreutils
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    from_source: coreutils
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - acl
+      - attr
+    revision: 1
+    configure:
+      - args:
+          - '@THIS_SOURCE_DIR@/configure'
+          - '--host=@OPTION:arch-triple@'
+          - '--prefix=/usr'
+          - '--enable-install-program=hostname'
+          - '--enable-no-install-program=kill,uptime'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'DESTDIR=@THIS_COLLECT_DIR@', 'install']
+
+  - name: dbus
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: 'https://gitlab.freedesktop.org/dbus/dbus.git'
+      tag: 'dbus-1.12.20'
+      version: '1.12.20'
+      tools_required:
+        - cross-toolchain
+        - cross-autoconf-archive
+      regenerate:
+        - args: ['./autogen.sh']
+          environ:
+            NOCONFIGURE: 'yes'
+    tools_required:
+      - cross-toolchain
+      - host-python
+      - virtual: pkgconfig-for-target
+        triple: '@OPTION:arch-triple@'
+    pkgs_required:
+      - mlibc
+      - glib
+      - libexpat
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--sysconfdir=/etc'
+        - '--localstatedir=/var'
+        #- '--enable-user-session'
+        - '--disable-doxygen-docs'
+        - '--disable-xml-docs'
+        - '--disable-static'
+        - '--enable-shared'
+        - '--enable-verbose-mode'
+        - '--with-systemdsystemunitdir=no'
+        - '--with-systemduserunitdir=no'
+        - '--docdir=/usr/share/doc/dbus-1.12.20'
+        - '--with-console-auth-dir=/run/console'
+        - '--with-system-pid-file=/run/dbus/pid'
+        - '--with-system-socket=/run/dbus/system_bus_socket'
+        - '--disable-selinux'
+        - '--disable-apparmor'
+        - '--disable-libaudit'
+        - '--disable-kqueue'
+        - '--disable-launchd'
+        - '--disable-systemd'
+        - '--disable-tests'
+    build:
+      # Copy dbus-arch-deps.h into /usr/include/dbus-1.0/dbus?
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: diffutils
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: 'https://git.savannah.gnu.org/git/diffutils.git'
+      tag: 'v3.11'
+      version: '3.11'
+      sources_required:
+        - gnulib
+      tools_required:
+        - cross-autoconf-v2.69
+        - cross-automake-v1.15
+      regenerate:
+        - args: ['python3', '@SOURCE_ROOT@/scripts/checkout-gnulib.py', '@SOURCE_ROOT@/ports/gnulib']
+        - args: ['./bootstrap', '--skip-po']
+        - args: ["cp", "@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.sub", "@THIS_SOURCE_DIR@/build-aux/"]
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-nls'
+        - '--disable-werror'
+      - args: 'sed -i s/-Werror//g @THIS_BUILD_DIR@/lib/Makefile'
+      - args: 'sed -i s/-Werror//g @THIS_BUILD_DIR@/src/Makefile'
+    build:
+      - args: ['make', '-j', '@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: file
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    from_source: file
+    tools_required:
+      - cross-toolchain
+      - cross-file
+    pkgs_required:
+      - mlibc
+      - zlib
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-bzlib'
+        - '--disable-xzlib'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: findutils
+    labels: [aarch64, riscv64]
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    metadata:
+      summary: GNU utilities for finding files
+      description: This package contains programs to find files. Programs are provided to search through all the files in a directory tree and to create, maintain, and search a database.
+      spdx: 'GPL-3.0-or-later'
+      website: 'https://www.gnu.org/software/findutils/'
+      maintainer: 'Dennis Bonke <dennis@managarm.org>'
+      categories: ['sys-apps']
+    source:
+      subdir: ports
+      git: 'https://https.git.savannah.gnu.org/git/findutils.git'
+      tag: 'v4.10.0'
+      version: '4.10.0'
+      sources_required:
+        - gnulib
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['python3', '@SOURCE_ROOT@/scripts/checkout-gnulib.py', '@SOURCE_ROOT@/ports/gnulib']
+        - args: ['./bootstrap', '--skip-po']
+        - args: ['cp',
+            '@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.sub',
+            '@THIS_SOURCE_DIR@/build-aux/']
+    tools_required:
+      - cross-toolchain
+      - host-python
+    pkgs_required:
+      - mlibc
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--without-selinux'
+        - '--disable-nls'
+        - '--localstatedir=/var/lib/locate'
+        environ:
+          'PYTHON': '@BUILD_ROOT@/tools/host-python/bin/python3'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+      - args: ['@SOURCE_ROOT@/scripts/keep-empty-directories.py', '@THIS_COLLECT_DIR@']
+
+  - name: gawk
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: 'https://git.savannah.gnu.org/git/gawk.git'
+      tag: 'gawk-4.2.1'
+      version: '4.2.1'
+      tools_required:
+          - 'cross-autoconf-v2.69'
+          - 'cross-automake-v1.15'
+      regenerate:
+        - args: sed -i 's/extras//' @THIS_SOURCE_DIR@/Makefile.in
+        - args: ['cp', '@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.sub', '@THIS_SOURCE_DIR@/']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    revision: 1
+    configure:
+      - args: ['@THIS_SOURCE_DIR@/configure', '--host=@OPTION:arch-triple@', '--prefix=/usr', '--disable-nls', '--disable-extensions']
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: grep
+    labels: [aarch64, riscv64]
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    metadata:
+      summary: GNU regular expression matcher
+      description: This package contains programs for searching through the contents of files.
+      spdx: 'GPL-3.0-or-later'
+      website: 'https://www.gnu.org/software/grep/'
+      maintainer: "Dennis Bonke <dennis@managarm.org>"
+      categories: ['sys-apps']
+    source:
+      subdir: ports
+      git: 'https://https.git.savannah.gnu.org/git/grep.git'
+      tag: 'v3.11'
+      version: '3.11'
+      sources_required:
+        - gnulib
+      tools_required:
+        - cross-autoconf-v2.69
+        - cross-automake-v1.15
+      regenerate:
+        - args: ['python3', '@SOURCE_ROOT@/scripts/checkout-gnulib.py', '@SOURCE_ROOT@/ports/gnulib']
+        - args: ['./bootstrap', '--skip-po']
+        - args: ['cp',
+            '@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.sub',
+            '@THIS_SOURCE_DIR@/build-aux/']
+    tools_required:
+      - cross-toolchain
+      # - virtual: pkgconfig-for-target
+      #   triple: '@OPTION:arch-triple@'
+    pkgs_required:
+      - mlibc
+      - pcre2
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-nls'
+      - args: 'sed -i s/-Werror//g @THIS_BUILD_DIR@/lib/Makefile'
+      - args: 'sed -i s/-Werror//g @THIS_BUILD_DIR@/src/Makefile'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: groff
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: 'https://git.savannah.gnu.org/git/groff.git'
+      tag: '1.22.4'
+      version: '1.22.4'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./bootstrap']
+        - args: ['cp',
+            '@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.sub',
+            '@THIS_SOURCE_DIR@/build-aux/']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--with-doc=no'
+        environ:
+          PAGE: 'A4'
+      - args: 'sed -i s/"_GL_MATH_CXX_REAL_FLOATING_DECL_1 (signbit)"//g @THIS_SOURCE_DIR@/lib/math.in.h'
+      - args: 'sed -i s/"_GL_MATH_CXX_REAL_FLOATING_DECL_2 (signbit)"//g @THIS_SOURCE_DIR@/lib/math.in.h'
+      - args: 'sed -i s/"#   undef signbit"//g @THIS_SOURCE_DIR@/lib/math.in.h'
+    build:
+      - args: ['make', '-j1']
+        environ:
+          xpmtoppm: '/usr/bin/true'
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: iana-etc
+    architecture: 'noarch'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      url: 'https://github.com/Mic92/iana-etc/releases/download/20230810/iana-etc-20230810.tar.gz'
+      extract_path: 'iana-etc-20230810'
+      format: 'tar.gz'
+      version: '20230810'
+    revision: 1
+    build:
+      - args: ['mkdir', '-p', '@THIS_COLLECT_DIR@/etc']
+      - args: ['cp', '@THIS_SOURCE_DIR@/services', '@THIS_COLLECT_DIR@/etc/']
+      - args: ['cp', '@THIS_SOURCE_DIR@/protocols', '@THIS_COLLECT_DIR@/etc/']
+
+  - name: iproute2
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: 'https://git.kernel.org/pub/scm/network/iproute2/iproute2.git'
+      tag: 'v5.18.0'
+      version: '5.18.0'
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    revision: 1
+    configure:
+      - args: ['cp', '-r', '@THIS_SOURCE_DIR@/.', '@THIS_BUILD_DIR@']
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--prefix=/usr'
+        - '--libdir=lib'
+        - '--include_dir=@THIS_SOURCE_DIR@/include'
+        environ:
+          SBINDIR: '/usr/sbin'
+          CC: '@OPTION:arch-triple@-gcc'
+          CXX: '@OPTION:arch-triple@-g++'
+      - args: ['rm', '-r', 'include/netinet']
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+        environ:
+          SBINDIR: '/usr/sbin'
+      - args: ['make', 'install']
+        environ:
+          SBINDIR: '/usr/sbin'
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: kmscon
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/dvdhrm/kmscon.git'
+      tag: 'kmscon-8'
+      version: '8'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+          environ:
+            'NOCONFIGURE': '1'
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - eudev
+      - libdrm
+      - libtsm
+      - libxkbcommon
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--with-sysroot=@SYSROOT_DIR@' # Set libtool's lt_sysroot.
+        - '--with-video=drm2d'
+        - '--with-renderers='
+        - '--with-fonts=unifont'
+        - '--disable-multi-seat'
+        - '--with-sessions=dummy,terminal'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+        quiet: true
+      - args: ['mkdir', '-p', '@THIS_COLLECT_DIR@/etc/kmscon']
+      - args: ['cp', '@SOURCE_ROOT@/meta-sources/base-files/kmscon.conf', '@THIS_COLLECT_DIR@/etc/kmscon/']
+
+  - name: kmod
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: 'https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git'
+      tag: 'v29'
+      version: '29'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - openssl
+      - xz-utils
+      - zlib
+      - zstd
+    revision: 1
+    configure:
+      # - args: ['cp', '-r', '@THIS_SOURCE_DIR@/.', '@THIS_BUILD_DIR@']
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--sysconfdir=/etc'
+        - '--with-openssl'
+        - '--with-xz'
+        - '--with-zstd'
+        - '--with-zlib'
+        - '--disable-manpages'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'DESTDIR=@THIS_COLLECT_DIR@', 'install']
+      - args: ['mkdir', '-pv', '@THIS_COLLECT_DIR@/usr/sbin']
+      - args: ['ln', '-svn', 'kmod', '@THIS_COLLECT_DIR@/usr/sbin/depmod']
+      - args: ['ln', '-svn', 'kmod', '@THIS_COLLECT_DIR@/usr/sbin/insmod']
+      - args: ['ln', '-svn', 'kmod', '@THIS_COLLECT_DIR@/usr/sbin/modinfo']
+      - args: ['ln', '-svn', 'kmod', '@THIS_COLLECT_DIR@/usr/sbin/modprobe']
+      - args: ['ln', '-svn', 'kmod', '@THIS_COLLECT_DIR@/usr/sbin/rmmod']
+      - args: ['ln', '-svn', 'kmod', '@THIS_COLLECT_DIR@/usr/bin/lsmod']
+
+  - name: less
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      url: 'http://www.greenwoodsoftware.com/less/less-563.tar.gz'
+      format: 'tar.gz'
+      extract_path: 'less-563'
+      version: '563'
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - ncurses
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--sysconfdir=/etc'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'DESTDIR=@THIS_COLLECT_DIR@', 'install']
+
+  - name: man-db
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: 'https://git.savannah.gnu.org/git/man-db.git'
+      tag: '2.9.4'
+      version: '2.9.4'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./bootstrap']
+        - args: ['cp',
+            '@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.sub',
+            '@THIS_SOURCE_DIR@/build-aux/']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - gdbm
+      - groff
+      - less
+      - libpipeline
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-nls'
+        - '--docdir=/usr/share/doc/man-db-2.9.4'
+        - '--sysconfdir=/etc'
+        - '--disable-setuid'
+        - '--with-systemdtmpfilesdir='
+        - '--with-systemdsystemunitdir='
+        - '--disable-manual'
+        - '--with-pager=/usr/bin/less'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: neofetch
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: 'https://github.com/64/neofetch.git'
+      branch: 'master'
+      commit: 'd27a0bd748310d8ace673a614f745303b444e00e'
+      version: '7.2.0'
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    revision: 1
+    configure:
+      - args: ['cp', '-r', '@THIS_SOURCE_DIR@/.', '@THIS_BUILD_DIR@']
+    build:
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: shadow
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: 'https://github.com/shadow-maint/shadow.git'
+      tag: '4.14.0'
+      version: '4.14.0'
+      tools_required:
+        - cross-toolchain
+        - host-gettext
+      regenerate:
+        - args: ['autoreconf', '-v', '-f', '--install']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - libiconv
+      - libintl
+      - libxcrypt
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--exec-prefix=/usr'
+        - '--sysconfdir=/etc'
+        - '--disable-static'
+        - '--enable-shared'
+        - '--disable-nls'
+        - '--without-audit'
+        - '--without-libpam'
+        - '--without-btrfs'
+        - '--without-selinux'
+        - '--without-acl'
+        - '--without-attr'
+        - '--without-skey'
+        - '--without-tcb'
+        - '--without-libcrack'
+        - '--without-nscd'
+        - '--without-sssd'
+        - '--without-libbsd'
+        - '--with-group-name-max-length=32'
+        - '--disable-man'
+        environ:
+          ac_cv_func_fsync: 'no'
+          ac_cv_header_sys_capability_h: 'no'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: sysvinit
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: 'https://github.com/slicer69/sysvinit.git'
+      tag: '3.04'
+      version: '3.04'
+      patch-path-strip: 1
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    revision: 1
+    configure:
+      - args: ['cp', '-r', '@THIS_SOURCE_DIR@/.', '@THIS_BUILD_DIR@']
+      # - args:
+      #   - '@THIS_SOURCE_DIR@/configure'
+      #   - '--host=@OPTION:arch-triple@'
+      #   - '--prefix=/usr'
+      #   - '--sysconfdir=/etc'
+    build:
+      - args: ['make', '-j@PARALLELISM@', 'CFLAGS=-O2 -ggdb']
+        environ:
+          CC: '@OPTION:arch-triple@-gcc'
+      - args: ['make', 'ROOT=@THIS_COLLECT_DIR@', 'install']
+      - args: ['cp', '-v', '@THIS_SOURCE_DIR@/../../meta-sources/base-files/inittab', '@THIS_COLLECT_DIR@/etc/inittab']
+      - args: ['cp', '-v', '@THIS_SOURCE_DIR@/../../meta-sources/base-files/fstab', '@THIS_COLLECT_DIR@/etc/fstab']
+
+  - name: util-linux
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: 'https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git'
+      tag: 'v2.41.2'
+      version: '2.41.2'
+      # tools_required:
+      #   - cross-toolchain
+      # regenerate:
+      #   - args: ['./autogen.sh']
+    tools_required:
+      - cross-toolchain
+      - virtual: pkgconfig-for-target
+        triple: '@OPTION:arch-triple@'
+    pkgs_required:
+      - mlibc
+      - file
+      - libiconv
+      - libintl
+      - libxcrypt
+      - ncurses
+      - readline
+      - zlib
+    configure:
+      - args:
+        - 'meson'
+        - 'setup'
+        - '--cross-file'
+        - '@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file'
+        - '--prefix=/usr'
+        - '--libdir=lib'
+        - '--buildtype=debugoptimized'
+        - '-Dbuild-python=disabled'
+        - '-Dbuild-bits=disabled'
+        - '-Dbuild-ldattach=disabled'
+        - '-Dbuild-lscpu=disabled'
+        - '-Dbuild-unshare=disabled'
+        - '-Dbuild-nsenter=disabled'
+        - '-Dbuild-ipcrm=disabled'
+        - '-Dbuild-ipcs=disabled'
+        - '-Dbuild-lsfd=disabled'
+        - '-Dprogram-tests=false'
+        - '-Dnls=disabled'
+        - '@THIS_SOURCE_DIR@'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: which
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      url: 'https://ftpmirror.gnu.org/gnu/which/which-2.21.tar.gz'
+      format: 'tar.gz'
+      extract_path: 'which-2.21'
+      version: '2.21'
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: sed
+    labels: [aarch64, riscv64]
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    metadata:
+      summary: Super-useful stream editor
+      description: This package contains a stream editor.
+      spdx: 'GPL-3.0-or-later'
+      website: 'https://www.gnu.org/software/sed/'
+      maintainer: "Dennis Bonke <dennis@managarm.org>"
+      categories: ['sys-apps']
+    source:
+      subdir: ports
+      git: 'https://https.git.savannah.gnu.org/git/sed.git'
+      tag: 'v4.9'
+      version: '4.9'
+      sources_required:
+        - gnulib
+      tools_required:
+        - cross-autoconf-v2.69
+        - cross-automake-v1.15
+        - cross-libtool
+      regenerate:
+        - args: ['python3', '@SOURCE_ROOT@/scripts/checkout-gnulib.py', '@SOURCE_ROOT@/ports/gnulib']
+        - args: ['./bootstrap', '--skip-po']
+        - args: ['cp',
+            '@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.sub',
+            '@THIS_SOURCE_DIR@/build-aux/']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-nls'
+        - '--disable-gcc-warnings'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'

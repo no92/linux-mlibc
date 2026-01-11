@@ -1,0 +1,76 @@
+packages:
+  - name: eudev
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/gentoo/eudev.git'
+      tag: 'v3.2.10'
+      version: '3.2.10'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - kmod
+      - util-linux
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--bindir=/usr/sbin'
+        - '--sysconfdir=/etc'
+        - '--disable-static'
+        - '--with-sysroot=@SYSROOT_DIR@' # Set libtool's lt_sysroot.
+        - '--disable-selinux'
+        - '--disable-mtd-probe'
+        - '--disable-rule-generator'
+        - '--enable-introspection=no'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+        quiet: true
+      - args: ['mkdir', '-pv', '@THIS_COLLECT_DIR@/usr/lib/udev/rules.d']
+      - args: ['mkdir', '-pv', '@THIS_COLLECT_DIR@/etc/udev/rules.d']
+
+  - name: e2fsprogs
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: https://git.kernel.org/pub/scm/fs/ext2/e2fsprogs.git
+      tag: 'v1.47.0'
+      version: '1.47.0'
+      regenerate:
+        - args: ['cp',
+            '@BUILD_ROOT@/tools/cross-automake-v1.15/share/automake-1.15/config.sub',
+            '@THIS_SOURCE_DIR@/config']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - kernel-headers
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--enable-elf-shlibs'
+        - '--disable-libblkid'
+        - '--disable-libuuid'
+        - '--disable-uuidd'
+        - '--disable-fsck'
+        - '--disable-defrag'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'

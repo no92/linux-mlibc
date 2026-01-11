@@ -1,0 +1,63 @@
+From 9ae07da91a39d52f081405fb8dd8cd6f5202e8ad Mon Sep 17 00:00:00 2001
+From: Dennis Bonke <admin@dennisbonke.com>
+Date: Sun, 11 Jan 2026 15:59:29 +0100
+Subject: [PATCH] Add mlibc support
+
+---
+ libmount/src/hook_idmap.c | 1 +
+ meson.build               | 6 ++++--
+ meson_options.txt         | 2 ++
+ 3 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/libmount/src/hook_idmap.c b/libmount/src/hook_idmap.c
+index 5095de1..e3a5576 100644
+--- a/libmount/src/hook_idmap.c
++++ b/libmount/src/hook_idmap.c
+@@ -20,6 +20,7 @@
+ #include <sys/wait.h>
+ #include <sys/ioctl.h>
+ #include <sys/mount.h>
++#include <signal.h>
+ 
+ #include "strutils.h"
+ #include "all-io.h"
+diff --git a/meson.build b/meson.build
+index 4ebf0ee..9c7395d 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1991,6 +1991,7 @@ if opt and not is_disabler(exe)
+   bashcompletions += ['swapoff']
+ endif
+ 
++opt = get_option('build-lscpu').require(have_cpu_set_t).allowed()
+ exe = executable(
+   'lscpu',
+   lscpu_sources,
+@@ -1999,8 +2000,9 @@ exe = executable(
+                lib_smartcols],
+   dependencies : [rtas_libs],
+   install_dir : usrbin_exec_dir,
+-  install : true)
+-if not is_disabler(exe)
++  install : opt,
++  build_by_default : opt)
++if opt and not is_disabler(exe)
+   exes += exe
+   manadocs += lscpu_manadocs
+   bashcompletions += ['lscpu']
+diff --git a/meson_options.txt b/meson_options.txt
+index 1ec9046..bf03d34 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -59,6 +59,8 @@ option('build-swapon', type : 'feature',
+        description : 'build swapon')
+ option('build-swapoff', type : 'feature',
+        description : 'build swapoff')
++option('build-lscpu', type : 'feature',
++       description : 'build lscpu')
+ option('build-chcpu', type : 'feature',
+        description : 'build chcpu')
+ option('build-losetup', type : 'feature',
+-- 
+2.51.0
+

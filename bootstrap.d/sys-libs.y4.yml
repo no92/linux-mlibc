@@ -1,0 +1,418 @@
+sources:
+  - name: tzdata
+    subdir: ports
+    url: 'https://data.iana.org/time-zones/releases/tzdata2025c.tar.gz'
+    format: 'tar.gz'
+    version: '2025c'
+
+  - name: ncurses
+    subdir: ports
+    git: 'https://github.com/ThomasDickey/ncurses-snapshots.git'
+    tag: 'v6_2'
+    version: '6.2'
+
+  - name: readline
+    subdir: ports
+    git: 'https://git.savannah.gnu.org/git/readline.git'
+    tag: 'readline-8.1'
+    version: '8.1'
+
+  - name: zlib
+    subdir: ports
+    git: 'https://github.com/madler/zlib.git'
+    tag: 'v1.2.11'
+    version: '1.2.11'
+
+packages:
+  - name: argp-standalone
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: 'https://github.com/argp-standalone/argp-standalone.git'
+      tag: '1.5.0'
+      version: '1.5.0'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['autoreconf', '-fvi']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - libintl
+    revision: 1
+    configure:
+      - args:
+        - "meson"
+        - 'setup'
+        - "--cross-file"
+        - "@SOURCE_ROOT@/scripts/meson-@OPTION:arch-triple@.cross-file"
+        - "--prefix=/usr"
+        - "-Dbuildtype=release"
+        - "@THIS_SOURCE_DIR@"
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+      - args: ['mkdir', '-pv', '@THIS_COLLECT_DIR@/usr/include']
+      - args: ['cp', '-v', '@THIS_SOURCE_DIR@/argp.h', '@THIS_COLLECT_DIR@/usr/include']
+
+  - name: fts-standalone
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: 'https://github.com/pullmoll/musl-fts.git'
+      tag: 'v1.2.7'
+      version: '1.2.7'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./bootstrap.sh']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-static'
+        - '--enable-shared'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: gdbm
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: 'https://git.savannah.gnu.org/git/gdbm.git'
+      tag: 'v1.22'
+      version: '1.22'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./bootstrap']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-nls'
+        - '--disable-static'
+        - '--enable-libgdbm-compat'
+        - '--without-readline'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: libcap
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      url: 'https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.67.tar.xz'
+      format: 'tar.xz'
+      extract_path: 'libcap-2.67'
+      version: '2.67'
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    revision: 1
+    configure:
+      - args: ['cp', '-r', '@THIS_SOURCE_DIR@/.', '@THIS_BUILD_DIR@']
+    build:
+      - args: ['make', 'CC=@OPTION:arch-triple@-gcc', 'BUILD_CC=gcc', 'prefix=/usr', 'DESTDIR=@THIS_COLLECT_DIR@']
+      - args: ['make', 'CC=@OPTION:arch-triple@-gcc', 'prefix=/usr', 'DESTDIR=@THIS_COLLECT_DIR@', 'install']
+
+  - name: libxcrypt
+    labels: [aarch64, riscv64]
+    architecture: '@OPTION:arch@'
+    metadata:
+      summary: Extended crypt library for descrypt, md5crypt, bcrypt, and others
+      description: This package contains a modern library for one-way hashing of passwords.
+      spdx: 'LGPL-2.1-or-later'
+      website: 'https://github.com/besser82/libxcrypt'
+      maintainer: 'Dennis Bonke <dennis@managarm.org>'
+      categories: ['sys-libs']
+    source:
+      subdir: 'ports'
+      git: 'https://github.com/besser82/libxcrypt.git'
+      tag: 'v4.4.38'
+      version: '4.4.38'
+      tools_required:
+        - cross-autoconf-v2.69
+        - cross-automake-v1.15
+        - cross-libtool
+        - cross-pkg-config
+      regenerate:
+        - args: ['./autogen.sh']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--with-sysroot=@SYSROOT_DIR@' # Set libtool's lt_sysroot.
+        - '--enable-obsolete-api=yes'
+        - '--disable-xcrypt-compat-files'
+        - '--disable-static'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: linux-pam
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: 'https://github.com/linux-pam/linux-pam.git'
+      tag: 'v1.5.2'
+      version: '1.5.2'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - libintl
+      - libnsl
+      - libtirpc
+      - libxcrypt
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--sbindir=/usr/sbin'
+        - '--sysconfdir=/etc'
+        - '--libdir=/usr/lib'
+        - '--enable-securedir=/usr/lib/security'
+        - '--docdir=/usr/share/doc/Linux-PAM-1.5.2'
+        - '--disable-doc'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+      - args: ['chmod', '-v', '4755', '@THIS_COLLECT_DIR@/usr/sbin/unix_chkpwd']
+      - args: ['install', '-v', '-m755', '-d', '@THIS_COLLECT_DIR@/etc/pam.d']
+      - args: ['cp', '-v', '@SOURCE_ROOT@/meta-sources/base-files/other.pam', '@THIS_COLLECT_DIR@/etc/pam.d/other']
+      - args: ['cp', '-v', '@SOURCE_ROOT@/meta-sources/base-files/system-account.pam', '@THIS_COLLECT_DIR@/etc/pam.d/system-account']
+      - args: ['cp', '-v', '@SOURCE_ROOT@/meta-sources/base-files/system-auth.pam', '@THIS_COLLECT_DIR@/etc/pam.d/system-auth']
+      - args: ['cp', '-v', '@SOURCE_ROOT@/meta-sources/base-files/system-session.pam', '@THIS_COLLECT_DIR@/etc/pam.d/system-session']
+      - args: ['cp', '-v', '@SOURCE_ROOT@/meta-sources/base-files/system-password.pam', '@THIS_COLLECT_DIR@/etc/pam.d/system-password']
+
+  - name: mtdev
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: 'ports'
+      git: 'https://bitmath.org/git/mtdev.git'
+      disable_shallow_fetch: true
+      tag: 'v1.1.6'
+      version: '1.1.6'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./autogen.sh']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--with-sysroot=@SYSROOT_DIR@' # Set libtool's lt_sysroot.
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: ncurses
+    architecture: '@OPTION:arch@'
+    from_source: ncurses
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--without-ada'
+        - '--enable-pc-files'
+        - '--with-shared'
+        - '--without-normal'
+        - '--with-manpage-format=normal'
+        - '--with-pkg-config-libdir=/usr/lib/pkgconfig'
+        - '--with-termlib'
+        - '--enable-widec'
+        - '--disable-stripping'
+        environ:
+          cf_cv_func_nanosleep: 'yes'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'DESTDIR=@THIS_COLLECT_DIR@', 'install']
+      # As we build ncurses with wide character support, make some compatibility links
+      - args: |
+          for lib in ncurses form panel menu tinfo ; do
+              rm -vf @THIS_COLLECT_DIR@/usr/lib/lib${lib}.so
+              echo "INPUT(-l${lib}w)" > @THIS_COLLECT_DIR@/usr/lib/lib${lib}.so
+              ln -sfv ${lib}w.pc @THIS_COLLECT_DIR@/usr/lib/pkgconfig/${lib}.pc
+          done
+
+          rm -vf @THIS_COLLECT_DIR@/usr/lib/libcursesw.so
+          echo "INPUT(-lncursesw)" > @THIS_COLLECT_DIR@/usr/lib/libcursesw.so
+          ln -sfv libncurses.so @THIS_COLLECT_DIR@/usr/lib/libcurses.so
+
+  - name: obstack-standalone
+    architecture: '@OPTION:arch@'
+    stability_level: 'broken'
+    source:
+      subdir: ports
+      git: 'https://github.com/void-linux/musl-obstack.git'
+      tag: 'v1.1'
+      version: '1.1.0'
+      tools_required:
+        - cross-toolchain
+      regenerate:
+        - args: ['./bootstrap.sh']
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-static'
+        - '--enable-shared'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+
+  - name: readline
+    architecture: '@OPTION:arch@'
+    from_source: readline
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+      - ncurses
+    revision: 1
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--host=@OPTION:arch-triple@'
+        - '--prefix=/usr'
+        - '--disable-static'
+        - '--enable-multibyte'
+    build:
+      - args: ["make", "-j@PARALLELISM@"]
+      - args: ["make", "DESTDIR=@THIS_COLLECT_DIR@", "install"]
+        environ:
+          DESTDIR: "@THIS_COLLECT_DIR@"
+
+  - name: tzdata
+    architecture: '@OPTION:arch@'
+    from_source: tzdata
+    default: true
+    revision: 1
+    configure:
+      - args: ['cp', '-r', '@THIS_SOURCE_DIR@/.', '@THIS_BUILD_DIR@']
+    build:
+      # Create the required directories
+      - args: ['mkdir', '-p', '@THIS_COLLECT_DIR@/etc']
+      - args: ['mkdir', '-p', '@THIS_COLLECT_DIR@/usr/share/zoneinfo/posix']
+      - args: ['mkdir', '-p', '@THIS_COLLECT_DIR@/usr/share/zoneinfo/right']
+      # Create the time zone files without leap seconds, convention puts these in both zoneinfo and zoneinfo/posix.
+      # After that. create time time zone files with leap seconds
+      - args: ['/usr/sbin/zic', '-L', '/dev/null', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo', '@THIS_BUILD_DIR@/etcetera']
+      - args: ['/usr/sbin/zic', '-L', '/dev/null', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo/posix', '@THIS_BUILD_DIR@/etcetera']
+      - args: ['/usr/sbin/zic', '-L', '@THIS_SOURCE_DIR@/leapseconds', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo/right', '@THIS_BUILD_DIR@/etcetera']
+      - args: ['/usr/sbin/zic', '-L', '/dev/null', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo', '@THIS_BUILD_DIR@/southamerica']
+      - args: ['/usr/sbin/zic', '-L', '/dev/null', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo/posix', '@THIS_BUILD_DIR@/southamerica']
+      - args: ['/usr/sbin/zic', '-L', '@THIS_SOURCE_DIR@/leapseconds', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo/right', '@THIS_BUILD_DIR@/southamerica']
+      - args: ['/usr/sbin/zic', '-L', '/dev/null', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo', '@THIS_BUILD_DIR@/northamerica']
+      - args: ['/usr/sbin/zic', '-L', '/dev/null', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo/posix', '@THIS_BUILD_DIR@/northamerica']
+      - args: ['/usr/sbin/zic', '-L', '@THIS_SOURCE_DIR@/leapseconds', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo/right', '@THIS_BUILD_DIR@/northamerica']
+      - args: ['/usr/sbin/zic', '-L', '/dev/null', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo', '@THIS_BUILD_DIR@/europe']
+      - args: ['/usr/sbin/zic', '-L', '/dev/null', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo/posix', '@THIS_BUILD_DIR@/europe']
+      - args: ['/usr/sbin/zic', '-L', '@THIS_SOURCE_DIR@/leapseconds', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo/right', '@THIS_BUILD_DIR@/europe']
+      - args: ['/usr/sbin/zic', '-L', '/dev/null', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo', '@THIS_BUILD_DIR@/africa']
+      - args: ['/usr/sbin/zic', '-L', '/dev/null', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo/posix', '@THIS_BUILD_DIR@/africa']
+      - args: ['/usr/sbin/zic', '-L', '@THIS_SOURCE_DIR@/leapseconds', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo/right', '@THIS_BUILD_DIR@/africa']
+      - args: ['/usr/sbin/zic', '-L', '/dev/null', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo', '@THIS_BUILD_DIR@/antarctica']
+      - args: ['/usr/sbin/zic', '-L', '/dev/null', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo/posix', '@THIS_BUILD_DIR@/antarctica']
+      - args: ['/usr/sbin/zic', '-L', '@THIS_SOURCE_DIR@/leapseconds', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo/right', '@THIS_BUILD_DIR@/antarctica']
+      - args: ['/usr/sbin/zic', '-L', '/dev/null', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo', '@THIS_BUILD_DIR@/asia']
+      - args: ['/usr/sbin/zic', '-L', '/dev/null', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo/posix', '@THIS_BUILD_DIR@/asia']
+      - args: ['/usr/sbin/zic', '-L', '@THIS_SOURCE_DIR@/leapseconds', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo/right', '@THIS_BUILD_DIR@/asia']
+      - args: ['/usr/sbin/zic', '-L', '/dev/null', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo', '@THIS_BUILD_DIR@/australasia']
+      - args: ['/usr/sbin/zic', '-L', '/dev/null', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo/posix', '@THIS_BUILD_DIR@/australasia']
+      - args: ['/usr/sbin/zic', '-L', '@THIS_SOURCE_DIR@/leapseconds', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo/right', '@THIS_BUILD_DIR@/australasia']
+      - args: ['/usr/sbin/zic', '-L', '/dev/null', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo', '@THIS_BUILD_DIR@/backward']
+      - args: ['/usr/sbin/zic', '-L', '/dev/null', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo/posix', '@THIS_BUILD_DIR@/backward']
+      - args: ['/usr/sbin/zic', '-L', '@THIS_SOURCE_DIR@/leapseconds', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo/right', '@THIS_BUILD_DIR@/backward']
+      # Copy some needed files to their location
+      - args: ['cp', '@THIS_BUILD_DIR@/zone.tab', '@THIS_BUILD_DIR@/zone1970.tab', '@THIS_BUILD_DIR@/iso3166.tab', '@THIS_COLLECT_DIR@/usr/share/zoneinfo']
+      # Create the posixrules file, POSIX requires daylight saving rules to be in accordance with US rules, thus use New York
+      - args: ['/usr/sbin/zic', '-d', '@THIS_COLLECT_DIR@/usr/share/zoneinfo', '-p', 'America/New_York']
+      # Default to UTC for localtime, this should be fixed, but that is pending xbstrap support.
+      - args: ['ln', '-sf', '/usr/share/zoneinfo/UTC', '@THIS_COLLECT_DIR@/etc/localtime"]
+
+  - name: zlib
+    architecture: '@OPTION:arch@'
+    from_source: zlib
+    tools_required:
+      - cross-toolchain
+    pkgs_required:
+      - mlibc
+    revision: 1
+    configure:
+      - args: 
+        - '@THIS_SOURCE_DIR@/configure'
+        environ:
+          CHOST: '@OPTION:arch-triple@'
+          prefix: '/usr'
+    build:
+      - args: ['make', '-j@PARALLELISM@']
+      - args: ['make', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
